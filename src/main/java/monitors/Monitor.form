@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="monitors.Monitor">
+  <grid id="27dc6" binding="panel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties>
+      <background color="-16777216"/>
+      <doubleBuffered value="true"/>
+      <foreground color="-16777216"/>
+      <minimumSize width="300" height="300"/>
+      <opaque value="true"/>
+      <preferredSize width="480" height="300"/>
+    </properties>
+    <border type="empty">
+      <size top="5" left="5" bottom="5" right="5"/>
+    </border>
+    <children>
+      <scrollpane id="b681c" binding="scroll">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <autoscrolls value="true"/>
+          <background color="-16777216"/>
+          <foreground color="-16777216"/>
+          <name value="scroll"/>
+          <opaque value="false"/>
+          <verticalScrollBarPolicy value="21"/>
+          <visible value="true"/>
+        </properties>
+        <border type="empty">
+          <size top="5" left="5" bottom="5" right="5"/>
+        </border>
+        <children>
+          <component id="7d646" class="javax.swing.JTextArea" binding="jTextArea" default-binding="true">
+            <constraints/>
+            <properties>
+              <autoscrolls value="false"/>
+              <background color="-15989242"/>
+              <caretColor color="-27392"/>
+              <editable value="false"/>
+              <enabled value="true"/>
+              <focusable value="false"/>
+              <font name="Helvetica" size="18" style="1"/>
+              <foreground color="-27136"/>
+              <inheritsPopupMenu value="false"/>
+              <lineWrap value="true"/>
+              <opaque value="true"/>
+              <requestFocusEnabled value="true"/>
+              <selectedTextColor color="-15989242"/>
+              <verifyInputWhenFocusTarget value="true"/>
+              <wrapStyleWord value="true"/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
+      <grid id="3b2d4" binding="label" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="false"/>
+          <foreground color="-16777216"/>
+          <opaque value="false"/>
+        </properties>
+        <border type="none">
+          <color color="-2328320"/>
+        </border>
+        <children>
+          <component id="d1a0b" class="javax.swing.JLabel" binding="mainLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                <preferred-size width="0" height="13"/>
+              </grid>
+            </constraints>
+            <properties>
+              <alignmentX value="0.5"/>
+              <autoscrolls value="false"/>
+              <enabled value="true"/>
+              <font name="Helvetica" size="18" style="1"/>
+              <foreground color="-6813696"/>
+              <horizontalAlignment value="0"/>
+              <opaque value="false"/>
+              <text value=""/>
+              <visible value="true"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+  <inspectionSuppressions>
+    <suppress inspection="NoLabelFor" id="7d646"/>
+  </inspectionSuppressions>
+</form>

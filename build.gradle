@@ -1,0 +1,179 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id "io.freefair.lombok" version "3.4.0"
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'http://www.dcm4che.org/maven2/' }
+    maven { url 'https://repository.mulesoft.org/nexus/content/repositories/public/' }
+}
+
+dependencies {
+    compile group: 'com.box', name: 'box-java-sdk', version: '2.25.0'
+    compile 'com.eclipsesource.minimal-json:minimal-json:0.9.1'
+    compile 'org.bitbucket.b_c:jose4j:0.4.4'
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.52'
+    compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.52'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile group: 'commons-net', name: 'commons-net', version: '3.6'
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+
+    compile 'com.google.apis:google-api-services-blogger:v3-rev62-1.25.0'
+    compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+    compile group: 'com.google.api-client', name: 'google-api-client', version: '1.25.0'
+    compile group: 'net.dean.jraw', name: 'JRAW', version: '1.1.0'
+
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+
+    compile group: 'com.github.goxr3plus', name: 'jaudiotagger', version: 'V2.2.6'
+    compile group: 'com.mpatric', name: 'mp3agic', version: '0.9.1'
+    compile group: 'org.jcodec', name: 'jcodec', version: '0.2.3'
+    compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+    compile group: 'xuggle', name: 'xuggle-xuggler', version: '5.4'
+
+    compile 'com.intellij:forms_rt:7.0.3'
+
+    compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.10.2'
+
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.24'
+
+
+//    compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
+
+}
+
+class MyShadow extends ShadowJar {
+    MyShadow() {
+        destinationDir = new File(System.getProperty("user.home") + File.separatorChar + "Documents")
+        classifier = null
+//        minimize()
+        from(project.convention.getPlugin(JavaPluginConvention).sourceSets.main.output)
+        configurations = [project.configurations.runtime]
+        exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+    }
+}
+
+def getVersion(String name) {
+    def versionPropsFile = file('version.properties')
+    if (versionPropsFile.canRead()) {
+        Properties versionProps = new Properties()
+        def stream = new FileInputStream(versionPropsFile)
+        versionProps.load(stream)
+        stream.close()
+        //get the version
+        version = versionProps[name] == null ? '0' : versionProps[name]
+        return version
+    }
+}
+
+def updateVersion(String storedVer, String name) {
+    def versionPropsFile = file('version.properties')
+    Properties versionProps = new Properties()
+    def stream = new FileInputStream(versionPropsFile)
+    versionProps.load(stream)
+    stream.close()
+    version = storedVer.toInteger() + 1
+    //write new version to file
+    versionProps[name] = version.toString()
+    def writer = versionPropsFile.newWriter()
+    versionProps.store(writer, null)
+    writer.close()
+}
+
+def newRelease(String packagePath, String name, String ver) {
+    return tasks.create(name, MyShadow) {
+        manifest.attributes 'Main-Class': packagePath + name
+        baseName = name
+        String storedVer = getVersion(name)
+        version = ver + storedVer
+        if (name != "Poster_Monitor") {
+            dependencies {
+                exclude(dependency(group: 'xuggle', name: 'xuggle-xuggler', version: '5.4'))
+            }
+        }
+        doLast {
+            updateVersion(storedVer, name)
+        }
+    }
+}
+
+// VISUALIZATION
+task SpaceMonitor {
+    dependsOn newRelease('monitors.disk_monitor.', 'DM', '1.0.')
+}
+task SizeData {
+    dependsOn newRelease('monitors.', 'DataSize', '1.0.')
+}
+task DataVisual {
+    dependsOn newRelease('monitors.', 'DataVisualisation', '1.0.')
+}
+// TESTING
+task MongoDB {
+    dependsOn newRelease('monitors.', 'MongoMonitor', '0.0.')
+}
+task FTPTest {
+    dependsOn newRelease('ftp.', 'FtpTest', '0.0.')
+}
+task TestFtpScene {
+    dependsOn newRelease('ftp.scene.', 'SceneFtpTest', '0.0.')
+}
+// AUTOMATION
+task ManualRP {
+    dependsOn newRelease('scraper.manual.', 'Manual_RP', '1.0.')
+}
+task Uploader {
+    dependsOn newRelease('monitors.', 'Uploader_Monitor', '3.1.')
+}
+task Poster {
+    dependsOn newRelease('monitors.', 'Poster_Monitor', '3.6.')
+}
+task Reposter {
+    dependsOn newRelease('monitors.', 'Reposter_Monitor', '3.3.')
+}
+task Tagger {
+    dependsOn newRelease('monitors.', 'Tagger_Monitor', '3.3.')
+}
+task SceneFTP {
+    dependsOn newRelease('monitors.', 'SCENE_FTP_Monitor', '1.0.')
+}
+task FtpAndSchedule {
+    dependsOn newRelease('monitors.', 'FTP_Monitor', '2.0.')
+}
+task ManualDMPScraper {
+    //OLD
+    dependsOn newRelease('monitors.', 'Manual_DMP_Scraper_Monitor', '2.0.')
+}
+task AutoDMPScraper {
+    dependsOn newRelease('monitors.', 'Auto_DMP_Scraper_Monitor', '1.1.')
+}
+task EwScraper{
+    dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '1.1.')
+}
+task BuildAll {
+//    dependsOn newRelease('monitors.', 'Beat_FTP_Monitor', '3.1.')
+//    dependsOn newRelease('monitors.', 'Scene_MP3_Monitor', '3.1.')
+//    dependsOn newRelease('monitors.', 'Scene_FLAC_Monitor', '3.1.')
+//
+    dependsOn Tagger
+//    dependsOn Uploader
+
+//    dependsOn Poster
+//    dependsOn Reposter
+
+//    dependsOn ManualDMPScraper
+    dependsOn AutoDMPScraper
+
+    dependsOn FtpAndSchedule
+}

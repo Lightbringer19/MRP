@@ -1,0 +1,1 @@
+Reposter case when no artist in DB, no title of track and no artist of track

@@ -1,0 +1,203 @@
+body:not(.search-results) article:not(.type-page) .entry-footer {
+    float: left;
+    width: 100%;
+    /*margin: null;*/
+    background: rgba(0, 0, 0, 0.05);
+    max-width: 740px;
+}
+
+.release-title {
+    padding: 10px 20px;
+    color: #5a2020;
+    background-color: #f0d9d9;
+    max-width: 740px;
+    margin: 20px -20px 20px 1px;
+    font-weight: bolder;
+    font-size: medium;
+}
+
+.entry-content h2,
+.entry-summary h2,
+.comment-content h2 {
+    font-size: 18px;
+}
+
+.single .byline,
+.full-size-link,
+body:not(.search-results).group-blog .byline,
+body:not(.search-results) .entry-format,
+body:not(.search-results) .cat-links,
+body:not(.search-results) .tags-links,
+body:not(.search-results) article:not(.sticky) .posted-on,
+body:not(.search-results) article:not(.type-page) .comments-link,
+body:not(.search-results) article:not(.type-page) .entry-footer .edit-link {
+    display: inline;
+    margin-bottom: 0.5384615385em;
+}
+
+.entry-footer > span {
+    margin: 0 10px 0px 0;
+}
+
+.entry-footer {
+    margin-top: 0;
+}
+
+body:not(.search-results) article:not(.type-page) .entry-content {
+    float: left;
+    width: 71.42857144%;
+}
+
+.entry-title {
+    font-size: 19px;
+    margin-bottom: 0px;
+}
+
+.artwork {
+    overflow: hidden;
+    float: left;
+    width: 300px;
+    height: 300px;
+    margin: 0 20px 0 0;
+}
+
+.info {
+    width: 100%;
+    font-size: 13px;
+}
+
+.info > table {
+    max-width: 420px;
+    width: 100%;
+    font-size: 13px;
+}
+
+.info > table td {
+    padding: 3px 0 3px 20px;
+    line-height: 20px;
+}
+
+.site-main {
+    float: left;
+    max-width: 780px;
+    width: 100%;
+}
+
+.site {
+    margin: 0;
+}
+
+body:not(.search-results) article:not(.type-page) .entry-content {
+    float: left;
+    max-width: 780px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+table {
+    table-layout: auto;
+}
+
+.info tr:first-child {
+    border: none;
+}
+
+table,
+th,
+td {
+    border: none;
+}
+
+.info tr:nth-child(2n) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.info tr {
+    border-top: 1px solid #ccc;
+}
+
+.content-area {
+    float: left;
+    margin-right: -100%;
+    width: 100%;
+    max-width: 780px;
+}
+
+.widget {
+    border-top: 0;
+    margin-bottom: 0;
+}
+
+.tracklist {
+    max-width: 740px;
+}
+
+.tracklist thead {
+
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #ccc;
+
+}
+
+.tracklist tbody tr {
+
+    border-bottom: 1px solid #ccc;
+
+}
+
+.tracklist tr:nth-child(2n) {
+
+    background-color: rgba(0, 0, 0, 0.05);
+
+}
+
+.download {
+    max-width: 740px;
+    padding: 20px 0;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.05) url(../images/stripes-light.png) 0 0 repeat;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+}
+
+.download a {
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background-color: #c02b2b;
+    border: 1px solid #ba3333;
+}
+
+li:nth-child(2n) {
+    background-color: #f1f1f1;
+}
+
+a {
+    color: #a40e0e;
+}
+
+.site-header {
+    padding: 30px 4.5455%;
+}
+
+.site-branding .site-title a {
+    color: #ab2525;
+}
+
+.site-description {
+    padding-top: 3px;
+}
+
+ul,
+ol {
+    list-style: none;
+    margin: 0;
+}
+
+.site-main > article {
+    margin-bottom: 25px;
+}
