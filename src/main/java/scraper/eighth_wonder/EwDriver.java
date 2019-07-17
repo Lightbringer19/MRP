@@ -38,40 +38,49 @@ class EwDriver {
         PASS = yamlConfig.config.getEw_password();
     }
 
-    public static void main(String[] args) throws ParseException, InterruptedException {
-        EwDriver ewDriver = new EwDriver();
-        ewDriver.ewCheck();
-    }
+    // public static void main(String[] args) throws ParseException, InterruptedException {
+    //     EwDriver ewDriver = new EwDriver();
+    //     ewDriver.ewCheck();
+    // }
 
-    void ewCheck() throws InterruptedException, ParseException {
+    void ewCheck() {
         driver = new FirefoxDriver(new FirefoxOptions().setHeadless(true));
-        // driver = new FirefoxDriver();
         Login();
-        driver.get("https://pool.8thwonderpromos.com/");
-        // SCRAPE PAGES TO DB
-        Thread.sleep(10000);
-        String html = driver.getPageSource();
-        String dateOnFirstPage = ewScraper.scrapeDate(html);
-        boolean newReleaseOnEW = mongoControl.ewDownloaded
-                .find(eq("releaseDate", dateOnFirstPage)).first() == null;
-        // // if newest scraped date not found in DB
-        if (newReleaseOnEW) {
-            //  GET COOKIES
-            cookieForAPI = driver.manage().getCookies().stream()
-                    .map(cookie -> cookie.getName() + "=" + cookie.getValue())
-                    .collect(Collectors.joining("; "));
-            // INSERT DATE TO DB
-            mongoControl.ewDownloaded.insertOne(new Document("releaseDate", dateOnFirstPage));
-            ewLogger.log("New Release Spotted");
-            // -> iterate over pages util the next date
-            String dateToDownload = getDownloadDate(html, dateOnFirstPage);
-            scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, "");
-            // SCRAPE VIDEOS AND DOWNLOAD
-            driver.findElement(By.linkText("Video")).click();
-            scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, "Videos ");
-            driver.quit();
-        } else {
-            driver.quit();
+        while (true) {
+            try {
+                driver.get("https://pool.8thwonderpromos.com/");
+                // SCRAPE PAGES TO DB
+                Thread.sleep(10000);
+                String html = driver.getPageSource();
+                String dateOnFirstPage = ewScraper.scrapeDate(html);
+                boolean newReleaseOnEW = mongoControl.ewDownloaded
+                        .find(eq("releaseDate", dateOnFirstPage)).first() == null;
+                // // if newest scraped date not found in DB
+                if (newReleaseOnEW) {
+                    //  GET COOKIES
+                    cookieForAPI = driver.manage().getCookies().stream()
+                            .map(cookie -> cookie.getName() + "=" + cookie.getValue())
+                            .collect(Collectors.joining("; "));
+                    ewLogger.log("New Release Spotted");
+                    // -> iterate over pages util the next date
+                    String dateToDownload = getDownloadDate(html, dateOnFirstPage);
+                    ewLogger.log("Downloading Music Release");
+                    scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, "");
+                    // SCRAPE VIDEOS AND DOWNLOAD
+                    driver.findElement(By.linkText("Video")).click();
+                    ewLogger.log("Looking for Video Release");
+                    scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, "Videos ");
+                    // INSERT DATE TO DB
+                    mongoControl.ewDownloaded.insertOne(
+                            new Document("releaseDate", dateOnFirstPage));
+                    driver.quit();
+                } else {
+                    driver.quit();
+                }
+                break;
+            } catch (InterruptedException | ParseException | NullPointerException e) {
+                ewLogger.log(e);
+            }
         }
     }
 
@@ -139,7 +148,7 @@ class EwDriver {
         } else {
             pagination_arw.get(0).click();
         }
-        Thread.sleep(1000);
+        Thread.sleep(4000);
     }
 
     void quitDriver() {

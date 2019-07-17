@@ -7,7 +7,7 @@ import java.util.TimerTask;
 
 public class FtpAndScheduleController extends Thread {
 
-    private FTPManager ftpManager = new FTPManager();
+    private RpAndBeatFTPManager rpAndBeatFtpManager = new RpAndBeatFTPManager();
     private ScheduleWatcher scheduleWatcher = new ScheduleWatcher();
 
     @Override
@@ -17,14 +17,14 @@ public class FtpAndScheduleController extends Thread {
             @Override
             @SneakyThrows
             public void run() {
-                ftpManager.checkFtp("RECORDPOOL");
+                rpAndBeatFtpManager.checkFtp("RECORDPOOL");
             }
         };
         TimerTask ftpCheckBeat = new TimerTask() {
             @Override
             @SneakyThrows
             public void run() {
-                ftpManager.checkFtp("BEATPORT");
+                rpAndBeatFtpManager.checkFtp("BEATPORT");
             }
         };
         TimerTask scheduleDownloaded = new TimerTask() {

@@ -30,7 +30,6 @@ class EwScraper {
                 ewLogger.log("Adding Track to Download List: "
                         + title + " | " + releaseDate);
                 scrapedLinks.add(downloadUrl);
-                // mongoControl.ewTracks.insertOne(ewTrackInfo.toDoc());
             }
         }
         return scrapedLinks;

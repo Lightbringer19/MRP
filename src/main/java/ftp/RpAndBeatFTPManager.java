@@ -17,7 +17,7 @@ import java.util.Locale;
 import static com.mongodb.client.model.Filters.eq;
 import static utils.FUtils.writeToFile;
 
-public class FTPManager {
+public class RpAndBeatFTPManager {
 
     private static String SERVER_RP;
     private static String USERNAME_RP;
@@ -58,7 +58,7 @@ public class FTPManager {
     private MongoControl mongoControl = new MongoControl();
     private FTPClient ftpClient = new FTPClient();
 
-    FTPManager() {
+    RpAndBeatFTPManager() {
         YamlConfig yamlConfig = new YamlConfig();
         SERVER_RP = yamlConfig.config.getRp_host();
         USERNAME_RP = yamlConfig.config.getRp_username();
