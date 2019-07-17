@@ -46,5 +46,7 @@ public class YamlConfig {
         private String dmp_password;
         private String ew_username;
         private String ew_password;
+        private String mp3_pool_username;
+        private String mp3_pool_password;
     }
 }
