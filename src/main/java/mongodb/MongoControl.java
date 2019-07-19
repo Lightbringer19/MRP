@@ -18,8 +18,8 @@ public class MongoControl {
     public final MongoCollection<Document> rpDownloadedCollection;
     public final MongoCollection<Document> toDownloadCollection;
     public final MongoCollection<Document> scrapedDMP;
-    public final MongoCollection<Document> ewTracks;
     public final MongoCollection<Document> ewDownloaded;
+    public final MongoCollection<Document> mp3PoolDownloaded;
 
     public MongoControl() {
         mongoClient = new MongoClient("localhost", 27017);
@@ -36,8 +36,8 @@ public class MongoControl {
         rpDownloadedCollection = ftpDB.getCollection("rp_downloaded");
         toDownloadCollection = ftpDB.getCollection("rp_toDownload");
 
-        ewTracks = ftpDB.getCollection("ew_Tracks");
         ewDownloaded = ftpDB.getCollection("ew_downloaded");
+        mp3PoolDownloaded = ftpDB.getCollection("mp3_pool_downloaded");
     }
 
 }
