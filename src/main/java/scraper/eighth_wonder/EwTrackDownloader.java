@@ -57,7 +57,7 @@ class EwTrackDownloader {
         File mp3File = new File(releaseFolderPath + fileName);
         ewLogger.log("Downloading file: " + fileName
                 + " | " + response.getStatusLine());
-        OutputStream outputStream = new FileOutputStream(mp3File);
+        @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
         response.getEntity().writeTo(outputStream);
         ewLogger.log("Downloaded: " + fileName);
     }
