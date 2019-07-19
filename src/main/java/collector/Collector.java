@@ -39,6 +39,13 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.xuggle.xuggler.IContainer.Type.READ;
 
 public class Collector {
+    // public static void main(String[] args) {
+    //     String pathname = "Z:\\8th Wonder Pool Videos 1907";
+    //     File file = new File(pathname);
+    //     File[] files = file.listFiles();
+    //     InfoForPost collect = collect(files, "ReleaseName", "link", "artlink", new File(""), "RECORDPOOL VIDEOS");
+    //     System.out.println(collect.toString());
+    // }
 
     public static InfoForPost Collect(File infoJsonFile, MongoControl mongoControl) {
 
@@ -183,7 +190,7 @@ public class Collector {
                     try {
                         MetadataEditor mediaMeta = MetadataEditor.createFrom(video_file);
                         itunesMeta = mediaMeta.getItunesMeta();
-                    } catch (AssertionError | IllegalArgumentException e1) {
+                    } catch (AssertionError | IllegalArgumentException | NullPointerException e1) {
                         Log.write("Exception in Collector: " + e1, "Poster");
                     }
                     String title;
