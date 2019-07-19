@@ -15,70 +15,78 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class SceneFTPManager {
+class SceneFTPManager {
     private static String SERVER_SCENE;
     private static String USERNAME_SCENE;
     private static String PASSWORD_SCENE;
     private static final int PORT_SCENE = 35695;
 
-    private static FTPSClient ftpClient;
+    private static FTPSClient ftpClient = new FTPSClient();
     private static MongoControl mongoControl = new MongoControl();
     private static String category;
 
-    public SceneFTPManager() {
+    SceneFTPManager() {
         YamlConfig yamlConfig = new YamlConfig();
         SERVER_SCENE = yamlConfig.config.getScene_host();
         USERNAME_SCENE = yamlConfig.config.getScene_username();
         PASSWORD_SCENE = yamlConfig.config.getScene_password();
     }
 
-    public void checkFtp(String categoryToDownload) throws IOException {
+    @SuppressWarnings("Duplicates")
+    void checkFtp(String categoryToDownload) throws IOException {
         category = categoryToDownload;
         Log.write("Checking FTP for New Releases: " + category, "SCENE_FTP");
-        ftpClient = new FTPSClient();
-        ftpClient.connect(SERVER_SCENE, PORT_SCENE);
-        ftpClient.login(USERNAME_SCENE, PASSWORD_SCENE);
-        Log();
-        ftpClient.enterLocalPassiveMode();
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+        try {
+            ftpClient.connect(SERVER_SCENE, PORT_SCENE);
+            ftpClient.login(USERNAME_SCENE, PASSWORD_SCENE);
+            Log();
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-        String ftpCategory = category.replace("SCENE-", "");
-        String pathname = "/ENGLISH/" + ftpCategory + "/";
+            String ftpCategory = category.replace("SCENE-", "");
+            String pathname = "/ENGLISH/" + ftpCategory + "/";
 
-        FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
-        // 0707 - Example
-        for (FTPFile dayFolder : dayFtpFolders) {
-            String name = dayFolder.getName();
-            long time = dayFolder.getTimestamp().getTimeInMillis();
-            //DB
-            String dayReleasesPath = pathname + name;
-            Document dayDoc = mongoControl.dayFolderTimeCollection
-                    .find(eq("folderPath", dayReleasesPath)).first();
-            if (dayDoc == null) {
-                //insert new DOC
-                mongoControl.dayFolderTimeCollection
-                        .insertOne(new Document("folderPath", dayReleasesPath)
-                                .append("timeStamp", time));
-                // DOWNLOAD
-                downloadNewReleases(dayReleasesPath);
-            } else {
-                //check time: if time changed -> download
-                long timeStamp = (long) dayDoc.get("timeStamp");
-                if (time > timeStamp) {
+            FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
+            // 0707 - Example
+            for (FTPFile dayFolder : dayFtpFolders) {
+                String name = dayFolder.getName();
+                long time = dayFolder.getTimestamp().getTimeInMillis();
+                //DB
+                String dayReleasesPath = pathname + name;
+                Document dayDoc = mongoControl.dayFolderTimeCollection
+                        .find(eq("folderPath", dayReleasesPath)).first();
+                if (dayDoc == null) {
+                    //insert new DOC
+                    mongoControl.dayFolderTimeCollection
+                            .insertOne(new Document("folderPath", dayReleasesPath)
+                                    .append("timeStamp", time));
+                    // DOWNLOAD
                     downloadNewReleases(dayReleasesPath);
+                } else {
+                    //check time: if time changed -> download
+                    long timeStamp = (long) dayDoc.get("timeStamp");
+                    if (time > timeStamp) {
+                        downloadNewReleases(dayReleasesPath);
+                    }
+                    //update DB
+                    dayDoc.put("timeStamp", time);
+                    mongoControl.dayFolderTimeCollection
+                            .replaceOne(eq("_id",
+                                    dayDoc.getObjectId("_id")), dayDoc);
                 }
-                //update DB
-                dayDoc.put("timeStamp", time);
-                mongoControl.dayFolderTimeCollection
-                        .replaceOne(eq("_id", dayDoc.getObjectId("_id")), dayDoc);
             }
+        } catch (Exception e) {
+            Log.write(e, "SCENE_FTP");
+        } finally {
+            ftpClient.logout();
+            Log();
+            ftpClient.disconnect();
         }
-        ftpClient.logout();
-        Log();
-        ftpClient.disconnect();
     }
 
     private void downloadNewReleases(String dayReleasesPath) throws IOException {
@@ -119,6 +127,13 @@ public class SceneFTPManager {
                     "SCENE_FTP");
             mongoControl.rpDownloadedCollection
                     .insertOne(new Document("releaseName", releaseName));
+            // DELETE -missing files
+            Arrays.stream(Objects.requireNonNull(new File(releaseLocalPath).listFiles()))
+                    .forEach(file -> {
+                        if (file.getName().contains("-missing")) {
+                            file.delete();
+                        }
+                    });
             // ADD TO UPLOAD QUEUE
             FUtils.writeFile(Constants.uploadDir, releaseName + ".json",
                     releaseLocalPath);

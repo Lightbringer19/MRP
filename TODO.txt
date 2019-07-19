@@ -1,1 +1,2 @@
-Reposter case when no artist in DB, no title of track and no artist of track
+Bypass 400 error code with reposter
+Add more logs to 8W

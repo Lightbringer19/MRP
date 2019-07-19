@@ -68,9 +68,11 @@ public class RpAndBeatFTPManager {
         PASSWORD_BEATPORT = yamlConfig.config.getBeat_password();
     }
 
+    @SuppressWarnings("Duplicates")
     void checkFtp(String categoryName) throws IOException {
         CATEGORY_NAME = categoryName;
-        Log.write("Checking FTP for New Releases: " + CATEGORY_NAME, "FTP&SCHEDULER");
+        Log.write("Checking FTP for New Releases: " + CATEGORY_NAME,
+                "FTP&SCHEDULER");
         String pathname;
         if (categoryName.equals("BEATPORT")) {
             SERVER = SERVER_BEATPORT;
@@ -88,41 +90,49 @@ public class RpAndBeatFTPManager {
             pathname = "/AUDIO/DATES/2019/" + month + "/";
         }
 
-        ftpClient.connect(SERVER, PORT);
-        ftpClient.login(USERNAME, PASSWORD);
-        Log();
-        ftpClient.enterLocalPassiveMode();
+        try {
+            ftpClient.connect(SERVER, PORT);
+            ftpClient.login(USERNAME, PASSWORD);
+            Log();
+            ftpClient.enterLocalPassiveMode();
 
-        FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
-        for (FTPFile ftpFile : dayFtpFolders) {
-            String name = ftpFile.getName();
-            if (!name.equals("_ALL_TRACKS__(ONLY_WORKS_WITH_FTP_CLIENT)")) {
-                long time = ftpFile.getTimestamp().getTimeInMillis();
-                //DB
-                String dayReleasesPath = pathname + name;
-                Document dayDoc = mongoControl.dayFolderTimeCollection
-                        .find(eq("folderPath", dayReleasesPath)).first();
-                if (dayDoc == null) {
-                    //insert new DOC
-                    mongoControl.dayFolderTimeCollection
-                            .insertOne(new Document("folderPath", dayReleasesPath)
-                                    .append("timeStamp", time));
-                    // DOWNLOAD
-                    downloadNewReleases(dayReleasesPath);
-                } else {
-                    //check time: if time changed -> download
-                    long timeStamp = (long) dayDoc.get("timeStamp");
-                    if (time > timeStamp) {
+            FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
+            for (FTPFile ftpFile : dayFtpFolders) {
+                String name = ftpFile.getName();
+                if (!name.equals("_ALL_TRACKS__(ONLY_WORKS_WITH_FTP_CLIENT)")) {
+                    long time = ftpFile.getTimestamp().getTimeInMillis();
+                    //DB
+                    String dayReleasesPath = pathname + name;
+                    Document dayDoc = mongoControl.dayFolderTimeCollection
+                            .find(eq("folderPath", dayReleasesPath)).first();
+                    if (dayDoc == null) {
+                        //insert new DOC
+                        mongoControl.dayFolderTimeCollection
+                                .insertOne(new Document("folderPath", dayReleasesPath)
+                                        .append("timeStamp", time));
+                        // DOWNLOAD
                         downloadNewReleases(dayReleasesPath);
+                    } else {
+                        //check time: if time changed -> download
+                        long timeStamp = (long) dayDoc.get("timeStamp");
+                        if (time > timeStamp) {
+                            downloadNewReleases(dayReleasesPath);
+                        }
+                        //update
+                        dayDoc.put("timeStamp", time);
+                        mongoControl.dayFolderTimeCollection
+                                .replaceOne(eq("_id",
+                                        dayDoc.getObjectId("_id")), dayDoc);
                     }
-                    //update
-                    dayDoc.put("timeStamp", time);
-                    mongoControl.dayFolderTimeCollection
-                            .replaceOne(eq("_id", dayDoc.getObjectId("_id")), dayDoc);
                 }
             }
+        } catch (Exception e) {
+            Log.write(e, "FTP&SCHEDULER");
+        } finally {
+            ftpClient.logout();
+            Log();
+            ftpClient.disconnect();
         }
-        ftpClient.disconnect();
     }
 
     private void downloadNewReleases(String dayReleasesPath) throws IOException {

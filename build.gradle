@@ -151,29 +151,21 @@ task SceneFTP {
 task FtpAndSchedule {
     dependsOn newRelease('monitors.', 'FTP_Monitor', '2.0.')
 }
-task ManualDMPScraper {
-    //OLD
-    dependsOn newRelease('monitors.', 'Manual_DMP_Scraper_Monitor', '2.0.')
-}
 task AutoDMPScraper {
     dependsOn newRelease('monitors.', 'Auto_DMP_Scraper_Monitor', '1.1.')
 }
-task EwScraper{
+task EwScraper {
     dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '1.1.')
 }
 task BuildAll {
-//    dependsOn newRelease('monitors.', 'Beat_FTP_Monitor', '3.1.')
-//    dependsOn newRelease('monitors.', 'Scene_MP3_Monitor', '3.1.')
-//    dependsOn newRelease('monitors.', 'Scene_FLAC_Monitor', '3.1.')
-//
-    dependsOn Tagger
+//    dependsOn Tagger
 //    dependsOn Uploader
 
 //    dependsOn Poster
 //    dependsOn Reposter
 
-//    dependsOn ManualDMPScraper
-    dependsOn AutoDMPScraper
+//    dependsOn AutoDMPScraper
 
     dependsOn FtpAndSchedule
+    dependsOn SceneFTP
 }
