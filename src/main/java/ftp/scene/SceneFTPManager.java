@@ -11,10 +11,7 @@ import utils.Constants;
 import utils.FUtils;
 import utils.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -142,15 +139,16 @@ class SceneFTPManager {
 
     private void downloadFile(String releaseRemotePath, String releaseLocalPath,
                               FTPFile releaseFile) throws IOException {
-        OutputStream output = new FileOutputStream(
-                releaseLocalPath + "/" + releaseFile.getName());
-        //get the file from the remote system
-        ftpClient.retrieveFile(releaseRemotePath
-                + releaseFile.getName(), output);
-        Log();
-        //close output stream
-        output.close();
-        Log.write("File Downloaded: " + releaseFile.getName(), "SCENE_FTP");
+        try (OutputStream output = new FileOutputStream(
+                releaseLocalPath + "/" + releaseFile.getName())) {
+            ftpClient.retrieveFile(releaseRemotePath
+                    + releaseFile.getName(), output);
+            Log();
+            Log.write("File Downloaded: " + releaseFile.getName(),
+                    "SCENE_FTP");
+        } catch (FileNotFoundException e) {
+            Log.write(e, "SCENE_FTP");
+        }
 
     }
 
