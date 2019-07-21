@@ -27,7 +27,9 @@ class Mp3PoolScraper {
         return releases.stream()
                 .map(release -> release.select("p").first().text()
                         .replace("Added On: ", ""))
-                .filter(releaseDate -> !releaseDate.equals(date)).findFirst().orElse(null);
+                .filter(releaseDate -> !releaseDate.equals(date))
+                .findFirst()
+                .orElse(null);
     }
 
     List<String> scrapeAllLinksOnPage(String html, String date, List<String> scrapedLinks) {

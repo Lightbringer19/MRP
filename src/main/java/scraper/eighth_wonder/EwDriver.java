@@ -44,10 +44,10 @@ class EwDriver {
     // }
 
     void ewCheck() {
-        driver = new FirefoxDriver(new FirefoxOptions().setHeadless(true));
-        Login();
         while (true) {
             try {
+                driver = new FirefoxDriver(new FirefoxOptions().setHeadless(true));
+                Login();
                 driver.get("https://pool.8thwonderpromos.com/");
                 // SCRAPE PAGES TO DB
                 Thread.sleep(10000);
@@ -73,14 +73,14 @@ class EwDriver {
                     // INSERT DATE TO DB
                     mongoControl.ewDownloaded.insertOne(
                             new Document("releaseDate", dateOnFirstPage));
-                    driver.quit();
-                } else {
-                    driver.quit();
                 }
                 break;
             } catch (InterruptedException | ParseException | NullPointerException e) {
                 ewLogger.log(e);
+            } finally {
+                driver.quit();
             }
+
         }
     }
 

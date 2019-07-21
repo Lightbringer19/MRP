@@ -30,7 +30,7 @@ class EwTrackDownloader {
         String releaseFolderPath =
                 "Z://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
                         "/RECORDPOOL/" + "8th Wonder Pool " + category +
-                        getDateForEwDownload(dateToDownload) + "/";
+                        getDateForDownload(dateToDownload) + "/";
         new File(releaseFolderPath).mkdirs();
         CustomExecutor downloadMaster = new CustomExecutor(10);
         scrapedLinks.stream()
@@ -62,7 +62,7 @@ class EwTrackDownloader {
         ewLogger.log("Downloaded: " + fileName);
     }
 
-    private static String getDateForEwDownload(String date) throws java.text.ParseException {
+    private static String getDateForDownload(String date) throws java.text.ParseException {
         SimpleDateFormat DATE_FORMAT =
                 new SimpleDateFormat("MM.dd.yy", Locale.US);
         Calendar cal = Calendar.getInstance();

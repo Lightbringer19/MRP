@@ -53,8 +53,7 @@ public class DmpApiService {
         static String getDownloadKey(String response2, String trackID) {
             int index1 = response2.indexOf("\"", response2.indexOf(trackID));
             int index2 = response2.indexOf("\"", index1 + 2);
-            String DownloadKey = response2.substring(index1 + 1, index2);
-            return DownloadKey;
+            return response2.substring(index1 + 1, index2);
         }
 
         static Request getRequestInfo(String response, String scraped) {
@@ -66,7 +65,8 @@ public class DmpApiService {
 
                 int lastIndexOfToken = response.lastIndexOf("value=\"");
                 int latsToken = response.indexOf("\"", lastIndexOfToken + 8);
-                String __RequestVerificationToken = response.substring(lastIndexOfToken + 7, latsToken);
+                String __RequestVerificationToken =
+                        response.substring(lastIndexOfToken + 7, latsToken);
 
                 String TrackID = scraped.substring(scraped.lastIndexOf("/") + 1);
                 String TrackTypeID = "originals";
