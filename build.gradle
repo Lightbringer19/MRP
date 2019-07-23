@@ -157,6 +157,9 @@ task AutoDMPScraper {
 task EwScraper {
     dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '1.1.')
 }
+task Mp3PoolScraper {
+    dependsOn newRelease('monitors.', 'Mp3Pool_Scraper_Monitor', '1.0.')
+}
 task BuildAll {
 //    dependsOn Tagger
 //    dependsOn Uploader

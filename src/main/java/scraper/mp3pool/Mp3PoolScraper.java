@@ -50,7 +50,7 @@ class Mp3PoolScraper {
                     links.stream()
                             .map(link -> link.attr("href"))
                             .filter(downloadUrl -> downloadUrl.contains("download/"))
-                            .map(downloadUrl -> downloadUrl.replace("/sub2", ""))
+                            // .map(downloadUrl -> downloadUrl.replace("/sub2", ""))
                             .forEach(scrapedLinks::add);
                 });
             }

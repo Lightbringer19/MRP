@@ -18,7 +18,7 @@ public class CustomExecutor {
     public void WaitUntilTheEnd() {
         executor.shutdown();
         try {
-            if (!executor.awaitTermination(600, TimeUnit.SECONDS)) {
+            if (!executor.awaitTermination(3 * 600, TimeUnit.SECONDS)) {
                 executor.shutdownNow();
             }
         } catch (InterruptedException ex) {

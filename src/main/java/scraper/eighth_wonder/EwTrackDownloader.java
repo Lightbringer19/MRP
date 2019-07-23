@@ -24,6 +24,7 @@ import static scraper.eighth_wonder.EwDriver.ewLogger;
 
 class EwTrackDownloader {
 
+    @SuppressWarnings("Duplicates")
     static void downloadLinks(List<String> scrapedLinks, String dateToDownload, String category)
             throws ParseException {
         ewLogger.log("Downloading release from date: " + dateToDownload);
