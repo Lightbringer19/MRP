@@ -17,7 +17,7 @@ import java.util.Locale;
 import static com.mongodb.client.model.Filters.eq;
 import static utils.FUtils.writeToFile;
 
-public class RpAndBeatFTPManager {
+class RpAndBeatFTPManager {
 
     private static String SERVER_RP;
     private static String USERNAME_RP;
@@ -52,7 +52,18 @@ public class RpAndBeatFTPManager {
             "MyMp3Pool",
             "HMC",
             "DMP",
-            "ONLY_WORKS_WITH_FTP_CLIENT"
+            "ONLY_WORKS_WITH_FTP_CLIENT",
+            "Ecuaremixes.com",
+            "Latinremixes.com",
+            "Pro Latin Remix",
+            "Europa Remix",
+            "Extreme Pro Remix",
+            "IntesaMusic.net",
+            "DVJ 3B",
+            "DVJ Marcos Cabrera",
+            "LatinoMusicPool",
+            "LatinoMusicPool.com",
+            "LMP"
     };
 
     private MongoControl mongoControl = new MongoControl();
@@ -142,9 +153,7 @@ public class RpAndBeatFTPManager {
         FTPFile[] releasesInDayFolder = ftpClient.listFiles(dayReleasesPath);
         for (FTPFile releaseFolder : releasesInDayFolder) {
             String releaseName = releaseFolder.getName();
-            String releaseNameCleaned = releaseName
-                    .replace(" [DJC]", "")
-                    .replace("TrackPack", "MyRecordPool Pack");
+            String releaseNameCleaned = cleanReleaseName(releaseName);
             String releasePath = dayReleasesPath + "/" + releaseName;
             //  Skip releases from sheet
             boolean download = toDownload(releaseName, releaseNameCleaned);
@@ -180,6 +189,15 @@ public class RpAndBeatFTPManager {
                                 .append("categoryName", CATEGORY_NAME));
             }
         }
+    }
+
+    private String cleanReleaseName(String releaseName) {
+        return releaseName
+                .replace(" [DJC]", "")
+                .replace("TrackPack", "MyRecordPool Pack")
+                .replace("Dj City", "DJ City")
+                .replace("DMS", "Direct Music Service")
+                .replace("LoMaximo", "LoMaximoProductions");
     }
 
     private boolean toDownload(String releaseName, String releaseNameCleaned) {
