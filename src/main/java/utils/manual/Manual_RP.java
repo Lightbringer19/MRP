@@ -1,4 +1,4 @@
-package scraper.manual;
+package utils.manual;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;

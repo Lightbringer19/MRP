@@ -31,6 +31,7 @@ class Mp3PoolDownloader {
         downloadMaster.WaitUntilTheEnd();
     }
 
+    @SuppressWarnings("Duplicates")
     @SneakyThrows
     private static void downloadFile(String url, String releaseFolderPath) {
         @Cleanup CloseableHttpClient client = HttpClients.createDefault();

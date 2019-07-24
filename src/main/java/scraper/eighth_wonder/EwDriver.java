@@ -1,9 +1,9 @@
 package scraper.eighth_wonder;
 
 import configuration.YamlConfig;
+import lombok.SneakyThrows;
 import mongodb.MongoControl;
 import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -126,9 +126,7 @@ class EwDriver {
         }
     }
 
-    @NotNull
-    private String getDownloadDate(String html, String dateOnFirstPage)
-            throws InterruptedException {
+    private String getDownloadDate(String html, String dateOnFirstPage) {
         while (true) {
             String downloadDate = ewScraper.previousDateOnThisPage(html, dateOnFirstPage);
             boolean dateOnThisPage = downloadDate != null;
@@ -141,7 +139,8 @@ class EwDriver {
         }
     }
 
-    private void nextPage() throws InterruptedException {
+    @SneakyThrows
+    private void nextPage() {
         List<WebElement> pagination_arw = driver.findElements(By.className("pagination_arw"));
         if (pagination_arw.size() > 2) {
             pagination_arw.get(1).click();

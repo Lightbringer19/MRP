@@ -48,19 +48,6 @@ public class DmpScraper {
         }
     }
 
-    public static void manualScrape(String html, String dateToDownload)
-            throws IOException, ParseException, java.text.ParseException {
-        ScrapedDmpPage scrapedDmpPage = scrapePageForDatesAndLinks(html);
-        Collection<String> linksToDownload = scrapedDmpPage
-                .getScraped().get(dateToDownload);
-        // GET URLS VIA API
-        List<String> downloadURLS = getDownloadUrls(linksToDownload);
-        // DOWNLOAD RELEASE
-        mongoControl.scrapedDMP.insertOne(new org.bson.Document("releaseDate", dateToDownload));
-        String dateForDmpDownload = getDateForDmpDownload(dateToDownload);
-        addToDownloadQueue(dateForDmpDownload, downloadURLS);
-    }
-
     private static ScrapedDmpPage scrapePageForDatesAndLinks(String html) {
         Document document = Jsoup.parse(html);
         MultiValuedMap<String, String> scraped = new HashSetValuedHashMap<>();

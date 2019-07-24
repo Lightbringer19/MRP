@@ -48,7 +48,7 @@ public class DmpApiService {
 
     }
 
-    public static class Extractor {
+    static class Extractor {
 
         static String getDownloadKey(String response2, String trackID) {
             int index1 = response2.indexOf("\"", response2.indexOf(trackID));

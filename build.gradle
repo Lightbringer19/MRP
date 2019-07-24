@@ -131,7 +131,7 @@ task TestFtpScene {
 }
 // AUTOMATION
 task ManualRP {
-    dependsOn newRelease('scraper.manual.', 'Manual_RP', '1.0.')
+    dependsOn newRelease('utils.manual.', 'Manual_RP', '1.0.')
 }
 task Uploader {
     dependsOn newRelease('monitors.', 'Uploader_Monitor', '3.1.')

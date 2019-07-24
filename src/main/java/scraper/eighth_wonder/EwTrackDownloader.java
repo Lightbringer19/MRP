@@ -51,6 +51,7 @@ class EwTrackDownloader {
         @Cleanup CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(url);
         get.setHeader("cookie", cookieForAPI);
+        get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
         @Cleanup CloseableHttpResponse response = client.execute(get);
         String fileName = response.getFirstHeader("Content-Disposition").getValue()
                 .replace("attachment; filename=", "")
