@@ -14,10 +14,10 @@ import static scraper.dmp.DmpApiService.Extractor.*;
 import static wordpress.ProxyHttp.getClean;
 import static wordpress.ProxyHttp.postClean;
 
-public class DmpApiService {
-
+class DmpApiService {
+    
     static String getDownloadUrl(String scraped, String cookie)
-            throws IOException, ParseException {
+       throws IOException, ParseException {
         String uri = "https://www.digitalmusicpool.com" + scraped;
         String response = getClean(uri, cookie);
         // Log.write(response, "Scraper");
@@ -45,44 +45,44 @@ public class DmpApiService {
             Log.write("Got Url: " + url, "Scraper");
             return url;
         }
-
+        
     }
-
+    
     static class Extractor {
-
+        
         static String getDownloadKey(String response2, String trackID) {
             int index1 = response2.indexOf("\"", response2.indexOf(trackID));
             int index2 = response2.indexOf("\"", index1 + 2);
             return response2.substring(index1 + 1, index2);
         }
-
+        
         static Request getRequestInfo(String response, String scraped) {
             if (response.contains("RH:")) {
-
+                
                 int indexOf = response.indexOf("RH: \"");
                 int lastIndexOf = response.indexOf("\"", indexOf + 5);
                 String RH = response.substring(indexOf + 5, lastIndexOf);
-
+                
                 int lastIndexOfToken = response.lastIndexOf("value=\"");
                 int latsToken = response.indexOf("\"", lastIndexOfToken + 8);
                 String __RequestVerificationToken =
-                        response.substring(lastIndexOfToken + 7, latsToken);
-
+                   response.substring(lastIndexOfToken + 7, latsToken);
+                
                 String TrackID = scraped.substring(scraped.lastIndexOf("/") + 1);
                 String TrackTypeID = "originals";
-
+                
                 Request request = new Request();
                 request.set__RequestVerificationToken(__RequestVerificationToken);
                 request.setRH(RH);
                 request.setTrackID(TrackID);
                 request.setTrackTypeID(TrackTypeID);
-
+                
                 System.out.println(request.toString());
                 return request;
             }
             return null;
         }
-
+        
         @Data
         @NoArgsConstructor
         static class Request {
@@ -93,19 +93,19 @@ public class DmpApiService {
             String RH;
             String TrackTypeID;
             String TrackID;
-
+            
             @Override
             public String toString() {
                 return
-                        "__RequestVerificationToken=" + __RequestVerificationToken +
-                                "&RecaptchaResponse=" + RecaptchaResponse +
-                                "&VoteValue=" + VoteValue +
-                                "&VoteComment=" + VoteComment +
-                                "&RH=" + RH +
-                                "&TrackTypeID=" + TrackTypeID +
-                                "&TrackID=" + TrackID;
+                   "__RequestVerificationToken=" + __RequestVerificationToken +
+                      "&RecaptchaResponse=" + RecaptchaResponse +
+                      "&VoteValue=" + VoteValue +
+                      "&VoteComment=" + VoteComment +
+                      "&RH=" + RH +
+                      "&TrackTypeID=" + TrackTypeID +
+                      "&TrackID=" + TrackID;
             }
-
+            
         }
     }
 }
