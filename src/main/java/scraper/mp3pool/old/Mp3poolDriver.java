@@ -1,4 +1,4 @@
-package scraper.mp3pool;
+package scraper.mp3pool.old;
 
 import configuration.YamlConfig;
 import mongodb.MongoControl;
@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static ftp.ScheduleWatcher.addToScheduleDB;
-import static scraper.mp3pool.Mp3PoolDownloader.downloadLinks;
+import static scraper.mp3pool.old.Mp3PoolDownloader.downloadLinks;
 
 public class Mp3poolDriver {
-
+    
     private static String USERNAME;
     private static String PASS;
     private WebDriver scrapeDriver;
@@ -34,23 +34,23 @@ public class Mp3poolDriver {
     private Mp3PoolScraper mp3PoolScraper = new Mp3PoolScraper();
     static Logger mp3Logger = new Logger("Mp3Pool");
     static String cookieForAPI;
-
+    
     Mp3poolDriver() {
         System.setProperty("jsse.enableSNIExtension", "false");
-
+        
         String pathToSelenium = Constants.filesDir + "geckodriver.exe";
         System.setProperty("webdriver.gecko.driver", pathToSelenium);
         YamlConfig yamlConfig = new YamlConfig();
-
+        
         USERNAME = yamlConfig.config.getMp3_pool_username();
         PASS = yamlConfig.config.getMp3_pool_password();
     }
-
+    
     public static void main(String[] args) {
         Mp3poolDriver mp3poolDriver = new Mp3poolDriver();
         mp3poolDriver.check();
     }
-
+    
     private void login(WebDriver driver) {
         mp3Logger.log("Login");
         driver.get("https://mp3poolonline.com/user/login");
@@ -64,7 +64,7 @@ public class Mp3poolDriver {
         // Click Login
         driver.findElement(By.id("edit-submit")).click();
     }
-
+    
     void check() {
         scrapeDriver = new FirefoxDriver();
         try {
@@ -73,11 +73,11 @@ public class Mp3poolDriver {
             String dateOnFirstPage = mp3PoolScraper.scrapeDate(html);
             // If release found -> scrape all links and date
             boolean newReleaseOnMp3Pool = mongoControl.mp3PoolDownloaded
-                    .find(eq("releaseDate", dateOnFirstPage)).first() == null;
+               .find(eq("releaseDate", dateOnFirstPage)).first() == null;
             if (newReleaseOnMp3Pool) {
                 cookieForAPI = scrapeDriver.manage().getCookies().stream()
-                        .map(cookie -> cookie.getName() + "=" + cookie.getValue())
-                        .collect(Collectors.joining("; "));
+                   .map(cookie -> cookie.getName() + "=" + cookie.getValue())
+                   .collect(Collectors.joining("; "));
                 //  Find next date
                 String dateToDownload = getDownloadDate(html, dateOnFirstPage);
                 System.out.println(dateToDownload);
@@ -94,16 +94,16 @@ public class Mp3poolDriver {
                 addToScheduleDB(new File(releaseFolderPath));
                 mp3Logger.log("Release Scheduled: " + dateToDownload);
                 mongoControl.mp3PoolDownloaded.insertOne(
-                        new Document("releaseDate", dateOnFirstPage));
+                   new Document("releaseDate", dateOnFirstPage));
             }
         } catch (Exception e) {
             mp3Logger.log(e);
         } finally {
             scrapeDriver.quit();
         }
-
+        
     }
-
+    
     private List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) {
         List<String> scrapedLinks = new ArrayList<>();
         while (true) {
@@ -112,17 +112,17 @@ public class Mp3poolDriver {
             nextPage();
             String dateOnTopOfThePage = mp3PoolScraper.scrapeDate(html);
             boolean noDownloadDateOnThePage = !dateOnTopOfThePage.equals(dateOnFirstPage)
-                    && !dateOnTopOfThePage.equals(dateToDownload);
+               && !dateOnTopOfThePage.equals(dateToDownload);
             if (noDownloadDateOnThePage) {
                 List<String> duplicates = scrapedLinks.stream()
-                        .filter(scrapedLink -> scrapedLink.endsWith("/"))
-                        .collect(Collectors.toList());
+                   .filter(scrapedLink -> scrapedLink.endsWith("/"))
+                   .collect(Collectors.toList());
                 scrapedLinks.removeAll(duplicates);
                 return scrapedLinks;
             }
         }
     }
-
+    
     private String getDownloadDate(String html, String dateOnFirstPage) {
         while (true) {
             String downloadDate = mp3PoolScraper.previousDateOnThisPage(html, dateOnFirstPage);
@@ -135,7 +135,7 @@ public class Mp3poolDriver {
             }
         }
     }
-
+    
     private void nextPage() {
         String currentUrl = scrapeDriver.getCurrentUrl();
         if (currentUrl.contains("page")) {
@@ -145,17 +145,17 @@ public class Mp3poolDriver {
             scrapeDriver.get("https://mp3poolonline.com/viewadminaudio?page=1");
         }
     }
-
+    
     private String getReleaseFolderPath(String date) throws ParseException {
         SimpleDateFormat DATE_FORMAT =
-                new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+           new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         Calendar cal = Calendar.getInstance();
         cal.setTime(DATE_FORMAT.parse(date));
         cal.add(Calendar.DAY_OF_MONTH, 1);
         String dateToDownload = new SimpleDateFormat("ddMM").format(cal.getTime());
         String releaseFolderPath =
-                "Z:\\\\TEMP FOR LATER\\2019\\" + CheckDate.getTodayDate() +
-                        "\\RECORDPOOL\\" + ("MyMp3Pool " + dateToDownload) + "\\";
+           "Z:\\\\TEMP FOR LATER\\2019\\" + CheckDate.getTodayDate() +
+              "\\RECORDPOOL\\" + ("MyMp3Pool " + dateToDownload) + "\\";
         new File(releaseFolderPath).mkdirs();
         return releaseFolderPath;
     }

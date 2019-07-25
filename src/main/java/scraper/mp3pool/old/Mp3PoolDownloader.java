@@ -1,4 +1,4 @@
-package scraper.mp3pool;
+package scraper.mp3pool.old;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -13,11 +13,11 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import static scraper.mp3pool.Mp3poolDriver.cookieForAPI;
-import static scraper.mp3pool.Mp3poolDriver.mp3Logger;
+import static scraper.mp3pool.old.Mp3poolDriver.cookieForAPI;
+import static scraper.mp3pool.old.Mp3poolDriver.mp3Logger;
 
 class Mp3PoolDownloader {
-
+    
     @SuppressWarnings("Duplicates")
     static void downloadLinks(List<String> scrapedLinks, String dateToDownload,
                               String releaseFolderPath) {
@@ -25,12 +25,12 @@ class Mp3PoolDownloader {
         new File(releaseFolderPath).mkdirs();
         CustomExecutor downloadMaster = new CustomExecutor(15);
         scrapedLinks.stream()
-                .map(downloadUrl -> new Thread(() ->
-                        downloadFile(downloadUrl, releaseFolderPath)))
-                .forEach(downloadMaster::submit);
+           .map(downloadUrl -> new Thread(() ->
+              downloadFile(downloadUrl, releaseFolderPath)))
+           .forEach(downloadMaster::submit);
         downloadMaster.WaitUntilTheEnd();
     }
-
+    
     @SuppressWarnings("Duplicates")
     @SneakyThrows
     private static void downloadFile(String url, String releaseFolderPath) {
@@ -40,13 +40,13 @@ class Mp3PoolDownloader {
         get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
         @Cleanup CloseableHttpResponse response = client.execute(get);
         String fileName = response.getFirstHeader("Content-Disposition").getValue()
-                .replace("attachment; filename=", "")
-                .replaceAll("\"", "");
+           .replace("attachment; filename=", "")
+           .replaceAll("\"", "");
         File mp3File = new File(releaseFolderPath + fileName);
         mp3Logger.log("Downloading file: " + fileName + " " + url
-                + " | " + response.getStatusLine());
+           + " | " + response.getStatusLine());
         @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
         response.getEntity().writeTo(outputStream);
     }
-
+    
 }

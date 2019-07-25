@@ -40,13 +40,13 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
     protected MongoCollection<Document> downloaded;
     protected String releaseName;
     
-    public Scraper(String loggerName) {
+    public Scraper() {
         System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
-        logger = new Logger(loggerName);
     }
     
     @Override
     public void run() {
+        logger = new Logger(releaseName);
         Timer timer = new Timer();
         Driver driver = new Driver();
         TimerTask check = new TimerTask() {
@@ -67,12 +67,13 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
             try {
                 driver = new FirefoxDriver();
                 login();
-                String html = driver.getPageSource();
-                String dateOnFirstPage = scrapeDate(html);
+                afterLogin();
+                String dateOnFirstPage = scrapeDate(driver.getPageSource());
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
                    .find(eq("releaseDate", dateOnFirstPage)).first() == null;
                 if (newReleaseOnThePool) {
+                    // if (true) {
                     // Get Cookies
                     cookieForAPI = driver.manage().getCookies().stream()
                        .map(cookie -> cookie.getName() + "=" + cookie.getValue())
@@ -167,6 +168,8 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
     public Logger getLogger() {
         return logger;
     }
+    
+    protected abstract void afterLogin();
     
     protected abstract void operationWithLinksAfterScrape(List<String> scrapedLinks);
     

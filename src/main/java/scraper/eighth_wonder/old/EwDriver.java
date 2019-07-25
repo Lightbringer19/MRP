@@ -1,4 +1,4 @@
-package scraper.eighth_wonder;
+package scraper.eighth_wonder.old;
 
 import configuration.YamlConfig;
 import lombok.SneakyThrows;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
-import static scraper.eighth_wonder.EwTrackDownloader.downloadLinks;
+import static scraper.eighth_wonder.old.EwTrackDownloader.downloadLinks;
 
 class EwDriver {
     private static String USERNAME;
@@ -29,7 +29,7 @@ class EwDriver {
     static MongoControl mongoControl = new MongoControl();
     private EwScraper ewScraper = new EwScraper();
     static Logger ewLogger = new Logger("8thWonder");
-
+    
     EwDriver() {
         String pathToSelenium = Constants.filesDir + "geckodriver.exe";
         System.setProperty("webdriver.gecko.driver", pathToSelenium);
@@ -37,12 +37,7 @@ class EwDriver {
         USERNAME = yamlConfig.config.getEw_username();
         PASS = yamlConfig.config.getEw_password();
     }
-
-    // public static void main(String[] args) throws ParseException, InterruptedException {
-    //     EwDriver ewDriver = new EwDriver();
-    //     ewDriver.ewCheck();
-    // }
-
+    
     void ewCheck() {
         while (true) {
             try {
@@ -54,13 +49,13 @@ class EwDriver {
                 String html = driver.getPageSource();
                 String dateOnFirstPage = ewScraper.scrapeDate(html);
                 boolean newReleaseOnEW = mongoControl.ewDownloaded
-                        .find(eq("releaseDate", dateOnFirstPage)).first() == null;
+                   .find(eq("releaseDate", dateOnFirstPage)).first() == null;
                 // // if newest scraped date not found in DB
                 if (newReleaseOnEW) {
                     //  GET COOKIES
                     cookieForAPI = driver.manage().getCookies().stream()
-                            .map(cookie -> cookie.getName() + "=" + cookie.getValue())
-                            .collect(Collectors.joining("; "));
+                       .map(cookie -> cookie.getName() + "=" + cookie.getValue())
+                       .collect(Collectors.joining("; "));
                     ewLogger.log("New Release Spotted");
                     // -> iterate over pages util the next date
                     String dateToDownload = getDownloadDate(html, dateOnFirstPage);
@@ -72,7 +67,7 @@ class EwDriver {
                     scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, "Videos ");
                     // INSERT DATE TO DB
                     mongoControl.ewDownloaded.insertOne(
-                            new Document("releaseDate", dateOnFirstPage));
+                       new Document("releaseDate", dateOnFirstPage));
                 }
                 break;
             } catch (InterruptedException | ParseException | NullPointerException e) {
@@ -80,13 +75,13 @@ class EwDriver {
             } finally {
                 driver.quit();
             }
-
+            
         }
     }
-
+    
     private void scrapeAndDownloadRelease(String dateOnFirstPage, String dateToDownload,
                                           String category)
-            throws InterruptedException, ParseException {
+       throws InterruptedException, ParseException {
         Thread.sleep(5000);
         // scrape all tracks from previous date
         List<String> scrapedLinks = scrapeLinks(dateOnFirstPage, dateToDownload);
@@ -95,7 +90,7 @@ class EwDriver {
             downloadLinks(scrapedLinks, dateToDownload, category);
         }
     }
-
+    
     private void Login() {
         ewLogger.log("Login");
         driver.get("https://www.8thwonderpromos.com/amember/login");
@@ -109,7 +104,7 @@ class EwDriver {
         // Click Login
         driver.findElement(By.className("password-link")).click();
     }
-
+    
     private List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) throws InterruptedException {
         List<String> scrapedLinks = new ArrayList<>();
         while (true) {
@@ -119,13 +114,13 @@ class EwDriver {
             //check date
             String dateOnTopOfThePage = ewScraper.scrapeDate(html);
             boolean noDownloadDateOnThePage = !dateOnTopOfThePage.equals(dateOnFirstPage)
-                    && !dateOnTopOfThePage.equals(dateToDownload);
+               && !dateOnTopOfThePage.equals(dateToDownload);
             if (noDownloadDateOnThePage) {
                 return scrapedLinks;
             }
         }
     }
-
+    
     private String getDownloadDate(String html, String dateOnFirstPage) {
         while (true) {
             String downloadDate = ewScraper.previousDateOnThisPage(html, dateOnFirstPage);
@@ -138,7 +133,7 @@ class EwDriver {
             }
         }
     }
-
+    
     @SneakyThrows
     private void nextPage() {
         List<WebElement> pagination_arw = driver.findElements(By.className("pagination_arw"));
@@ -149,9 +144,9 @@ class EwDriver {
         }
         Thread.sleep(4000);
     }
-
+    
     void quitDriver() {
         driver.quit();
     }
-
+    
 }

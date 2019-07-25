@@ -1,4 +1,4 @@
-package scraper.mp3pool.test;
+package scraper.mp3pool;
 
 import org.jsoup.Jsoup;
 import org.openqa.selenium.By;
@@ -7,15 +7,14 @@ import scraper.abstraction.Scraper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Mp3PoolTest extends Scraper {
+public class Mp3PoolNew extends Scraper {
     
     public static void main(String[] args) {
-        Mp3PoolTest mp3PoolTest = new Mp3PoolTest();
-        mp3PoolTest.run();
+        Mp3PoolNew mp3PoolNew = new Mp3PoolNew();
+        mp3PoolNew.run();
     }
     
-    private Mp3PoolTest() {
-        super("MyMp3Pool");
+    private Mp3PoolNew() {
         System.setProperty("jsse.enableSNIExtension", "false");
         USERNAME = yamlConfig.getMp3_pool_username();
         PASS = yamlConfig.getMp3_pool_password();
@@ -26,6 +25,7 @@ public class Mp3PoolTest extends Scraper {
         submitButtonNavigator = By.id("edit-submit");
         downloaded = mongoControl.mp3PoolDownloaded;
         releaseName = "MyMp3Pool";
+        
     }
     
     @Override
@@ -86,5 +86,9 @@ public class Mp3PoolTest extends Scraper {
                      .filter(downloadUrl -> downloadUrl.contains("download/"))
                      .forEach(scrapedLinks::add);
               }));
+    }
+    
+    @Override
+    protected void afterLogin() {
     }
 }

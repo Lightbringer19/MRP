@@ -1,21 +1,21 @@
-package scraper.eighth_wonder;
+package scraper.mp3pool.old;
 
 import lombok.SneakyThrows;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class EwSchedulerMain extends Thread {
-
+public class Mp3PoolSchedulerMain extends Thread {
+    
     @Override
     public void run() {
         Timer timer = new Timer();
-        EwDriver ewDriver = new EwDriver();
+        Mp3poolDriver mp3poolDriver = new Mp3poolDriver();
         TimerTask checkEw = new TimerTask() {
             @Override
             @SneakyThrows
             public void run() {
-                ewDriver.ewCheck();
+                mp3poolDriver.check();
             }
         };
         long sec = 1000;
