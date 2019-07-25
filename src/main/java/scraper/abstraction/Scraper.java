@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public abstract class Scraper extends Thread implements ScrapeInterface, DownloadInterface {
+public abstract class Scraper extends Thread
+   implements ScrapingInterface, DownloadInterface, ScraperInterface {
     
     protected static MongoControl mongoControl = new MongoControl();
     private static String cookieForAPI;
@@ -40,15 +41,19 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
     protected MongoCollection<Document> downloaded;
     protected String releaseName;
     
+    protected boolean exitAfterCheck = true;
+    
     public Scraper() {
         System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
     }
     
     @Override
+    @SuppressWarnings("Duplicates")
     public void run() {
         logger = new Logger(releaseName);
         Timer timer = new Timer();
         Driver driver = new Driver();
+        beforeCheck();
         TimerTask check = new TimerTask() {
             @Override
             @SneakyThrows
@@ -65,9 +70,7 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
     private class Driver {
         private void check() {
             try {
-                driver = new FirefoxDriver();
-                login();
-                afterLogin();
+                firstStageForCheck();
                 String dateOnFirstPage = scrapeDate(driver.getPageSource());
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
@@ -89,39 +92,49 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
             } catch (Exception e) {
                 logger.log(e);
             } finally {
-                driver.quit();
-            }
-        }
-        
-        private void login() {
-            logger.log("Login");
-            driver.get(loginUrl);
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            // Enter Username
-            WebElement nameField = driver.findElement(nameFieldNavigator);
-            nameField.sendKeys(USERNAME);
-            // Enter Password
-            WebElement passwordField = driver.findElement(passFieldNavigator);
-            passwordField.sendKeys(PASS);
-            // Click Login
-            driver.findElement(submitButtonNavigator).click();
-        }
-        
-        private String getDownloadDate(String dateOnFirstPage) {
-            while (true) {
-                String html = driver.getPageSource();
-                String downloadDate = previousDateOnThisPage(html, dateOnFirstPage);
-                boolean dateOnThisPage = downloadDate != null;
-                if (dateOnThisPage) {
-                    return downloadDate;
-                } else {
-                    nextPage();
+                if (exitAfterCheck) {
+                    driver.quit();
                 }
             }
         }
     }
     
-    private List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) {
+    protected void login() {
+        driver = new FirefoxDriver();
+        logger.log("Login");
+        driver.get(loginUrl);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        // Enter Username
+        WebElement nameField = driver.findElement(nameFieldNavigator);
+        nameField.sendKeys(USERNAME);
+        // Enter Password
+        WebElement passwordField = driver.findElement(passFieldNavigator);
+        passwordField.sendKeys(PASS);
+        beforeLogin();
+        // Click Login
+        driver.findElement(submitButtonNavigator).click();
+        afterLogin();
+    }
+    
+    @Override
+    public void firstStageForCheck() {
+        login();
+    }
+    
+    protected String getDownloadDate(String dateOnFirstPage) {
+        while (true) {
+            String html = driver.getPageSource();
+            String downloadDate = previousDateOnThisPage(html, dateOnFirstPage);
+            boolean dateOnThisPage = downloadDate != null;
+            if (dateOnThisPage) {
+                return downloadDate;
+            } else {
+                nextPage();
+            }
+        }
+    }
+    
+    protected List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) {
         List<String> scrapedLinks = new ArrayList<>();
         while (true) {
             scrapeAllLinksOnPage(driver.getPageSource(), dateToDownload, scrapedLinks);
@@ -136,27 +149,25 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
         }
     }
     
-    @SneakyThrows
-    private String formatDateToDownload(String date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        return new SimpleDateFormat("ddMM").format(cal.getTime());
-    }
-    
     protected void mainOperation(String dateOnFirstPage, String dateToDownload) {
         scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, releaseName);
     }
     
     protected void scrapeAndDownloadRelease(String dateOnFirstPage, String dateToDownload,
                                             String releaseName) {
-        //Scrape all links
         List<String> scrapedLinks = scrapeLinks(dateOnFirstPage, dateToDownload);
-        //  Download
         if (scrapedLinks.size() > 0) {
             downloadLinks(scrapedLinks,
                releaseName + " " + formatDateToDownload(dateToDownload));
         }
+    }
+    
+    @SneakyThrows
+    private String formatDateToDownload(String date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        return new SimpleDateFormat("ddMM").format(cal.getTime());
     }
     
     @Override
@@ -169,9 +180,4 @@ public abstract class Scraper extends Thread implements ScrapeInterface, Downloa
         return logger;
     }
     
-    protected abstract void afterLogin();
-    
-    protected abstract void operationWithLinksAfterScrape(List<String> scrapedLinks);
-    
-    protected abstract void nextPage();
 }

@@ -11,7 +11,12 @@ import java.util.List;
 
 public class EwNew extends Scraper {
     
-    private EwNew() {
+    public static void main(String[] args) {
+        EwNew ewNew = new EwNew();
+        ewNew.run();
+    }
+    
+    public EwNew() {
         USERNAME = yamlConfig.getEw_username();
         PASS = yamlConfig.getEw_password();
         dateFormat = "MM.dd.yy";
@@ -23,16 +28,10 @@ public class EwNew extends Scraper {
         releaseName = "8th Wonder Pool";
     }
     
-    public static void main(String[] args) {
-        EwNew ewNew = new EwNew();
-        ewNew.run();
-    }
-    
     @Override
     @SneakyThrows
-    protected void afterLogin() {
+    public void afterLogin() {
         Thread.sleep(10_000);
-        
     }
     
     @Override
@@ -46,18 +45,6 @@ public class EwNew extends Scraper {
         logger.log("Looking for Video Release");
         scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload,
            releaseName + " Videos");
-    }
-    
-    @Override
-    @SneakyThrows
-    protected void nextPage() {
-        List<WebElement> pagination_arw = driver.findElements(By.className("pagination_arw"));
-        if (pagination_arw.size() > 2) {
-            pagination_arw.get(1).click();
-        } else {
-            pagination_arw.get(0).click();
-        }
-        Thread.sleep(10_000);
     }
     
     @Override
@@ -99,7 +86,14 @@ public class EwNew extends Scraper {
     }
     
     @Override
-    protected void operationWithLinksAfterScrape(List<String> scrapedLinks) {
+    @SneakyThrows
+    public void nextPage() {
+        List<WebElement> pagination_arw = driver.findElements(By.className("pagination_arw"));
+        if (pagination_arw.size() > 2) {
+            pagination_arw.get(1).click();
+        } else {
+            pagination_arw.get(0).click();
+        }
+        Thread.sleep(10_000);
     }
-    
 }

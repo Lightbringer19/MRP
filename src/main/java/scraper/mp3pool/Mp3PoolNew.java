@@ -29,7 +29,7 @@ public class Mp3PoolNew extends Scraper {
     }
     
     @Override
-    protected void operationWithLinksAfterScrape(List<String> scrapedLinks) {
+    public void operationWithLinksAfterScrape(List<String> scrapedLinks) {
         driver.quit();
         List<String> duplicates = scrapedLinks.stream()
            .filter(scrapedLink -> scrapedLink.endsWith("/"))
@@ -38,7 +38,7 @@ public class Mp3PoolNew extends Scraper {
     }
     
     @Override
-    protected void nextPage() {
+    public void nextPage() {
         String currentUrl = driver.getCurrentUrl();
         if (currentUrl.contains("page")) {
             int pageNumber = Integer.parseInt(currentUrl.substring(currentUrl.indexOf("=") + 1));
@@ -88,7 +88,4 @@ public class Mp3PoolNew extends Scraper {
               }));
     }
     
-    @Override
-    protected void afterLogin() {
-    }
 }

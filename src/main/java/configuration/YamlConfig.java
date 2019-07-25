@@ -7,25 +7,25 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import java.io.InputStream;
 
 public class YamlConfig {
-
+    
     public Config config;
-
+    
     public static void main(String[] args) {
         YamlConfig yamlConfig = new YamlConfig();
         System.out.println(yamlConfig.config.toString());
     }
-
+    
     public YamlConfig() {
         Yaml yaml = new Yaml(new Constructor(Config.class));
         InputStream inputStream = YamlConfig.class
-                .getClassLoader()
-                .getResourceAsStream("config.yaml");
+           .getClassLoader()
+           .getResourceAsStream("config.yaml");
         config = yaml.load(inputStream);
     }
-
+    
     @Data
     public static class Config {
-
+        
         private String box_user_id;
         private String mrp_authorization;
         private String scene_host;
@@ -48,5 +48,7 @@ public class YamlConfig {
         private String ew_password;
         private String mp3_pool_username;
         private String mp3_pool_password;
+        private String bj_username;
+        private String bj_password;
     }
 }
