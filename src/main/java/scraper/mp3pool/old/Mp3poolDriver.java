@@ -101,7 +101,6 @@ public class Mp3poolDriver {
         } finally {
             scrapeDriver.quit();
         }
-        
     }
     
     private List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) {

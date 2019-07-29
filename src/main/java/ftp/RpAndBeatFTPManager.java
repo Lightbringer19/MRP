@@ -18,57 +18,58 @@ import static com.mongodb.client.model.Filters.eq;
 import static utils.FUtils.writeToFile;
 
 class RpAndBeatFTPManager {
-
+    
     private static String SERVER_RP;
     private static String USERNAME_RP;
     private static String PASSWORD_RP;
     private static int PORT_RP = 21;
-
+    
     private static String SERVER_BEATPORT;
     private static String USERNAME_BEATPORT;
     private static String PASSWORD_BEATPORT;
     private static final int PORT_BEATPORT = 7777;
-
+    
     private static String SERVER;
     private static String USERNAME;
     private static String PASSWORD;
     private static int PORT;
-
+    
     private static String CATEGORY_NAME;
-
+    
     // private static final String SERVER = "127.0.0.1";
     // private static final String USERNAME = "Admin";
     // private static final String PASSWORD = "1234";
-
+    
     private static final String[] SKIP = {
-            "BPM Supreme",
-            "BPM Latino",
-            "MP3 Pool Online",
-            "8th Wonder",
-            "Digital Music Pool",
-            "Crate Connect",
-            "BeatJunkies",
-            "Headliner Music Pool",
-            "MyMp3Pool",
-            "HMC",
-            "DMP",
-            "ONLY_WORKS_WITH_FTP_CLIENT",
-            "Ecuaremixes.com",
-            "Latinremixes.com",
-            "Pro Latin Remix",
-            "Europa Remix",
-            "Extreme Pro Remix",
-            "IntesaMusic.net",
-            "DVJ 3B",
-            "DVJ Marcos Cabrera",
-            "LatinoMusicPool",
-            "LatinoMusicPool.com",
-            "LMP"
+       "BPM Supreme",
+       "BPM Latino",
+       "MP3 Pool Online",
+       "8th Wonder",
+       "Digital Music Pool",
+       "Crate Connect",
+       "BeatJunkies",
+       "Headliner Music Pool",
+       "MyMp3Pool",
+       "HMC",
+       "DMP",
+       "ONLY_WORKS_WITH_FTP_CLIENT",
+       "Ecuaremixes.com",
+       "Latinremixes.com",
+       "Pro Latin Remix",
+       "Europa Remix",
+       "Extreme Pro Remix",
+       "IntesaMusic.net",
+       "DVJ 3B",
+       "DVJ Marcos Cabrera",
+       "LatinoMusicPool",
+       "LatinoMusicPool.com",
+       "LMP",
+       "DaZone"
     };
-
+    
     private MongoControl mongoControl = new MongoControl();
     private FTPClient ftpClient = new FTPClient();
-
+    
     RpAndBeatFTPManager() {
         YamlConfig yamlConfig = new YamlConfig();
         SERVER_RP = yamlConfig.config.getRp_host();
@@ -78,12 +79,12 @@ class RpAndBeatFTPManager {
         USERNAME_BEATPORT = yamlConfig.config.getBeat_username();
         PASSWORD_BEATPORT = yamlConfig.config.getBeat_password();
     }
-
+    
     @SuppressWarnings("Duplicates")
     void checkFtp(String categoryName) throws IOException {
         CATEGORY_NAME = categoryName;
         Log.write("Checking FTP for New Releases: " + CATEGORY_NAME,
-                "FTP&SCHEDULER");
+           "FTP&SCHEDULER");
         String pathname;
         if (categoryName.equals("BEATPORT")) {
             SERVER = SERVER_BEATPORT;
@@ -97,16 +98,16 @@ class RpAndBeatFTPManager {
             PASSWORD = PASSWORD_RP;
             PORT = PORT_RP;
             String month = new SimpleDateFormat("MM-MMM", Locale.US)
-                    .format(new Date()).toUpperCase();
+               .format(new Date()).toUpperCase();
             pathname = "/AUDIO/DATES/2019/" + month + "/";
         }
-
+        
         try {
             ftpClient.connect(SERVER, PORT);
             ftpClient.login(USERNAME, PASSWORD);
             Log();
             ftpClient.enterLocalPassiveMode();
-
+            
             FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
             for (FTPFile ftpFile : dayFtpFolders) {
                 String name = ftpFile.getName();
@@ -115,12 +116,12 @@ class RpAndBeatFTPManager {
                     //DB
                     String dayReleasesPath = pathname + name;
                     Document dayDoc = mongoControl.dayFolderTimeCollection
-                            .find(eq("folderPath", dayReleasesPath)).first();
+                       .find(eq("folderPath", dayReleasesPath)).first();
                     if (dayDoc == null) {
                         //insert new DOC
                         mongoControl.dayFolderTimeCollection
-                                .insertOne(new Document("folderPath", dayReleasesPath)
-                                        .append("timeStamp", time));
+                           .insertOne(new Document("folderPath", dayReleasesPath)
+                              .append("timeStamp", time));
                         // DOWNLOAD
                         downloadNewReleases(dayReleasesPath);
                     } else {
@@ -132,8 +133,8 @@ class RpAndBeatFTPManager {
                         //update
                         dayDoc.put("timeStamp", time);
                         mongoControl.dayFolderTimeCollection
-                                .replaceOne(eq("_id",
-                                        dayDoc.getObjectId("_id")), dayDoc);
+                           .replaceOne(eq("_id",
+                              dayDoc.getObjectId("_id")), dayDoc);
                     }
                 }
             }
@@ -145,11 +146,11 @@ class RpAndBeatFTPManager {
             ftpClient.disconnect();
         }
     }
-
+    
     private void downloadNewReleases(String dayReleasesPath) throws IOException {
         //download new Releases in folder
         Log.write("New Releases In Folder: " + dayReleasesPath,
-                "FTP&SCHEDULER");
+           "FTP&SCHEDULER");
         FTPFile[] releasesInDayFolder = ftpClient.listFiles(dayReleasesPath);
         for (FTPFile releaseFolder : releasesInDayFolder) {
             String releaseName = releaseFolder.getName();
@@ -160,7 +161,7 @@ class RpAndBeatFTPManager {
             if (download) {
                 // download release
                 Log.write("New Releases to Download: " + releaseName,
-                        "FTP&SCHEDULER");
+                   "FTP&SCHEDULER");
                 // check for sub folders
                 FTPFile[] releaseFiles = ftpClient.listFiles(releasePath);
                 String link;
@@ -170,36 +171,36 @@ class RpAndBeatFTPManager {
                     for (FTPFile releaseFile : releaseFiles) {
                         String subName = releasePath + "/" + releaseFile.getName();
                         String subLink =
-                                "ftp://" + USERNAME.replace("@", "%40")
-                                        + ":" + PASSWORD + "@" + SERVER + ":" + PORT +
-                                        subName.replaceAll(" ", "%20");
+                           "ftp://" + USERNAME.replace("@", "%40")
+                              + ":" + PASSWORD + "@" + SERVER + ":" + PORT +
+                              subName.replaceAll(" ", "%20");
                         subLinks.add(subLink);
                     }
                     link = String.join(" ", subLinks);
                 } else {
                     link = "ftp://" + USERNAME.replace("@", "%40")
-                            + ":" + PASSWORD + "@" +
-                            SERVER + ":" + PORT + releasePath;
+                       + ":" + PASSWORD + "@" +
+                       SERVER + ":" + PORT + releasePath;
                 }
                 writeToFile(releaseNameCleaned, link, CATEGORY_NAME);
                 // add to TO_DOWNLOAD QUEUE
                 mongoControl.toDownloadCollection.insertOne(
-                        new Document("releaseName", releaseNameCleaned)
-                                .append("link", link)
-                                .append("categoryName", CATEGORY_NAME));
+                   new Document("releaseName", releaseNameCleaned)
+                      .append("link", link)
+                      .append("categoryName", CATEGORY_NAME));
             }
         }
     }
-
+    
     private String cleanReleaseName(String releaseName) {
         return releaseName
-                .replace(" [DJC]", "")
-                .replace("TrackPack", "MyRecordPool Pack")
-                .replace("Dj City", "DJ City")
-                .replace("DMS", "Direct Music Service")
-                .replace("LoMaximo", "LoMaximoProductions");
+           .replace(" [DJC]", "")
+           .replace("TrackPack", "MyRecordPool Pack")
+           .replace("Dj City", "DJ City")
+           .replace("DMS", "Direct Music Service")
+           .replace("LoMaximo", "LoMaximoProductions");
     }
-
+    
     private boolean toDownload(String releaseName, String releaseNameCleaned) {
         if (releaseName.equals(".") || releaseName.equals("..")) {
             return false;
@@ -211,16 +212,16 @@ class RpAndBeatFTPManager {
             }
             // check if release downloaded
             boolean releaseNotDownloaded = mongoControl.rpDownloadedCollection
-                    .find(eq("releaseName", releaseNameCleaned))
-                    .first() == null;
+               .find(eq("releaseName", releaseNameCleaned))
+               .first() == null;
             // CHECK IF RELEASE IS IN QUEUE TO DOWNLOAD
             boolean releaseNotInDownloadQueue = mongoControl.toDownloadCollection
-                    .find(eq("releaseName", releaseNameCleaned))
-                    .first() == null;
+               .find(eq("releaseName", releaseNameCleaned))
+               .first() == null;
             return releaseNotDownloaded && releaseNotInDownloadQueue;
         }
     }
-
+    
     private void Log() {
         System.out.print(ftpClient.getReplyString());
     }

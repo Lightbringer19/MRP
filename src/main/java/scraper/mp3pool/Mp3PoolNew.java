@@ -14,7 +14,7 @@ public class Mp3PoolNew extends Scraper {
         mp3PoolNew.run();
     }
     
-    private Mp3PoolNew() {
+    public Mp3PoolNew() {
         System.setProperty("jsse.enableSNIExtension", "false");
         USERNAME = yamlConfig.getMp3_pool_username();
         PASS = yamlConfig.getMp3_pool_password();

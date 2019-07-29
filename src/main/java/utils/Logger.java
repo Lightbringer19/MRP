@@ -8,10 +8,10 @@ public class Logger {
     }
     
     public void log(Object logMessage) {
-        if (logMessage.getClass().isInstance(Exception.class)) {
-            Log.write((Exception) logMessage, loggerName);
-        } else {
+        if (logMessage.getClass().equals(String.class)) {
             Log.write((String) logMessage, loggerName);
+        } else {
+            Log.write((Exception) logMessage, loggerName);
         }
     }
     
