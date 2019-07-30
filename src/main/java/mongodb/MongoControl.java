@@ -21,6 +21,7 @@ public class MongoControl {
     public final MongoCollection<Document> ewDownloaded;
     public final MongoCollection<Document> mp3PoolDownloaded;
     public final MongoCollection<Document> bjDownloaded;
+    public final MongoCollection<Document> hlDownloaded;
     
     public MongoControl() {
         mongoClient = new MongoClient("localhost", 27017);
@@ -40,6 +41,7 @@ public class MongoControl {
         ewDownloaded = ftpDB.getCollection("ew_downloaded");
         mp3PoolDownloaded = ftpDB.getCollection("mp3_pool_downloaded");
         bjDownloaded = ftpDB.getCollection("bj_downloaded");
+        hlDownloaded = ftpDB.getCollection("hl_downloaded");
     }
     
 }

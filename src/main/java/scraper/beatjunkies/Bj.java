@@ -66,7 +66,7 @@ public class Bj extends Scraper {
     }
     
     @Override
-    public String scrapeDate(String html) {
+    public String scrapeDateOnFirstPage(String html) {
         Element trackContainer = Jsoup.parse(requireNonNull(html))
            .select("div[class=widget-content]").first();
     

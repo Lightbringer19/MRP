@@ -71,12 +71,13 @@ public abstract class Scraper extends Thread
         private void check() {
             try {
                 firstStageForCheck();
-                String dateOnFirstPage = scrapeDate(driver.getPageSource());
+                String dateOnFirstPage = scrapeDateOnFirstPage(driver.getPageSource());
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
                    .find(eq("releaseDate", dateOnFirstPage)).first() == null;
-                if (newReleaseOnThePool) {
-                    // if (true) {
+                // if (newReleaseOnThePool) {
+                // TODO: 30.07.2019  
+                if (true) {
                     // Get Cookies
                     cookieForAPI = driver.manage().getCookies().stream()
                        .map(cookie -> cookie.getName() + "=" + cookie.getValue())
@@ -137,9 +138,10 @@ public abstract class Scraper extends Thread
     protected List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) {
         List<String> scrapedLinks = new ArrayList<>();
         while (true) {
-            scrapeAllLinksOnPage(driver.getPageSource(), dateToDownload, scrapedLinks);
+            scrapeAllLinksOnPage(driver.getPageSource(), dateToDownload,
+               dateOnFirstPage, scrapedLinks);
             nextPage();
-            String dateOnTopOfThePage = scrapeDate(driver.getPageSource());
+            String dateOnTopOfThePage = scrapeDateOnFirstPage(driver.getPageSource());
             boolean noDownloadDateOnThePage = !dateOnTopOfThePage.equals(dateOnFirstPage)
                && !dateOnTopOfThePage.equals(dateToDownload);
             if (noDownloadDateOnThePage) {
@@ -157,6 +159,7 @@ public abstract class Scraper extends Thread
                                             String releaseName) {
         List<String> scrapedLinks = scrapeLinks(dateOnFirstPage, dateToDownload);
         if (scrapedLinks.size() > 0) {
+            // TODO: 30.07.2019  
             downloadLinks(scrapedLinks,
                releaseName + " " + formatDateToDownload(dateToDownload));
         }

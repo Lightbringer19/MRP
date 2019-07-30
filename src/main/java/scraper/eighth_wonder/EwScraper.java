@@ -48,7 +48,7 @@ public class EwScraper extends Scraper {
     }
     
     @Override
-    public String scrapeDate(String html) {
+    public String scrapeDateOnFirstPage(String html) {
         Element firstTrack = Jsoup.parse(html).select("div[class=tracks-list__item]").first();
         Element trackInfo = firstTrack.select("div[class=col-sm-4 m-w-100]").first();
         return trackInfo.select("div[class=col-sm-12 m-mar-l-20p " +
@@ -68,7 +68,7 @@ public class EwScraper extends Scraper {
     }
     
     @Override
-    public void scrapeAllLinksOnPage(String html, String date, List<String> scrapedLinks) {
+    public void scrapeAllLinksOnPage(String html, String date, String dateOnFirstPage, List<String> scrapedLinks) {
         Jsoup.parse(html).select("div[class=tracks-list__item]").forEach(track -> {
             Element trackInfo = track.select("div[class=col-sm-4 m-w-100]").first();
             String releaseDate = trackInfo.select("div[class=col-sm-12 m-mar-l-20p " +

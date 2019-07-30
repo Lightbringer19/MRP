@@ -158,6 +158,9 @@ task Mp3PoolScraper {
 task BeatJunkiesScraper {
     dependsOn newRelease('monitors.', 'BeatJunkies_Monitor', '1.0.')
 }
+task HeadlineScraper {
+    dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '1.0.')
+}
 
 task BuildAll {
 //    dependsOn Tagger

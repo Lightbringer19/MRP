@@ -46,9 +46,13 @@ public interface DownloadInterface {
             System.out.println(url + response.getStatusLine().getStatusCode());
             String fileName = response.getFirstHeader("Content-Disposition").getValue()
                .replace("attachment; filename=", "")
+               .replace("attachment", "")
                .replaceAll("\"", "")
                .replaceAll("\\\\", "")
                .replaceAll("&amp;", "&");
+            if (url.contains("headlinermusicclub")) {
+                fileName = url.substring(url.lastIndexOf("/"));
+            }
             File mp3File = new File(releaseFolderPath + fileName);
             getLogger().log("Downloading file: " + fileName + " " + url
                + " | " + response.getStatusLine());

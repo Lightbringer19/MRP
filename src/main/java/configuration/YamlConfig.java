@@ -50,5 +50,7 @@ public class YamlConfig {
         private String mp3_pool_password;
         private String bj_username;
         private String bj_password;
+        private String hl_username;
+        private String hl_password;
     }
 }

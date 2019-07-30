@@ -4,12 +4,12 @@ import java.util.List;
 
 public interface ScrapingInterface {
     
-    String scrapeDate(String html);
+    String scrapeDateOnFirstPage(String html);
     
-    default String previousDateOnThisPage(String html, String date) {
+    default String previousDateOnThisPage(String html, String dateOnFirstPage) {
         return null;
     }
     
-    default void scrapeAllLinksOnPage(String html, String date, List<String> scrapedLinks) {
+    default void scrapeAllLinksOnPage(String html, String dateToDownload, String dateOnFirstPage, List<String> scrapedLinks) {
     }
 }
