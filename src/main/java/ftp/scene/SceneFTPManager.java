@@ -22,20 +22,20 @@ class SceneFTPManager {
     private static String USERNAME_SCENE;
     private static String PASSWORD_SCENE;
     private static final int PORT_SCENE = 35695;
-
+    
     private static FTPSClient ftpClient = new FTPSClient();
     private static MongoControl mongoControl = new MongoControl();
     private static String category;
-
+    
     SceneFTPManager() {
         YamlConfig yamlConfig = new YamlConfig();
         SERVER_SCENE = yamlConfig.config.getScene_host();
         USERNAME_SCENE = yamlConfig.config.getScene_username();
         PASSWORD_SCENE = yamlConfig.config.getScene_password();
     }
-
+    
     @SuppressWarnings("Duplicates")
-    void checkFtp(String categoryToDownload) throws IOException {
+    void checkFtp(String categoryToDownload) {
         category = categoryToDownload;
         Log.write("Checking FTP for New Releases: " + category, "SCENE_FTP");
         try {
@@ -44,10 +44,10 @@ class SceneFTPManager {
             Log();
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
+            
             String ftpCategory = category.replace("SCENE-", "");
             String pathname = "/ENGLISH/" + ftpCategory + "/";
-
+            
             FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
             // 0707 - Example
             for (FTPFile dayFolder : dayFtpFolders) {
@@ -56,12 +56,12 @@ class SceneFTPManager {
                 //DB
                 String dayReleasesPath = pathname + name;
                 Document dayDoc = mongoControl.dayFolderTimeCollection
-                        .find(eq("folderPath", dayReleasesPath)).first();
+                   .find(eq("folderPath", dayReleasesPath)).first();
                 if (dayDoc == null) {
                     //insert new DOC
                     mongoControl.dayFolderTimeCollection
-                            .insertOne(new Document("folderPath", dayReleasesPath)
-                                    .append("timeStamp", time));
+                       .insertOne(new Document("folderPath", dayReleasesPath)
+                          .append("timeStamp", time));
                     // DOWNLOAD
                     downloadNewReleases(dayReleasesPath);
                 } else {
@@ -73,32 +73,36 @@ class SceneFTPManager {
                     //update DB
                     dayDoc.put("timeStamp", time);
                     mongoControl.dayFolderTimeCollection
-                            .replaceOne(eq("_id",
-                                    dayDoc.getObjectId("_id")), dayDoc);
+                       .replaceOne(eq("_id",
+                          dayDoc.getObjectId("_id")), dayDoc);
                 }
             }
         } catch (Exception e) {
             Log.write(e, "SCENE_FTP");
         } finally {
-            ftpClient.logout();
-            Log();
-            ftpClient.disconnect();
+            try {
+                ftpClient.logout();
+                Log();
+                ftpClient.disconnect();
+            } catch (IOException e) {
+                Log.write(e, "SCENE_FTP");
+            }
         }
     }
-
+    
     private void downloadNewReleases(String dayReleasesPath) throws IOException {
         //download new Releases in folder
         Log.write("New Releases In Folder: " + dayReleasesPath,
-                "SCENE_FTP");
+           "SCENE_FTP");
         FTPFile[] releasesInDayFolder = ftpClient.listFiles(dayReleasesPath);
         // 0707/releaseName - Example
         for (FTPFile releaseFolder : releasesInDayFolder) {
             downloadRelease(dayReleasesPath, releaseFolder);
         }
     }
-
+    
     private void downloadRelease(String dayReleasesPath, FTPFile releaseFolder)
-            throws IOException {
+       throws IOException {
         String releaseName = releaseFolder.getName();
         String releaseRemotePath = dayReleasesPath + "/" + releaseName + "/";
         //Skip check
@@ -106,11 +110,11 @@ class SceneFTPManager {
         if (download) {
             // download release
             Log.write("New Release to Download: " + releaseName,
-                    "SCENE_FTP");
+               "SCENE_FTP");
             // create local release folder
             String releaseLocalPath =
-                    "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
-                            + "/" + category + "/" + releaseName;
+               "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
+                  + "/" + category + "/" + releaseName;
             new File(releaseLocalPath).mkdirs();
             // .mp3 or .flac or any other files in the release folder
             FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);
@@ -121,48 +125,48 @@ class SceneFTPManager {
                 downloadFile(releaseRemotePath, releaseLocalPath, releaseFile);
             }
             Log.write("Release Downloaded: " + releaseName,
-                    "SCENE_FTP");
+               "SCENE_FTP");
             mongoControl.rpDownloadedCollection
-                    .insertOne(new Document("releaseName", releaseName));
+               .insertOne(new Document("releaseName", releaseName));
             // DELETE -missing files
             Arrays.stream(Objects.requireNonNull(new File(releaseLocalPath).listFiles()))
-                    .forEach(file -> {
-                        if (file.getName().contains("-missing")) {
-                            file.delete();
-                        }
-                    });
+               .forEach(file -> {
+                   if (file.getName().contains("-missing")) {
+                       file.delete();
+                   }
+               });
             // ADD TO UPLOAD QUEUE
             FUtils.writeFile(Constants.uploadDir, releaseName + ".json",
-                    releaseLocalPath);
+               releaseLocalPath);
         }
     }
-
+    
     private void downloadFile(String releaseRemotePath, String releaseLocalPath,
                               FTPFile releaseFile) throws IOException {
         try (OutputStream output = new FileOutputStream(
-                releaseLocalPath + "/" + releaseFile.getName())) {
+           releaseLocalPath + "/" + releaseFile.getName())) {
             ftpClient.retrieveFile(releaseRemotePath
-                    + releaseFile.getName(), output);
+               + releaseFile.getName(), output);
             Log();
             Log.write("File Downloaded: " + releaseFile.getName(),
-                    "SCENE_FTP");
+               "SCENE_FTP");
         } catch (FileNotFoundException e) {
             Log.write(e, "SCENE_FTP");
         }
-
+        
     }
-
+    
     private boolean toDownload(String releaseName) {
         if (releaseName.contains("(incomplete)")) {
             return false;
         } else {
             // check if release downloaded
             return mongoControl.rpDownloadedCollection
-                    .find(eq("releaseName", releaseName))
-                    .first() == null;
+               .find(eq("releaseName", releaseName))
+               .first() == null;
         }
     }
-
+    
     private void Log() {
         System.out.print(ftpClient.getReplyString());
     }

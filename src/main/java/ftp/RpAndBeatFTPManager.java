@@ -81,7 +81,7 @@ class RpAndBeatFTPManager {
     }
     
     @SuppressWarnings("Duplicates")
-    void checkFtp(String categoryName) throws IOException {
+    void checkFtp(String categoryName) {
         CATEGORY_NAME = categoryName;
         Log.write("Checking FTP for New Releases: " + CATEGORY_NAME,
            "FTP&SCHEDULER");
@@ -141,9 +141,13 @@ class RpAndBeatFTPManager {
         } catch (Exception e) {
             Log.write(e, "FTP&SCHEDULER");
         } finally {
-            ftpClient.logout();
-            Log();
-            ftpClient.disconnect();
+            try {
+                ftpClient.logout();
+                Log();
+                ftpClient.disconnect();
+            } catch (IOException e) {
+                Log.write(e, "FTP&SCHEDULER");
+            }
         }
     }
     

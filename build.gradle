@@ -164,12 +164,14 @@ task BuildAll {
 //    dependsOn Uploader
 
 //    dependsOn Poster
-    dependsOn Reposter
+//    dependsOn Reposter
 
 //    dependsOn AutoDMPScraper
-//    dependsOn SceneFTP
 
+    dependsOn SceneFTP
     dependsOn FtpAndSchedule
-    dependsOn EwScraper
-    dependsOn Mp3PoolScraper
+
+//    dependsOn FtpAndSchedule
+//    dependsOn EwScraper
+//    dependsOn Mp3PoolScraper
 }

@@ -9,14 +9,14 @@ import scraper.abstraction.Scraper;
 
 import java.util.List;
 
-public class EwNew extends Scraper {
+public class EwScraper extends Scraper {
     
     public static void main(String[] args) {
-        EwNew ewNew = new EwNew();
-        ewNew.run();
+        EwScraper ewScraper = new EwScraper();
+        ewScraper.run();
     }
     
-    public EwNew() {
+    public EwScraper() {
         USERNAME = yamlConfig.getEw_username();
         PASS = yamlConfig.getEw_password();
         dateFormat = "MM.dd.yy";

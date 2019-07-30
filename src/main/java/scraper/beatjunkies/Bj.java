@@ -42,7 +42,7 @@ public class Bj extends Scraper {
     @Override
     @SneakyThrows
     public void beforeLogin() {
-        for (int i = 90; i > 0; i--) {
+        for (int i = 150; i > 0; i--) {
             System.out.println("Time Left to Solve CAPTCHA: " + i + " SEC");
             Thread.sleep(1000);
         }
@@ -52,7 +52,7 @@ public class Bj extends Scraper {
     @SneakyThrows
     public void afterLogin() {
         driver.get("https://beatjunkies.com/record-pool");
-        for (int i = 90; i > 0; i--) {
+        for (int i = 150; i > 0; i--) {
             System.out.println("Time Left to Solve CAPTCHA: " + i + " SEC");
             Thread.sleep(1000);
         }

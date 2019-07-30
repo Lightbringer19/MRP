@@ -7,14 +7,14 @@ import scraper.abstraction.Scraper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Mp3PoolNew extends Scraper {
+public class Mp3PoolScraper extends Scraper {
     
     public static void main(String[] args) {
-        Mp3PoolNew mp3PoolNew = new Mp3PoolNew();
-        mp3PoolNew.run();
+        Mp3PoolScraper mp3PoolScraper = new Mp3PoolScraper();
+        mp3PoolScraper.run();
     }
     
-    public Mp3PoolNew() {
+    public Mp3PoolScraper() {
         System.setProperty("jsse.enableSNIExtension", "false");
         USERNAME = yamlConfig.getMp3_pool_username();
         PASS = yamlConfig.getMp3_pool_password();
