@@ -49,7 +49,7 @@ public class Mp3PoolScraper extends Scraper {
     }
     
     @Override
-    public String scrapeDateOnFirstPage(String html) {
+    public String scrapeFirstDate(String html) {
         return Jsoup.parse(html)
            .select("div[class=innerPlayer1]").first()
            .select("p").first().text()
@@ -68,12 +68,12 @@ public class Mp3PoolScraper extends Scraper {
     }
     
     @Override
-    public void scrapeAllLinksOnPage(String html, String date, String dateOnFirstPage, List<String> scrapedLinks) {
+    public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
         Jsoup.parse(html)
            .select("div[class=innerPlayer1]")
            .stream()
            .filter(release -> release.select("p").first().text()
-              .replace("Added On: ", "").equals(date))
+              .replace("Added On: ", "").equals(downloadDate))
            .forEach(release -> release.select("div>ul>li")
               .forEach(track -> {
                   if (!track.select("div[class=track-title]").text().equals("")) {

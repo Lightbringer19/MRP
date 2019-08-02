@@ -36,34 +36,34 @@ public class HlScraper extends Scraper {
     }
     
     @Override
-    public String scrapeDateOnFirstPage(String html) {
+    public String scrapeFirstDate(String html) {
         return Jsoup.parse(html).select("div[class=tracks_homepage]>div>div")
            .first().text()
            .replace("Added on ", "");
     }
     
     @Override
-    public String previousDateOnThisPage(String html, String dateOnFirstPage) {
+    public String previousDateOnThisPage(String html, String firstDate) {
         //noinspection OptionalGetWithoutIsPresent
         return Jsoup.parse(html)
            .select("div[class=date-added]")
            .stream()
            .map(nextDate -> nextDate.text().replace("Added on ", ""))
-           .filter(dateFormatted -> !dateFormatted.equals(dateOnFirstPage))
+           .filter(dateFormatted -> !dateFormatted.equals(firstDate))
            .findFirst().get();
     }
     
     @Override
-    public void scrapeAllLinksOnPage(String html, String dateToDownload, String dateOnFirstPage, List<String> scrapedLinks) {
+    public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
         Document document = Jsoup.parse(html);
         Elements dates = document.select("div[class=date-added]");
         String containerHtml = document.select("div[class=tracks_homepage]").html();
-        int indexOfFirstDate = containerHtml.indexOf(dateToDownload);
+        int indexOfFirstDate = containerHtml.indexOf(downloadDate);
         
         Optional<String> dateAfterDownloadDate = dates.stream()
            .map(date -> date.text().replace("Added on ", ""))
            .filter(dateFormatted ->
-              !dateFormatted.equals(dateToDownload) && !dateFormatted.equals(dateOnFirstPage))
+              !dateFormatted.equals(downloadDate) && !dateFormatted.equals(firstDate))
            .findFirst();
         String htmlWithTracks;
         if (dateAfterDownloadDate.isPresent()) {

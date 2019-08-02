@@ -38,8 +38,9 @@ public interface DownloadInterface {
     @SuppressWarnings("Duplicates")
     default void downloadFile(String url, String releaseFolderPath) {
         try {
+            String downloadUrl = url.replaceAll(" ", "%20");
             @Cleanup CloseableHttpClient client = HttpClients.createDefault();
-            HttpGet get = new HttpGet(url);
+            HttpGet get = new HttpGet(downloadUrl);
             get.setHeader("Cookie", getCookie());
             get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
             @Cleanup CloseableHttpResponse response = client.execute(get);
@@ -50,8 +51,9 @@ public interface DownloadInterface {
                .replaceAll("\"", "")
                .replaceAll("\\\\", "")
                .replaceAll("&amp;", "&");
-            if (url.contains("headlinermusicclub")) {
-                fileName = url.substring(url.lastIndexOf("/"));
+            if (url.contains("headlinermusicclub") || url.contains("bpm")) {
+                fileName = url.substring(url.lastIndexOf("/"))
+                   .replace("?download", "");
             }
             File mp3File = new File(releaseFolderPath + fileName);
             getLogger().log("Downloading file: " + fileName + " " + url

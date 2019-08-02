@@ -43,7 +43,7 @@ public class Bj extends Scraper {
     }
     
     @Override
-    public String scrapeDateOnFirstPage(String html) {
+    public String scrapeFirstDate(String html) {
         Element trackContainer = Jsoup.parse(requireNonNull(html))
            .select("div[class=widget-content]").first();
     
@@ -61,7 +61,7 @@ public class Bj extends Scraper {
     }
     
     @Override
-    protected List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) {
+    protected List<String> scrapeLinks(String firstDate, String downloadDate) {
         return Jsoup.parse(htmlWithTracks)
            .select("div[class*=widget-beats-play rpool]").stream()
            .map(trackInfo -> "https://beatjunkies.com" +
@@ -71,7 +71,7 @@ public class Bj extends Scraper {
     }
     
     @Override
-    protected String getDownloadDate(String dateOnFirstPage) {
+    protected String getDownloadDate(String firstDate) {
         return dates.get(1);
     }
 }

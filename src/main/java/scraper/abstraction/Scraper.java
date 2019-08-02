@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import mongodb.MongoControl;
 import org.bson.Document;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -77,24 +78,24 @@ public abstract class Scraper extends Thread
         private void check() {
             try {
                 firstStageForCheck();
-                String dateOnFirstPage = scrapeDateOnFirstPage(driver.getPageSource());
+                String firstDate = scrapeFirstDate(getPageSource());
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
-                   .find(eq("releaseDate", dateOnFirstPage)).first() == null;
-                if (newReleaseOnThePool) {
-                    // TODO: 30.07.2019
-                    // if (true) {
+                   .find(eq("releaseDate", firstDate)).first() == null;
+                // if (newReleaseOnThePool) {
+                // TODO: 02.08.2019
+                if (true) {
                     // Get Cookies
                     cookieForAPI = driver.manage().getCookies().stream()
                        .map(cookie -> cookie.getName() + "=" + cookie.getValue())
                        .collect(Collectors.joining("; "));
                     //  Find next date
-                    String dateToDownload = getDownloadDate(dateOnFirstPage);
+                    String downloadDate = getDownloadDate(firstDate);
                     // MAIN OPERATION EXECUTION
-                    mainOperation(dateOnFirstPage, dateToDownload);
+                    mainOperation(firstDate, downloadDate);
                     // Schedule release and add to DB
                     downloaded.insertOne(
-                       new Document("releaseDate", dateOnFirstPage));
+                       new Document("releaseDate", firstDate));
                 }
             } catch (Exception e) {
                 logger.log(e);
@@ -128,10 +129,10 @@ public abstract class Scraper extends Thread
         login();
     }
     
-    protected String getDownloadDate(String dateOnFirstPage) {
+    protected String getDownloadDate(String firstDate) {
         while (true) {
-            String html = driver.getPageSource();
-            String downloadDate = previousDateOnThisPage(html, dateOnFirstPage);
+            String html = getPageSource();
+            String downloadDate = previousDateOnThisPage(html, firstDate);
             boolean dateOnThisPage = downloadDate != null;
             if (dateOnThisPage) {
                 return downloadDate;
@@ -141,15 +142,15 @@ public abstract class Scraper extends Thread
         }
     }
     
-    protected List<String> scrapeLinks(String dateOnFirstPage, String dateToDownload) {
+    protected List<String> scrapeLinks(String firstDate, String downloadDate) {
         List<String> scrapedLinks = new ArrayList<>();
         while (true) {
-            scrapeAllLinksOnPage(driver.getPageSource(), dateToDownload,
-               dateOnFirstPage, scrapedLinks);
+            scrapeAllLinksOnPage(getPageSource(), downloadDate,
+               firstDate, scrapedLinks);
             nextPage();
-            String dateOnTopOfThePage = scrapeDateOnFirstPage(driver.getPageSource());
-            boolean noDownloadDateOnThePage = !dateOnTopOfThePage.equals(dateOnFirstPage)
-               && !dateOnTopOfThePage.equals(dateToDownload);
+            String dateOnTopOfThePage = scrapeFirstDate(getPageSource());
+            boolean noDownloadDateOnThePage = !dateOnTopOfThePage.equals(firstDate)
+               && !dateOnTopOfThePage.equals(downloadDate);
             if (noDownloadDateOnThePage) {
                 operationWithLinksAfterScrape(scrapedLinks);
                 return scrapedLinks;
@@ -157,25 +158,32 @@ public abstract class Scraper extends Thread
         }
     }
     
-    protected void mainOperation(String dateOnFirstPage, String dateToDownload) {
-        scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, releaseName);
+    protected void mainOperation(String firstDate, String downloadDate) {
+        scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
     }
     
-    protected void scrapeAndDownloadRelease(String dateOnFirstPage, String dateToDownload,
+    protected void scrapeAndDownloadRelease(String firstDate, String downloadDate,
                                             String releaseName) {
-        List<String> scrapedLinks = scrapeLinks(dateOnFirstPage, dateToDownload);
+        List<String> scrapedLinks = scrapeLinks(firstDate, downloadDate);
         if (scrapedLinks.size() > 0) {
             downloadLinks(scrapedLinks,
-               releaseName + " " + formatDateToDownload(dateToDownload));
+               releaseName + " " + formatDownloadDate(downloadDate));
         }
     }
     
     @SneakyThrows
-    private String formatDateToDownload(String date) {
+    private String formatDownloadDate(String date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
         cal.add(Calendar.DAY_OF_MONTH, 1);
         return new SimpleDateFormat("ddMM").format(cal.getTime());
+    }
+    
+    private String getPageSource() {
+        String javascript = "return document.getElementsByTagName('html')[0].innerHTML";
+        String pageSource = (String) ((JavascriptExecutor) driver).executeScript(javascript,
+           driver.findElement(By.tagName("html")));
+        return "<html>" + pageSource + "</html>";
     }
     
     @Override

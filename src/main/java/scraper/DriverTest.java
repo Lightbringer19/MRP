@@ -14,8 +14,13 @@ public class DriverTest {
         FirefoxOptions firefoxOptions = new FirefoxOptions().setProfile(ini);
         WebDriver driver = new FirefoxDriver(firefoxOptions);
         try {
-            driver.get("");
+            driver.get("https://www.bpmsupreme.com/store/newreleases/audio/classic/1");
             Thread.sleep(10000);
+            // String javascript = "return document.getElementsByTagName('html')[0].innerHTML";
+            // String pageSource = (String) ((JavascriptExecutor) driver).executeScript(javascript,
+            //    driver.findElement(By.tagName("html")));
+            // pageSource = "<html>" + pageSource + "</html>";
+            // System.out.println(pageSource);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

@@ -36,19 +36,19 @@ public class EwScraper extends Scraper {
     
     @Override
     @SneakyThrows
-    protected void mainOperation(String dateOnFirstPage, String dateToDownload) {
+    protected void mainOperation(String firstDate, String downloadDate) {
         logger.log("Downloading Music Release");
-        scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload, releaseName);
+        scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
         // SCRAPE VIDEOS AND DOWNLOAD
         driver.findElement(By.linkText("Video")).click();
         Thread.sleep(10_000);
         logger.log("Looking for Video Release");
-        scrapeAndDownloadRelease(dateOnFirstPage, dateToDownload,
+        scrapeAndDownloadRelease(firstDate, downloadDate,
            releaseName + " Videos");
     }
     
     @Override
-    public String scrapeDateOnFirstPage(String html) {
+    public String scrapeFirstDate(String html) {
         Element firstTrack = Jsoup.parse(html).select("div[class=tracks-list__item]").first();
         Element trackInfo = firstTrack.select("div[class=col-sm-4 m-w-100]").first();
         return trackInfo.select("div[class=col-sm-12 m-mar-l-20p " +
@@ -68,12 +68,12 @@ public class EwScraper extends Scraper {
     }
     
     @Override
-    public void scrapeAllLinksOnPage(String html, String date, String dateOnFirstPage, List<String> scrapedLinks) {
+    public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
         Jsoup.parse(html).select("div[class=tracks-list__item]").forEach(track -> {
             Element trackInfo = track.select("div[class=col-sm-4 m-w-100]").first();
             String releaseDate = trackInfo.select("div[class=col-sm-12 m-mar-l-20p " +
                "no-padding]>div[class=col-sm-2 no-padding]").first().text();
-            if (releaseDate.equals(date)) {
+            if (releaseDate.equals(downloadDate)) {
                 String downloadUrl = "https://pool.8thwonderpromos.com" +
                    track.select("a[class=btn-download tracks-list__" +
                       "action-button download-btn]").attr("href");
