@@ -47,7 +47,7 @@ class RpAndBeatFTPManager {
        "8th Wonder",
        "Digital Music Pool",
        "Crate Connect",
-       // "BeatJunkies", // TODO
+       "BeatJunkies",
        "Headliner Music Pool",
        "MyMp3Pool",
        "HMC",

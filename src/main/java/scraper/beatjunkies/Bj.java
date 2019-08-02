@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
@@ -31,36 +32,12 @@ public class Bj extends Scraper {
         downloaded = mongoControl.bjDownloaded;
         dateFormat = "MMMM d, yyyy";
         releaseName = "Beatjunkies";
-        exitAfterCheck = false;
-    }
-    
-    @Override
-    public void beforeCheck() {
-        login();
-    }
-    
-    @Override
-    @SneakyThrows
-    public void beforeLogin() {
-        for (int i = 150; i > 0; i--) {
-            System.out.println("Time Left to Solve CAPTCHA: " + i + " SEC");
-            Thread.sleep(1000);
-        }
-    }
-    
-    @Override
-    @SneakyThrows
-    public void afterLogin() {
-        driver.get("https://beatjunkies.com/record-pool");
-        for (int i = 150; i > 0; i--) {
-            System.out.println("Time Left to Solve CAPTCHA: " + i + " SEC");
-            Thread.sleep(1000);
-        }
     }
     
     @Override
     @SneakyThrows
     public void firstStageForCheck() {
+        driver = new FirefoxDriver(firefoxOptions);
         driver.get("https://beatjunkies.com/record-pool");
         Thread.sleep(1000);
     }

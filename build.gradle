@@ -156,7 +156,7 @@ task Mp3PoolScraper {
     dependsOn newRelease('monitors.', 'Mp3Pool_Scraper_Monitor', '2.0.')
 }
 task BeatJunkiesScraper {
-    dependsOn newRelease('monitors.', 'BeatJunkies_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'BeatJunkies_Monitor', '2.0.')
 }
 task HeadlineScraper {
     dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '1.0.')
@@ -171,9 +171,10 @@ task BuildAll {
 
 //    dependsOn AutoDMPScraper
 
-    dependsOn SceneFTP
+//    dependsOn SceneFTP
     dependsOn FtpAndSchedule
 
+    dependsOn BeatJunkiesScraper
 //    dependsOn FtpAndSchedule
 //    dependsOn EwScraper
 //    dependsOn Mp3PoolScraper

@@ -9,6 +9,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.ProfilesIni;
 import utils.Constants;
 import utils.Logger;
 
@@ -42,9 +45,12 @@ public abstract class Scraper extends Thread
     protected String releaseName;
     
     protected boolean exitAfterCheck = true;
+    protected final FirefoxOptions firefoxOptions;
     
     public Scraper() {
         System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
+        FirefoxProfile ini = new ProfilesIni().getProfile("selenium");
+        firefoxOptions = new FirefoxOptions().setProfile(ini);
     }
     
     @Override
@@ -75,9 +81,9 @@ public abstract class Scraper extends Thread
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
                    .find(eq("releaseDate", dateOnFirstPage)).first() == null;
-                // if (newReleaseOnThePool) {
-                // TODO: 30.07.2019  
-                if (true) {
+                if (newReleaseOnThePool) {
+                    // TODO: 30.07.2019
+                    // if (true) {
                     // Get Cookies
                     cookieForAPI = driver.manage().getCookies().stream()
                        .map(cookie -> cookie.getName() + "=" + cookie.getValue())
@@ -101,7 +107,7 @@ public abstract class Scraper extends Thread
     }
     
     protected void login() {
-        driver = new FirefoxDriver();
+        driver = new FirefoxDriver(firefoxOptions);
         logger.log("Login");
         driver.get(loginUrl);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -159,7 +165,6 @@ public abstract class Scraper extends Thread
                                             String releaseName) {
         List<String> scrapedLinks = scrapeLinks(dateOnFirstPage, dateToDownload);
         if (scrapedLinks.size() > 0) {
-            // TODO: 30.07.2019  
             downloadLinks(scrapedLinks,
                releaseName + " " + formatDateToDownload(dateToDownload));
         }
