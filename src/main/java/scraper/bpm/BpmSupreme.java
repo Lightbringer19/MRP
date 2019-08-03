@@ -3,12 +3,10 @@ package scraper.bpm;
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
-import org.openqa.selenium.By;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.jsoup.select.Elements;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class BpmSupreme extends Scraper implements ApiService {
     
@@ -18,23 +16,17 @@ public class BpmSupreme extends Scraper implements ApiService {
     }
     
     public BpmSupreme() {
-        // USERNAME = yamlConfig.getEw_username();
-        // PASS = yamlConfig.getEw_password();
-        dateFormat = "MM.dd.yy";
-        // loginUrl = "";
-        // nameFieldNavigator = By.id("amember-login");
-        // passFieldNavigator = By.id("amember-pass");
-        // submitButtonNavigator = By.className("password-link");
+        dateFormat = "MM/dd/yy";
         downloaded = mongoControl.bpmDownloaded;
         releaseName = "Bpm Supreme";
+    
+        loginAtFirstStage = false;
+        urlForFirstStage = "https://www.bpmsupreme.com/store/newreleases/audio/classic/1";
     }
     
     @Override
     @SneakyThrows
-    public void firstStageForCheck() {
-        driver = new FirefoxDriver(firefoxOptions);
-        driver.get("https://www.bpmsupreme.com/store/newreleases/audio/classic/1");
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    public void afterFirstStage() {
         Thread.sleep(10_000);
     }
     
@@ -51,19 +43,44 @@ public class BpmSupreme extends Scraper implements ApiService {
            .filter(date -> !date.text().equals(firstDate))
            .findFirst()
            .map(Element::text)
-           .orElse(firstDate);
+           .orElse(null);
     }
     
     @Override
     public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate,
                                      List<String> scrapedLinks) {
-        
+        Elements trackInfos = Jsoup.parse(html)
+           .select("li[class=even updatedversion ng-scope]");
+        for (Element trackInfo : trackInfos) {
+            String date = trackInfo.select("span[class=date ng-binding]").text();
+            if (date.equals(downloadDate)) {
+                String title = trackInfo.select("div[class=title_box]>h3").first()
+                   .attr("title");
+                Element trackTags = trackInfo.select("div[class=tag]").first();
+                Elements trackDownloadInfos = trackTags.select("span");
+                for (Element downloadInfo : trackDownloadInfos) {
+                    String trackId = downloadInfo.attr("id")
+                       .replace("icon_download_", "");
+                    String linkForApi = "https://www.bpmsupreme.com/store/output_file/" + trackId;
+                    String downloadUrl = getDownloadUrl(linkForApi);
+                    String trackType = downloadInfo.text();
+                    logger.log(title + " (" + trackType + ") | "
+                       + downloadUrl
+                    );
+                    scrapedLinks.add(downloadUrl);
+                }
+            }
+        }
     }
     
     @Override
     @SneakyThrows
     public void nextPage() {
-        driver.findElement(By.linkText("›")).click();
+        String currentUrl = driver.getCurrentUrl();
+        Integer pageNumber =
+           Integer.valueOf(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
+        String finalUrl = currentUrl.replace(pageNumber.toString(), String.valueOf(pageNumber + 1));
+        driver.get(finalUrl);
         Thread.sleep(10_000);
     }
 }

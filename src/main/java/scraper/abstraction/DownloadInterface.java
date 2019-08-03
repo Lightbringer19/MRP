@@ -44,16 +44,18 @@ public interface DownloadInterface {
             get.setHeader("Cookie", getCookie());
             get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
             @Cleanup CloseableHttpResponse response = client.execute(get);
-            System.out.println(url + response.getStatusLine().getStatusCode());
-            String fileName = response.getFirstHeader("Content-Disposition").getValue()
-               .replace("attachment; filename=", "")
-               .replace("attachment", "")
-               .replaceAll("\"", "")
-               .replaceAll("\\\\", "")
-               .replaceAll("&amp;", "&");
+            System.out.println(downloadUrl + " " + response.getStatusLine().getStatusCode());
+            String fileName;
             if (url.contains("headlinermusicclub") || url.contains("bpm")) {
                 fileName = url.substring(url.lastIndexOf("/"))
                    .replace("?download", "");
+            } else {
+                fileName = response.getFirstHeader("Content-Disposition").getValue()
+                   .replace("attachment; filename=", "")
+                   .replace("attachment", "")
+                   .replaceAll("\"", "")
+                   .replaceAll("\\\\", "")
+                   .replaceAll("&amp;", "&");
             }
             File mp3File = new File(releaseFolderPath + fileName);
             getLogger().log("Downloading file: " + fileName + " " + url

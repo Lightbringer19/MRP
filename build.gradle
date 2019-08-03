@@ -161,6 +161,9 @@ task BeatJunkiesScraper {
 task HeadlineScraper {
     dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '1.1.')
 }
+task BpmSupremeScraper {
+    dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '1.0.')
+}
 
 task BuildAll {
 //    dependsOn Tagger

@@ -16,11 +16,6 @@ public class DriverTest {
         try {
             driver.get("https://www.bpmsupreme.com/store/newreleases/audio/classic/1");
             Thread.sleep(10000);
-            // String javascript = "return document.getElementsByTagName('html')[0].innerHTML";
-            // String pageSource = (String) ((JavascriptExecutor) driver).executeScript(javascript,
-            //    driver.findElement(By.tagName("html")));
-            // pageSource = "<html>" + pageSource + "</html>";
-            // System.out.println(pageSource);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

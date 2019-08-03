@@ -21,22 +21,25 @@ public class ScraperTest {
         
         List<String> scrapedLinks = new ArrayList<>();
         String downloadDate = "08/01/19";
-        // TODO: 02.08.2019 Finish Scraping
         Elements trackInfos = document.select("li[class=even updatedversion ng-scope]");
         for (Element trackInfo : trackInfos) {
             String date = trackInfo.select("span[class=date ng-binding]").text();
             if (date.equals(downloadDate)) {
+                String title = trackInfo.select("div[class=title_box]>h3").first()
+                   .attr("title");
                 Element trackTags = trackInfo.select("div[class=tag]").first();
-                Elements tracks = trackTags.select("span");
-                for (Element track : tracks) {
-                    String trackId = track.attr("id")
+                Elements trackDownloadInfos = trackTags.select("span");
+                for (Element downloadInfo : trackDownloadInfos) {
+                    String trackId = downloadInfo.attr("id")
                        .replace("icon_download_", "");
-                    String linkToApi = "https://www.bpmsupreme.com/store/output_file/" + trackId;
-                    // TODO: 02.08.2019 API SERVICE TO GET FILE LINK
-                    System.out.println(linkToApi);
+                    String trackType = downloadInfo.text();
+                    // String linkToApi = "https://www.bpmsupreme.com/store/output_file/" + trackId;
+                    // String downloadUrl = getDownloadUrl(linkToApi);
+                    System.out.println(title + " " + trackType + " " + trackId);
+                    // scrapedLinks.add(downloadUrl);
+                    // System.out.println(linkToApi);
                 }
             }
-            // System.out.println(element.text());
         }
     }
     
