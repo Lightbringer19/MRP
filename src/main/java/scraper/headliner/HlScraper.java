@@ -1,6 +1,5 @@
 package scraper.headliner;
 
-import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -27,12 +26,9 @@ public class HlScraper extends Scraper {
         submitButtonNavigator = By.id("wp-submit1");
         downloaded = mongoControl.hlDownloaded;
         releaseName = "Headliner Music Club";
-    }
     
-    @Override
-    @SneakyThrows
-    public void afterLogin() {
-        Thread.sleep(1000);
+        loginAtFirstStage = false;
+        urlForFirstStage = "https://headlinermusicclub.com/welcome/";
     }
     
     @Override

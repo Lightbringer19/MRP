@@ -10,6 +10,9 @@ public interface ScraperInterface {
     default void firstStageForCheck() {
     }
     
+    default void afterFirstStage() {
+    }
+    
     default void beforeLogin() {
     }
     

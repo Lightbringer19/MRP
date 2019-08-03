@@ -159,7 +159,7 @@ task BeatJunkiesScraper {
     dependsOn newRelease('monitors.', 'BeatJunkies_Monitor', '2.0.')
 }
 task HeadlineScraper {
-    dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '1.1.')
 }
 
 task BuildAll {

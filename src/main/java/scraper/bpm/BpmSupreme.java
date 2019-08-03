@@ -8,6 +8,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BpmSupreme extends Scraper implements ApiService {
     
@@ -33,6 +34,7 @@ public class BpmSupreme extends Scraper implements ApiService {
     public void firstStageForCheck() {
         driver = new FirefoxDriver(firefoxOptions);
         driver.get("https://www.bpmsupreme.com/store/newreleases/audio/classic/1");
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         Thread.sleep(10_000);
     }
     

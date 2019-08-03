@@ -30,6 +30,7 @@ public abstract class Scraper extends Thread
     private static String cookieForAPI;
     protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
     protected static WebDriver driver;
+    protected static FirefoxOptions firefoxOptions;
     
     protected Logger logger;
     
@@ -45,8 +46,10 @@ public abstract class Scraper extends Thread
     protected MongoCollection<Document> downloaded;
     protected String releaseName;
     
+    protected boolean loginAtFirstStage = true;
+    protected String urlForFirstStage;
+    
     protected boolean exitAfterCheck = true;
-    protected final FirefoxOptions firefoxOptions;
     
     public Scraper() {
         System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
@@ -82,9 +85,9 @@ public abstract class Scraper extends Thread
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
                    .find(eq("releaseDate", firstDate)).first() == null;
-                // if (newReleaseOnThePool) {
-                // TODO: 02.08.2019
-                if (true) {
+                if (newReleaseOnThePool) {
+                    // TODO: 02.08.2019
+                    // if (true) {
                     // Get Cookies
                     cookieForAPI = driver.manage().getCookies().stream()
                        .map(cookie -> cookie.getName() + "=" + cookie.getValue())
@@ -126,7 +129,18 @@ public abstract class Scraper extends Thread
     
     @Override
     public void firstStageForCheck() {
-        login();
+        if (loginAtFirstStage) {
+            login();
+        } else {
+            getDriverPage();
+        }
+        afterFirstStage();
+    }
+    
+    private void getDriverPage() {
+        driver = new FirefoxDriver(firefoxOptions);
+        driver.get(urlForFirstStage);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }
     
     protected String getDownloadDate(String firstDate) {
