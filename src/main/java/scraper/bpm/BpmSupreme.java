@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
@@ -16,18 +17,37 @@ public class BpmSupreme extends Scraper implements ApiService {
     }
     
     public BpmSupreme() {
+        USERNAME = yamlConfig.getBpm_username();
+        PASS = yamlConfig.getBpm_password();
+        loginUrl = "https://www.bpmsupreme.com/login";
+        nameFieldNavigator = By.id("login-form-email");
+        passFieldNavigator = By.id("login-form-password");
+        submitButtonNavigator = By.tagName("button");
+    
         dateFormat = "MM/dd/yy";
         downloaded = mongoControl.bpmDownloaded;
         releaseName = "Bpm Supreme";
-    
-        loginAtFirstStage = false;
-        urlForFirstStage = "https://www.bpmsupreme.com/store/newreleases/audio/classic/1";
     }
     
     @Override
     @SneakyThrows
     public void afterFirstStage() {
+        driver.get("https://www.bpmsupreme.com/store/newreleases/audio/classic/1");
         Thread.sleep(10_000);
+    }
+    
+    @Override
+    @SneakyThrows
+    protected void mainOperation(String firstDate, String downloadDate) {
+        logger.log("Downloading Music Release");
+        scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
+        // SCRAPE VIDEOS AND DOWNLOAD
+        String videosUrl = "https://www.bpmsupreme.com/store/newreleases/video/classic/1";
+        driver.get(videosUrl);
+        Thread.sleep(10_000);
+        logger.log("Looking for Video Release");
+        scrapeAndDownloadRelease(firstDate, downloadDate,
+           releaseName + " Videos");
     }
     
     @Override

@@ -13,14 +13,12 @@ import java.util.List;
 
 public class ScraperTest {
     
-    private static String htmlWithTracks;
-    
     public static void main(String[] args) throws ParseException {
         String html = FUtils.readFile(new File("Z:\\source.html"));
         Document document = Jsoup.parse(html);
         
         List<String> scrapedLinks = new ArrayList<>();
-        String downloadDate = "08/01/19";
+        String downloadDate = "08/02/19";
         Elements trackInfos = document.select("li[class=even updatedversion ng-scope]");
         for (Element trackInfo : trackInfos) {
             String date = trackInfo.select("span[class=date ng-binding]").text();

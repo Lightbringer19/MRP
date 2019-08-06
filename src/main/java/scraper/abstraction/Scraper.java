@@ -111,7 +111,7 @@ public abstract class Scraper extends Thread
     }
     
     protected void login() {
-        driver = new FirefoxDriver(firefoxOptions);
+        driver = new FirefoxDriver();
         logger.log("Login");
         driver.get(loginUrl);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);

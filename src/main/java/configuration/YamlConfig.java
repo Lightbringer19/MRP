@@ -52,5 +52,7 @@ public class YamlConfig {
         private String bj_password;
         private String hl_username;
         private String hl_password;
+        private String bpm_username;
+        private String bpm_password;
     }
 }
