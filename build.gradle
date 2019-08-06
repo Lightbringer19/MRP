@@ -124,8 +124,8 @@ task MongoDB {
     dependsOn newRelease('monitors.', 'MongoMonitor', '0.0.')
 }
 // AUTOMATION
-task ManualRP {
-    dependsOn newRelease('utils.manual.', 'Manual_RP', '1.0.')
+task Manual_Scheduler {
+    dependsOn newRelease('monitors.', 'Manual_Scheduler_Monitor', '1.0.')
 }
 task Uploader {
     dependsOn newRelease('monitors.', 'Uploader_Monitor', '3.1.')
