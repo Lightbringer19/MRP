@@ -23,6 +23,7 @@ public class MongoControl {
     public final MongoCollection<Document> bjDownloaded;
     public final MongoCollection<Document> hlDownloaded;
     public final MongoCollection<Document> bpmDownloaded;
+    public final MongoCollection<Document> bpmLatinoDownloaded;
     
     public MongoControl() {
         mongoClient = new MongoClient("localhost", 27017);
@@ -44,6 +45,7 @@ public class MongoControl {
         bjDownloaded = ftpDB.getCollection("bj_downloaded");
         hlDownloaded = ftpDB.getCollection("hl_downloaded");
         bpmDownloaded = ftpDB.getCollection("bpm_downloaded");
+        bpmLatinoDownloaded = ftpDB.getCollection("bpmLatino_downloaded");
     }
     
 }

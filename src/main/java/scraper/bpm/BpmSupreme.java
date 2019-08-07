@@ -86,8 +86,7 @@ public class BpmSupreme extends Scraper implements ApiService {
                     String downloadUrl = getDownloadUrl(linkForApi);
                     String trackType = downloadInfo.text();
                     logger.log(title + " (" + trackType + ") | "
-                       + downloadUrl
-                    );
+                       + downloadUrl);
                     scrapedLinks.add(downloadUrl);
                 }
             }

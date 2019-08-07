@@ -8,8 +8,6 @@ import utils.FUtils;
 
 import java.io.File;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ScraperTest {
     
@@ -17,28 +15,36 @@ public class ScraperTest {
         String html = FUtils.readFile(new File("Z:\\source.html"));
         Document document = Jsoup.parse(html);
         
-        List<String> scrapedLinks = new ArrayList<>();
-        String downloadDate = "08/02/19";
-        Elements trackInfos = document.select("li[class=even updatedversion ng-scope]");
+        String firstDate = document.select("div[class=date_box]").first().text();
+        
+        System.out.println(firstDate);
+        
+        String downloadDate = document
+           .select("div[class=date_box]")
+           .stream()
+           .filter(date -> !date.text().equals(firstDate))
+           .findFirst()
+           .map(Element::text)
+           .orElse(null);
+        
+        System.out.println(downloadDate);
+        
+        Elements trackInfos = document.select("ul[class=songlist]>li");
         for (Element trackInfo : trackInfos) {
-            String date = trackInfo.select("span[class=date ng-binding]").text();
-            if (date.equals(downloadDate)) {
-                String title = trackInfo.select("div[class=title_box]>h3").first()
-                   .attr("title");
-                Element trackTags = trackInfo.select("div[class=tag]").first();
-                Elements trackDownloadInfos = trackTags.select("span");
-                for (Element downloadInfo : trackDownloadInfos) {
-                    String trackId = downloadInfo.attr("id")
-                       .replace("icon_download_", "");
-                    String trackType = downloadInfo.text();
-                    // String linkToApi = "https://www.bpmsupreme.com/store/output_file/" + trackId;
-                    // String downloadUrl = getDownloadUrl(linkToApi);
-                    System.out.println(title + " " + trackType + " " + trackId);
-                    // scrapedLinks.add(downloadUrl);
-                    // System.out.println(linkToApi);
+            String trackDate = trackInfo.select("div[class=date_box]").text();
+            if (trackDate.equals(downloadDate)) {
+                Elements downloadInfos = trackInfo
+                   .select("div[class=view_drop_block]>ul>li");
+                for (Element downloadInfo : downloadInfos) {
+                    String trackName = downloadInfo.select("p").text();
+                    String downloadUrl = downloadInfo
+                       .select("span[class=download_icon sprite ]>a")
+                       .attr("href");
+                    System.out.println(trackName + " | " + downloadUrl);
                 }
             }
         }
+        
     }
     
 }

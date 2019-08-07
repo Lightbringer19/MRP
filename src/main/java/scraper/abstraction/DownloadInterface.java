@@ -46,13 +46,14 @@ public interface DownloadInterface {
             @Cleanup CloseableHttpResponse response = client.execute(get);
             System.out.println(downloadUrl + " " + response.getStatusLine().getStatusCode());
             String fileName;
-            if (url.contains("headlinermusicclub") || url.contains("bpm")) {
+            if (url.contains("headlinermusicclub") || url.contains("av.bpm")) {
                 fileName = url.substring(url.lastIndexOf("/"))
                    .replace("?download", "");
             } else {
                 fileName = response.getFirstHeader("Content-Disposition").getValue()
                    .replace("attachment; filename=", "")
                    .replace("attachment", "")
+                   .replaceAll(";", "")
                    .replaceAll("\"", "")
                    .replaceAll("\\\\", "")
                    .replaceAll("&amp;", "&");

@@ -164,6 +164,9 @@ task HeadlineScraper {
 task BpmSupremeScraper {
     dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '1.1.')
 }
+task BpmLatinoScraper {
+    dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '1.0.')
+}
 
 task BuildAll {
 //    dependsOn Tagger

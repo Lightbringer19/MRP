@@ -44,11 +44,12 @@ public abstract class Scraper extends Thread
     protected By nameFieldNavigator;
     protected By passFieldNavigator;
     protected By submitButtonNavigator;
+    
     protected MongoCollection<Document> downloaded;
     protected String releaseName;
     
-    protected boolean loginAtFirstStage = true;
     protected String urlForFirstStage;
+    protected boolean loginAtFirstStage = true;
     
     protected boolean exitAfterCheck = true;
     
