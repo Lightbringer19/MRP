@@ -32,7 +32,8 @@ public class BpmSupreme extends Scraper implements ApiService {
     @Override
     @SneakyThrows
     public void afterFirstStage() {
-        driver.get("https://www.bpmsupreme.com/store/newreleases/audio/classic/1");
+        urlToGet = "https://www.bpmsupreme.com/store/newreleases/audio/classic/1";
+        driver.get(urlToGet);
         Thread.sleep(10_000);
     }
     
@@ -42,8 +43,8 @@ public class BpmSupreme extends Scraper implements ApiService {
         logger.log("Downloading Music Release");
         scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
         // SCRAPE VIDEOS AND DOWNLOAD
-        String videosUrl = "https://www.bpmsupreme.com/store/newreleases/video/classic/1";
-        driver.get(videosUrl);
+        urlToGet = "https://www.bpmsupreme.com/store/newreleases/video/classic/1";
+        driver.get(urlToGet);
         Thread.sleep(10_000);
         logger.log("Looking for Video Release");
         scrapeAndDownloadRelease(firstDate, downloadDate,
@@ -99,8 +100,8 @@ public class BpmSupreme extends Scraper implements ApiService {
         String currentUrl = driver.getCurrentUrl();
         Integer pageNumber =
            Integer.valueOf(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-        String finalUrl = currentUrl.replace(pageNumber.toString(), String.valueOf(pageNumber + 1));
-        driver.get(finalUrl);
+        urlToGet = currentUrl.replace(pageNumber.toString(), String.valueOf(pageNumber + 1));
+        driver.get(urlToGet);
         Thread.sleep(10_000);
     }
 }

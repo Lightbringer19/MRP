@@ -31,6 +31,7 @@ public abstract class Scraper extends Thread
     protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
     protected static WebDriver driver;
     protected static FirefoxOptions firefoxOptions;
+    protected String urlToGet;
     
     protected Logger logger;
     
@@ -81,7 +82,7 @@ public abstract class Scraper extends Thread
         private void check() {
             try {
                 firstStageForCheck();
-                String firstDate = scrapeFirstDate(getPageSource());
+                String firstDate = getFirstDate();
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
                    .find(eq("releaseDate", firstDate)).first() == null;
@@ -137,6 +138,18 @@ public abstract class Scraper extends Thread
         afterFirstStage();
     }
     
+    @SneakyThrows
+    private String getFirstDate() {
+        while (true) {
+            try {
+                return scrapeFirstDate(getPageSource());
+            } catch (NullPointerException e) {
+                driver.get(urlToGet);
+                Thread.sleep(10_000);
+            }
+        }
+    }
+    
     private void getDriverPage() {
         driver = new FirefoxDriver(firefoxOptions);
         driver.get(urlForFirstStage);
@@ -162,7 +175,7 @@ public abstract class Scraper extends Thread
             scrapeAllLinksOnPage(getPageSource(), downloadDate,
                firstDate, scrapedLinks);
             nextPage();
-            String dateOnTopOfThePage = scrapeFirstDate(getPageSource());
+            String dateOnTopOfThePage = getFirstDate();
             boolean noDownloadDateOnThePage = !dateOnTopOfThePage.equals(firstDate)
                && !dateOnTopOfThePage.equals(downloadDate);
             if (noDownloadDateOnThePage) {

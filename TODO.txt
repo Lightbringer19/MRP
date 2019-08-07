@@ -1,1 +1,1 @@
-Add more logs to 8W
+Rework Download System for DJ FTP and Beatport
