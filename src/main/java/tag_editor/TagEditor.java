@@ -56,6 +56,12 @@ class TagEditor {
                     tag.setField(FieldKey.ARTIST, titleSplit[0]);
                     tag.setField(FieldKey.TITLE, titleSplit[1]);
                 }
+                //artist filtering
+                if (artist.contains(", SharingDB.eu")) {
+                    artist = artist
+                       .replace(WWW_electronicfresh_COM, "");
+                    tag.setField(FieldKey.ARTIST, artist);
+                }
                 // genre filtering
                 String genreDescription = tag.getFirst(FieldKey.GENRE);
                 String[] falseGenres = {
