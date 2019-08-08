@@ -1,6 +1,7 @@
 package ftp.scene;
 
 import configuration.YamlConfig;
+import lombok.SneakyThrows;
 import mongodb.MongoControl;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPFile;
@@ -14,10 +15,12 @@ import utils.Log;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.mongodb.client.model.Filters.eq;
 
-class SceneFTPManager {
+public class SceneFTPManager extends Thread {
     private static String SERVER_SCENE;
     private static String USERNAME_SCENE;
     private static String PASSWORD_SCENE;
@@ -27,15 +30,38 @@ class SceneFTPManager {
     private static MongoControl mongoControl = new MongoControl();
     private static String category;
     
-    SceneFTPManager() {
+    public SceneFTPManager() {
         YamlConfig yamlConfig = new YamlConfig();
         SERVER_SCENE = yamlConfig.config.getScene_host();
         USERNAME_SCENE = yamlConfig.config.getScene_username();
         PASSWORD_SCENE = yamlConfig.config.getScene_password();
     }
     
-    @SuppressWarnings("Duplicates")
-    void checkFtp(String categoryToDownload) {
+    @Override
+    public void run() {
+        SceneFTPManager sceneFTPManager = new SceneFTPManager();
+        Timer timer = new Timer();
+        TimerTask ftpCheckMp3 = new TimerTask() {
+            @Override
+            @SneakyThrows
+            public void run() {
+                sceneFTPManager.checkFtp("SCENE-MP3");
+            }
+        };
+        TimerTask ftpCheckFlac = new TimerTask() {
+            @Override
+            @SneakyThrows
+            public void run() {
+                sceneFTPManager.checkFtp("SCENE-FLAC");
+            }
+        };
+        long sec = 1000;
+        long min = sec * 60;
+        timer.schedule(ftpCheckMp3, 0, min);
+        timer.schedule(ftpCheckFlac, 0, min);
+    }
+    
+    private void checkFtp(String categoryToDownload) {
         category = categoryToDownload;
         Log.write("Checking FTP for New Releases: " + category, "SCENE_FTP");
         try {
@@ -49,7 +75,6 @@ class SceneFTPManager {
             String pathname = "/ENGLISH/" + ftpCategory + "/";
             
             FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
-            // 0707 - Example
             for (FTPFile dayFolder : dayFtpFolders) {
                 String name = dayFolder.getName();
                 long time = dayFolder.getTimestamp().getTimeInMillis();
@@ -124,10 +149,6 @@ class SceneFTPManager {
                 }
                 downloadFile(releaseRemotePath, releaseLocalPath, releaseFile);
             }
-            Log.write("Release Downloaded: " + releaseName,
-               "SCENE_FTP");
-            mongoControl.rpDownloadedCollection
-               .insertOne(new Document("releaseName", releaseName));
             // DELETE -missing files
             Arrays.stream(Objects.requireNonNull(new File(releaseLocalPath).listFiles()))
                .forEach(file -> {
@@ -136,6 +157,10 @@ class SceneFTPManager {
                    }
                });
             // ADD TO UPLOAD QUEUE
+            Log.write("Release Downloaded: " + releaseName,
+               "SCENE_FTP");
+            mongoControl.rpDownloadedCollection
+               .insertOne(new Document("releaseName", releaseName));
             FUtils.writeFile(Constants.uploadDir, releaseName + ".json",
                releaseLocalPath);
         }

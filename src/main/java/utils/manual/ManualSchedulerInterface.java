@@ -7,7 +7,7 @@ import org.bson.Document;
 import java.io.File;
 
 import static com.mongodb.client.model.Filters.eq;
-import static ftp.ScheduleWatcher.addToScheduleDB;
+import static scheduler.ScheduleWatcher.addToScheduleDB;
 
 public interface ManualSchedulerInterface {
     

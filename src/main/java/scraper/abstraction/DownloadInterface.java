@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import static ftp.ScheduleWatcher.addToScheduleDB;
+import static scheduler.ScheduleWatcher.addToScheduleDB;
 
 public interface DownloadInterface {
     

@@ -1,6 +1,7 @@
 package ftp;
 
 import configuration.YamlConfig;
+import lombok.SneakyThrows;
 import mongodb.MongoControl;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -9,15 +10,12 @@ import utils.Log;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static utils.FUtils.writeToFile;
 
-class RpAndBeatFTPManager {
+public class RpAndBeatFTPManager extends Thread {
     
     private static String SERVER_RP;
     private static String USERNAME_RP;
@@ -70,7 +68,7 @@ class RpAndBeatFTPManager {
     private MongoControl mongoControl = new MongoControl();
     private FTPClient ftpClient = new FTPClient();
     
-    RpAndBeatFTPManager() {
+    public RpAndBeatFTPManager() {
         YamlConfig yamlConfig = new YamlConfig();
         SERVER_RP = yamlConfig.config.getRp_host();
         USERNAME_RP = yamlConfig.config.getRp_username();
@@ -80,7 +78,32 @@ class RpAndBeatFTPManager {
         PASSWORD_BEATPORT = yamlConfig.config.getBeat_password();
     }
     
-    @SuppressWarnings("Duplicates")
+    @Override
+    public void run() {
+        RpAndBeatFTPManager rpAndBeatFtpManager = new RpAndBeatFTPManager();
+        Timer timer = new Timer();
+        TimerTask ftpCheck = new TimerTask() {
+            @Override
+            @SneakyThrows
+            public void run() {
+                rpAndBeatFtpManager.checkFtp("RECORDPOOL");
+            }
+        };
+        TimerTask ftpCheckBeat = new TimerTask() {
+            @Override
+            @SneakyThrows
+            public void run() {
+                rpAndBeatFtpManager.checkFtp("BEATPORT");
+            }
+        };
+        long sec = 1000;
+        long min = sec * 60;
+        long hour = 60 * min;
+        timer.schedule(ftpCheck, 0, 2 * hour);
+        timer.schedule(ftpCheckBeat, 0, min);
+        
+    }
+    
     void checkFtp(String categoryName) {
         CATEGORY_NAME = categoryName;
         Log.write("Checking FTP for New Releases: " + CATEGORY_NAME,

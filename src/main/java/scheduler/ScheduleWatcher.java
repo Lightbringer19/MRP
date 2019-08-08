@@ -1,6 +1,7 @@
-package ftp;
+package scheduler;
 
 import com.mongodb.client.FindIterable;
+import lombok.SneakyThrows;
 import mongodb.MongoControl;
 import org.apache.commons.io.FileUtils;
 import org.bson.Document;
@@ -10,9 +11,7 @@ import utils.Log;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -21,23 +20,49 @@ import static utils.Constants.scheduleDir;
 import static utils.Constants.tagsDir;
 import static utils.FUtils.writeToFile;
 
-public class ScheduleWatcher {
-
+public class ScheduleWatcher extends Thread {
+    
     private static final SimpleDateFormat DATE_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
-    public static final MongoControl MONGO_CONTROL = new MongoControl();
-
-    ScheduleWatcher() {
+       new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+    private static final MongoControl MONGO_CONTROL = new MongoControl();
+    
+    public ScheduleWatcher() {
     }
-
-    public static void main(String[] args) throws IOException {
+    
+    @Override
+    public void run() {
+        Timer timer = new Timer();
         ScheduleWatcher scheduleWatcher = new ScheduleWatcher();
-        scheduleWatcher.scheduleDownloaded();
-        scheduleWatcher.addReleaseToTagQue();
-        scheduleWatcher.checkToDownloadQueue();
+        TimerTask scheduleDownloaded = new TimerTask() {
+            @Override
+            @SneakyThrows
+            public void run() {
+                scheduleWatcher.scheduleDownloaded();
+            }
+        };
+        TimerTask addReleaseToTagQue = new TimerTask() {
+            @Override
+            @SneakyThrows
+            public void run() {
+                scheduleWatcher.addReleaseToTagQue();
+            }
+        };
+        TimerTask checkToDownloadQueue = new TimerTask() {
+            @Override
+            @SneakyThrows
+            public void run() {
+                scheduleWatcher.checkToDownloadQueue();
+            }
+        };
+        long sec = 1000;
+        long min = sec * 60;
+        long hour = 60 * min;
+        timer.schedule(checkToDownloadQueue, 0, 2 * hour);
+        timer.schedule(scheduleDownloaded, 0, min);
+        timer.schedule(addReleaseToTagQue, 0, min);
     }
-
-    void checkToDownloadQueue() {
+    
+    private void checkToDownloadQueue() {
         FindIterable<Document> toDownload = MONGO_CONTROL.toDownloadCollection.find();
         for (Document releaseToDownload : toDownload) {
             String releaseName = (String) releaseToDownload.get("releaseName");
@@ -46,21 +71,21 @@ public class ScheduleWatcher {
             writeToFile(releaseName, link, categoryName);
         }
     }
-
-    void addReleaseToTagQue() {
+    
+    private void addReleaseToTagQue() {
         Document releaseToAdd = MONGO_CONTROL.scheduleCollection
-                .find(lt("scheduleTimeMillis", new Date().getTime())).first();
+           .find(lt("scheduleTimeMillis", new Date().getTime())).first();
         if (releaseToAdd != null) {
             String releaseName = releaseToAdd.get("releaseName").toString();
             String path = releaseToAdd.get("path").toString();
             Log.write("Adding Release to Tag Que: " + releaseName,
-                    "FTP&SCHEDULER");
+               "SCHEDULER");
             FUtils.writeFile(tagsDir, releaseName + ".json", path);
             MONGO_CONTROL.scheduleCollection.deleteOne(releaseToAdd);
         }
     }
-
-    void scheduleDownloaded() throws IOException {
+    
+    private void scheduleDownloaded() throws IOException {
         File[] toSchedule = new File(scheduleDir).listFiles();
         for (File scheduleFile : toSchedule) {
             File folderToSchedule = new File(FUtils.readFile(scheduleFile));
@@ -69,35 +94,34 @@ public class ScheduleWatcher {
             if (categoryName.equals("RECORDPOOL")) {
                 // add to schedule DB
                 addToScheduleDB(folderToSchedule);
-
             } else {
                 // add to tag editor SCHEDULE
                 File tagScheduleFile = new File(tagsDir +
-                        scheduleFile.getName());
+                   scheduleFile.getName());
                 FileUtils.copyFile(scheduleFile, tagScheduleFile);
             }
             // delete from TO_DOWNLOAD QUEUE
             MONGO_CONTROL.toDownloadCollection
-                    .deleteOne(eq("releaseName", folderToSchedule.getName()));
+               .deleteOne(eq("releaseName", folderToSchedule.getName()));
             // add releases to FTP_Downloaded DB
             MONGO_CONTROL.rpDownloadedCollection
-                    .insertOne(new Document("releaseName", folderToSchedule.getName()));
+               .insertOne(new Document("releaseName", folderToSchedule.getName()));
             //delete schedule file
             scheduleFile.delete();
         }
     }
-
+    
     public static void addToScheduleDB(File folderToSchedule) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, ThreadLocalRandom.current().nextInt(480, 720));
         String scheduleTime = DATE_FORMAT.format(cal.getTime());
         Document scheduleTask = new Document()
-                .append("releaseName", folderToSchedule.getName())
-                .append("path", folderToSchedule.getAbsolutePath())
-                .append("scheduleTime", scheduleTime)
-                .append("scheduleTimeMillis", cal.getTime().getTime());
+           .append("releaseName", folderToSchedule.getName())
+           .append("path", folderToSchedule.getAbsolutePath())
+           .append("scheduleTime", scheduleTime)
+           .append("scheduleTimeMillis", cal.getTime().getTime());
         Log.write("Scheduling the Release: " + folderToSchedule.getName()
-                + " To Time: " + scheduleTime, "FTP&SCHEDULER");
+           + " To Time: " + scheduleTime, "SCHEDULER");
         MONGO_CONTROL.scheduleCollection.insertOne(scheduleTask);
     }
 }

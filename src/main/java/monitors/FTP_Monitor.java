@@ -1,10 +1,10 @@
 package monitors;
 
-import ftp.FtpAndScheduleController;
+import ftp.RpAndBeatFTPManager;
 
 public class FTP_Monitor extends Monitor {
     public static void main(String[] args) {
         setTITLE("FTP_Monitor");
-        doAll(new FtpAndScheduleController());
+        doAll(new RpAndBeatFTPManager());
     }
 }

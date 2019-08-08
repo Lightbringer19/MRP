@@ -142,8 +142,14 @@ task Tagger {
 task SceneFTP {
     dependsOn newRelease('monitors.', 'SCENE_FTP_Monitor', '1.0.')
 }
-task FtpAndSchedule {
-    dependsOn newRelease('monitors.', 'FTP_Monitor', '2.0.')
+task BeatportFtp {
+    dependsOn newRelease('monitors.', 'Beatport_FTP_Monitor', '1.0.')
+}
+task DjPoolFtp {
+    dependsOn newRelease('monitors.', 'DJ_Pool_FTP_Monitor', '1.0.')
+}
+task ScheduleWatcher {
+    dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '1.0.')
 }
 //SCRAPERS
 task AutoDMPScraper {
@@ -178,9 +184,11 @@ task BuildAll {
 //    dependsOn AutoDMPScraper
 
 //    dependsOn SceneFTP
-    dependsOn FtpAndSchedule
 
-    dependsOn BeatJunkiesScraper
+    dependsOn BeatportFtp
+    dependsOn DjPoolFtp
+
+//    dependsOn BeatJunkiesScraper
 //    dependsOn FtpAndSchedule
 //    dependsOn EwScraper
 //    dependsOn Mp3PoolScraper
