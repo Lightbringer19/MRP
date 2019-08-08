@@ -32,13 +32,14 @@ public class TagRunnerMain extends Thread {
                 Log.write(CheckDate.getNowTime() + " Tagger Sleeping", "Tagger");
                 Thread.sleep(10000);
             } catch (Exception e) {
-                Log.write(CheckDate.getNowTime() + " Tagger Sleeping With Exception " + e, "Tagger");
+                Log.write(CheckDate.getNowTime() +
+                   " Tagger Sleeping With Exception " + e, "Tagger");
                 Log.write(e, "Tagger");
                 Thread.sleep(5000);
             }
         }
     }
-
+    
     private static void editRecordPool(File infoFile, File folderToEdit, String category) {
         // Edit tags in folder
         Log.write("Editing Folder: " + folderToEdit.getName(), "Tagger");
@@ -60,9 +61,9 @@ public class TagRunnerMain extends Thread {
         Log.write("Folder Edited: " + folderToEdit.getName(), "Tagger");
         // send info of edited folder to Uploader
         FUtils.writeFile(Constants.uploadDir, folderToEdit.getName() + ".json",
-                folderToEdit.getAbsolutePath());
+           folderToEdit.getAbsolutePath());
     }
-
+    
     @Override
     public void run() {
         new File(tagsDir).mkdirs();
@@ -73,7 +74,7 @@ public class TagRunnerMain extends Thread {
             e.printStackTrace();
         }
     }
-
+    
     @SneakyThrows
     private static void BeatPortEdit(File infoFile) {
         try {
@@ -87,22 +88,24 @@ public class TagRunnerMain extends Thread {
             TagEditor.EditMP3TagsInFolder(folderToTag);
             infoFile.delete();
             // send info of edited folder to Uploader
-            FUtils.writeFile(Constants.uploadDir, folderToTag.getName() + ".json", folderToTag.getAbsolutePath());
+            FUtils.writeFile(Constants.uploadDir,
+               folderToTag.getName() + ".json", folderToTag.getAbsolutePath());
         } catch (Exception e) {
             Log.write("Exception TagEdit " + e, "Tagger");
             Thread.sleep(5000);
         }
     }
-
+    
     private static File renameFolder(File folderToTag, String stringToReplace) {
         String folderName = folderToTag.getName();
         if (folderName.contains(stringToReplace)) {
             folderName = folderName.replace(stringToReplace, "");
-            File renamedFolder = new File(folderToTag.getParentFile().getAbsolutePath() + "//" + folderName);
+            File renamedFolder = new File(
+               folderToTag.getParentFile().getAbsolutePath() + "//" + folderName);
             folderToTag.renameTo(renamedFolder);
             folderToTag = renamedFolder;
         }
         return folderToTag;
     }
-
+    
 }

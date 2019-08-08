@@ -50,7 +50,7 @@ public class BeatportFtp extends FtpManager {
             logger.log("Release Downloaded: " + releaseName);
             mongoControl.rpDownloadedCollection
                .insertOne(new Document("releaseName", releaseName));
-            FUtils.writeFile(Constants.uploadDir, releaseName + ".json",
+            FUtils.writeFile(Constants.tagsDir, releaseName + ".json",
                releaseLocalPath);
         }
     }

@@ -21,11 +21,12 @@ import java.util.Arrays;
 import java.util.Map;
 
 class TagEditor {
-
+    
     private static final String WWW_MY_RECORD_POOL_COM = "www.MyRecordPool.com";
     private static final String WWW_GROOVYTUNES_ORG = "-www.groovytunes.org";
     private static final String WWW_electronicfresh_COM = "www.electronicfresh.com";
-
+    public static final String SHARING_DB_EU = " – SharingDB.eu";
+    
     static void editMP3(File file) {
         try {
             Log.write("Editing Tags: " + file.getName(), "Tagger");
@@ -42,8 +43,10 @@ class TagEditor {
                 tag.setField(FieldKey.ALBUM_ARTIST, WWW_MY_RECORD_POOL_COM);
                 // title filtering
                 String title = tag.getFirst(FieldKey.TITLE);
-                if (title.contains(WWW_electronicfresh_COM)) {
-                    title = title.replace(WWW_electronicfresh_COM, "");
+                if (title.contains(WWW_electronicfresh_COM) || title.contains(SHARING_DB_EU)) {
+                    title = title
+                       .replace(SHARING_DB_EU, "")
+                       .replace(WWW_electronicfresh_COM, "");
                     tag.setField(FieldKey.TITLE, title);
                 }
                 // get artist and title from title
@@ -55,10 +58,11 @@ class TagEditor {
                 }
                 // genre filtering
                 String genreDescription = tag.getFirst(FieldKey.GENRE);
-                String[] falseGenres = {"SharingDB", "www.original-mass.net", "hotreleases", "electronicfresh"};
+                String[] falseGenres = {
+                   "SharingDB", "www.original-mass.net", "hotreleases", "electronicfresh"};
                 for (String genre : falseGenres) {
-                    boolean shar = genreDescription.contains(genre);
-                    if (shar) {
+                    boolean contains = genreDescription.contains(genre);
+                    if (contains) {
                         tag.deleteField(FieldKey.GENRE);
                     }
                 }
@@ -70,17 +74,20 @@ class TagEditor {
                     // compare artwork with promoImage
                     ImageExtractor imageExtractor = new ImageExtractor().invoke();
                     byte[] artData = art.getBinaryData();
-                    if (Arrays.equals(imageExtractor.getMyrec(), artData) || Arrays.equals(imageExtractor.getElectroFresh(), artData)) {
+                    if (Arrays.equals(imageExtractor.getMyrec(), artData) ||
+                       Arrays.equals(imageExtractor.getElectroFresh(), artData)) {
                         // if promotion image is present
                         Artwork logoArt = ArtworkFactory
-                                .createArtworkFromFile(new File(Constants.filesDir + "logo.jpg"));
+                           .createArtworkFromFile(
+                              new File(Constants.filesDir + "logo.jpg"));
                         tag.deleteArtworkField();
                         tag.addField(logoArt);
                     }
                 }
                 // when no art
                 else {
-                    Artwork logoArt = ArtworkFactory.createArtworkFromFile(new File(Constants.filesDir + "logo.jpg"));
+                    Artwork logoArt = ArtworkFactory.createArtworkFromFile(
+                       new File(Constants.filesDir + "logo.jpg"));
                     tag.deleteArtworkField();
                     tag.addField(logoArt);
                 }
@@ -89,8 +96,10 @@ class TagEditor {
             // rename file
             String fileName = file.getName();
             if (fileName.contains(WWW_GROOVYTUNES_ORG)) {
-                String ReplacedName = fileName.replace(WWW_GROOVYTUNES_ORG, "");
-                File dest = new File(file.getParentFile().getAbsolutePath() + "//" + ReplacedName);
+                String ReplacedName = fileName
+                   .replace(WWW_GROOVYTUNES_ORG, "");
+                File dest = new File(file.getParentFile().getAbsolutePath() +
+                   "//" + ReplacedName);
                 file.renameTo(dest);
             }
             Log.write("Tag Edited: " + file.getName(), "Tagger");
@@ -104,7 +113,7 @@ class TagEditor {
             }
         }
     }
-
+    
     static void EditMP4(File file) {
         try {
             Log.write("Editing MP4: " + file.getName(), "Tagger");
@@ -115,8 +124,10 @@ class TagEditor {
             itunesMeta.put(-1453039239, MetaValue.createString(" "));
             itunesMeta.put(757935405, MetaValue.createString(" "));
             itunesMeta.put(-1453101708, MetaValue.createString(" "));
-            itunesMeta.put(-1453233054, MetaValue.createString(WWW_MY_RECORD_POOL_COM));// Album
-            itunesMeta.put(1631670868, MetaValue.createString(WWW_MY_RECORD_POOL_COM)); // Album Artist
+            // Album
+            itunesMeta.put(-1453233054, MetaValue.createString(WWW_MY_RECORD_POOL_COM));
+            // Album Artist
+            itunesMeta.put(1631670868, MetaValue.createString(WWW_MY_RECORD_POOL_COM));
             // Add Logo
             String logoPath = Constants.filesDir + "logo.jpg";
             InputStream logo = new FileInputStream(logoPath);
@@ -135,7 +146,7 @@ class TagEditor {
             }
         }
     }
-
+    
     static void EditMP3TagsInFolder(File folder) {
         File[] Mp3Folder = folder.listFiles();
         // extract artwork from file
@@ -146,9 +157,9 @@ class TagEditor {
                 editMP3(file);
             }
         }
-
+        
     }
-
+    
     private static void getArtwork(File[] folder) {
         try {
             for (File file : folder) {
@@ -162,7 +173,8 @@ class TagEditor {
                         Artwork art = tag.getFirstArtwork();
                         if (art != null) {
                             byte[] artData = art.getBinaryData();
-                            if (!Arrays.equals(myrec, artData) && !Arrays.equals(electroFresh, artData)) {
+                            if (!Arrays.equals(myrec, artData) &&
+                               !Arrays.equals(electroFresh, artData)) {
                                 OutputStream os = new FileOutputStream(changeFileName(file));
                                 os.write(artData);
                                 os.close();
@@ -173,7 +185,7 @@ class TagEditor {
                 }
             }
         } catch (IOException | CannotReadException | TagException | ReadOnlyFileException
-                | InvalidAudioFrameException e) {
+           | InvalidAudioFrameException e) {
             Log.write("Exception getArtwork " + e, "Tagger");
             try {
                 Thread.sleep(1000);
@@ -182,7 +194,7 @@ class TagEditor {
             }
         }
     }
-
+    
     private static File changeFileName(File file) {
         String pathToArt = file.getAbsolutePath().replace(".mp3", ".jpg");
         if (file.getName().contains(WWW_GROOVYTUNES_ORG)) {
@@ -190,24 +202,26 @@ class TagEditor {
         }
         return new File(pathToArt);
     }
-
+    
     private static class ImageExtractor {
         private byte[] myrec;
         private byte[] electroFresh;
-
+        
         byte[] getMyrec() {
             return myrec;
         }
-
+        
         byte[] getElectroFresh() {
             return electroFresh;
         }
-
+        
         ImageExtractor invoke() throws IOException {
-            InputStream myrecImage = new FileInputStream(Constants.filesDir + "pickmyrec.jpg");
+            InputStream myrecImage =
+               new FileInputStream(Constants.filesDir + "pickmyrec.jpg");
             myrec = IOUtils.toByteArray(myrecImage);
             myrecImage.close();
-            InputStream electroFreshImage = new FileInputStream(Constants.filesDir + "electronicfresh.jpg");
+            InputStream electroFreshImage =
+               new FileInputStream(Constants.filesDir + "electronicfresh.jpg");
             electroFresh = IOUtils.toByteArray(electroFreshImage);
             electroFreshImage.close();
             return this;
