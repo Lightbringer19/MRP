@@ -18,10 +18,9 @@ public interface ManualSchedulerInterface {
     
     default void checkRelease(File release) {
         String releaseName = release.getName();
-        System.out.println("Checking: " + releaseName);
-        if (!releaseInDB(RELEASES_COLLECTION, releaseName)) {
-            if (!releaseInDB(SCHEDULE_COLLECTION, releaseName)) {
-                if (!releaseInDB(TO_DOWNLOAD_COLLECTION, releaseName)) {
+        if (releaseNotInDB(RELEASES_COLLECTION, releaseName)) {
+            if (releaseNotInDB(SCHEDULE_COLLECTION, releaseName)) {
+                if (releaseNotInDB(TO_DOWNLOAD_COLLECTION, releaseName)) {
                     addToScheduleDB(release);
                 } else {
                     System.out.println("Release in To_Download Queue: " + releaseName);
@@ -34,8 +33,8 @@ public interface ManualSchedulerInterface {
         }
     }
     
-    default boolean releaseInDB(MongoCollection<Document> releasesCollection, String releaseName) {
+    default boolean releaseNotInDB(MongoCollection<Document> releasesCollection, String releaseName) {
         return releasesCollection
-           .find(eq("releaseName", releaseName)).first() != null;
+           .find(eq("releaseName", releaseName)).first() == null;
     }
 }
