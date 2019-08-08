@@ -59,7 +59,7 @@ class TagEditor {
                 //artist filtering
                 if (artist.contains(", SharingDB.eu")) {
                     artist = artist
-                       .replace(WWW_electronicfresh_COM, "");
+                       .replace(", SharingDB.eu", "");
                     tag.setField(FieldKey.ARTIST, artist);
                 }
                 // genre filtering
