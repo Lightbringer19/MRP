@@ -1,24 +1,18 @@
 package scheduler;
 
-import com.mongodb.client.FindIterable;
 import lombok.SneakyThrows;
 import mongodb.MongoControl;
-import org.apache.commons.io.FileUtils;
 import org.bson.Document;
 import utils.FUtils;
 import utils.Log;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lt;
-import static utils.Constants.scheduleDir;
 import static utils.Constants.tagsDir;
-import static utils.FUtils.writeToFile;
 
 public class ScheduleWatcher extends Thread {
     
@@ -33,13 +27,13 @@ public class ScheduleWatcher extends Thread {
     public void run() {
         Timer timer = new Timer();
         ScheduleWatcher scheduleWatcher = new ScheduleWatcher();
-        TimerTask scheduleDownloaded = new TimerTask() {
-            @Override
-            @SneakyThrows
-            public void run() {
-                scheduleWatcher.scheduleDownloaded();
-            }
-        };
+        // TimerTask scheduleDownloaded = new TimerTask() {
+        //     @Override
+        //     @SneakyThrows
+        //     public void run() {
+        //         scheduleWatcher.scheduleDownloaded();
+        //     }
+        // };
         TimerTask addReleaseToTagQue = new TimerTask() {
             @Override
             @SneakyThrows
@@ -47,30 +41,30 @@ public class ScheduleWatcher extends Thread {
                 scheduleWatcher.addReleaseToTagQue();
             }
         };
-        TimerTask checkToDownloadQueue = new TimerTask() {
-            @Override
-            @SneakyThrows
-            public void run() {
-                scheduleWatcher.checkToDownloadQueue();
-            }
-        };
+        // TimerTask checkToDownloadQueue = new TimerTask() {
+        //     @Override
+        //     @SneakyThrows
+        //     public void run() {
+        //         scheduleWatcher.checkToDownloadQueue();
+        //     }
+        // };
         long sec = 1000;
         long min = sec * 60;
         long hour = 60 * min;
-        timer.schedule(checkToDownloadQueue, 0, 2 * hour);
-        timer.schedule(scheduleDownloaded, 0, min);
+        // timer.schedule(checkToDownloadQueue, 0, 2 * hour);
+        // timer.schedule(scheduleDownloaded, 0, min);
         timer.schedule(addReleaseToTagQue, 0, min);
     }
     
-    private void checkToDownloadQueue() {
-        FindIterable<Document> toDownload = MONGO_CONTROL.toDownloadCollection.find();
-        for (Document releaseToDownload : toDownload) {
-            String releaseName = (String) releaseToDownload.get("releaseName");
-            String link = (String) releaseToDownload.get("link");
-            String categoryName = (String) releaseToDownload.get("categoryName");
-            writeToFile(releaseName, link, categoryName);
-        }
-    }
+    // private void checkToDownloadQueue() {
+    //     FindIterable<Document> toDownload = MONGO_CONTROL.toDownloadCollection.find();
+    //     for (Document releaseToDownload : toDownload) {
+    //         String releaseName = (String) releaseToDownload.get("releaseName");
+    //         String link = (String) releaseToDownload.get("link");
+    //         String categoryName = (String) releaseToDownload.get("categoryName");
+    //         writeToFile(releaseName, link, categoryName);
+    //     }
+    // }
     
     private void addReleaseToTagQue() {
         Document releaseToAdd = MONGO_CONTROL.scheduleCollection
@@ -85,31 +79,31 @@ public class ScheduleWatcher extends Thread {
         }
     }
     
-    private void scheduleDownloaded() throws IOException {
-        File[] toSchedule = new File(scheduleDir).listFiles();
-        for (File scheduleFile : toSchedule) {
-            File folderToSchedule = new File(FUtils.readFile(scheduleFile));
-            // LOGIC FOR DIFFERENT FTP
-            String categoryName = folderToSchedule.getParentFile().getName();
-            if (categoryName.equals("RECORDPOOL")) {
-                // add to schedule DB
-                addToScheduleDB(folderToSchedule);
-            } else {
-                // add to tag editor SCHEDULE
-                File tagScheduleFile = new File(tagsDir +
-                   scheduleFile.getName());
-                FileUtils.copyFile(scheduleFile, tagScheduleFile);
-            }
-            // delete from TO_DOWNLOAD QUEUE
-            MONGO_CONTROL.toDownloadCollection
-               .deleteOne(eq("releaseName", folderToSchedule.getName()));
-            // add releases to FTP_Downloaded DB
-            MONGO_CONTROL.rpDownloadedCollection
-               .insertOne(new Document("releaseName", folderToSchedule.getName()));
-            //delete schedule file
-            scheduleFile.delete();
-        }
-    }
+    // private void scheduleDownloaded() throws IOException {
+    //     File[] toSchedule = new File(scheduleDir).listFiles();
+    //     for (File scheduleFile : toSchedule) {
+    //         File folderToSchedule = new File(FUtils.readFile(scheduleFile));
+    //         // LOGIC FOR DIFFERENT FTP
+    //         String categoryName = folderToSchedule.getParentFile().getName();
+    //         if (categoryName.equals("RECORDPOOL")) {
+    //             // add to schedule DB
+    //             addToScheduleDB(folderToSchedule);
+    //         } else {
+    //             // add to tag editor SCHEDULE
+    //             File tagScheduleFile = new File(tagsDir +
+    //                scheduleFile.getName());
+    //             FileUtils.copyFile(scheduleFile, tagScheduleFile);
+    //         }
+    //         // delete from TO_DOWNLOAD QUEUE
+    //         MONGO_CONTROL.toDownloadCollection
+    //            .deleteOne(eq("releaseName", folderToSchedule.getName()));
+    //         // add releases to FTP_Downloaded DB
+    //         MONGO_CONTROL.rpDownloadedCollection
+    //            .insertOne(new Document("releaseName", folderToSchedule.getName()));
+    //         //delete schedule file
+    //         scheduleFile.delete();
+    //     }
+    // }
     
     public static void addToScheduleDB(File folderToSchedule) {
         Calendar cal = Calendar.getInstance();

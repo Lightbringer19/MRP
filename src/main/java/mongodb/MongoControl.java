@@ -24,28 +24,35 @@ public class MongoControl {
     public final MongoCollection<Document> hlDownloaded;
     public final MongoCollection<Document> bpmDownloaded;
     public final MongoCollection<Document> bpmLatinoDownloaded;
+    public final MongoCollection<Document> scrapedReleases;
     
     public MongoControl() {
         mongoClient = new MongoClient("localhost", 27017);
-    
+        
+        //mainDB
         mrpDB = mongoClient.getDatabase("MRP");
         releasesCollection = mrpDB.getCollection("releases");
         tasksCollection = mrpDB.getCollection("tasks");
         staticImageLinksCollection = mrpDB.getCollection("staticImageLinks");
-        scrapedDMP = mrpDB.getCollection("scrapedDMP");
-    
+        
+        //FTP
         ftpDB = mongoClient.getDatabase("FTP");
         scheduleCollection = ftpDB.getCollection("schedule");
         dayFolderTimeCollection = ftpDB.getCollection("rp_timeStamps");
         rpDownloadedCollection = ftpDB.getCollection("rp_downloaded");
         toDownloadCollection = ftpDB.getCollection("rp_toDownload");
+        
+        //SCRAPING
+        scrapedReleases = ftpDB.getCollection("scrapedReleases");
     
+        scrapedDMP = mrpDB.getCollection("scrapedDMP");
         ewDownloaded = ftpDB.getCollection("ew_downloaded");
         mp3PoolDownloaded = ftpDB.getCollection("mp3_pool_downloaded");
         bjDownloaded = ftpDB.getCollection("bj_downloaded");
         hlDownloaded = ftpDB.getCollection("hl_downloaded");
         bpmDownloaded = ftpDB.getCollection("bpm_downloaded");
         bpmLatinoDownloaded = ftpDB.getCollection("bpmLatino_downloaded");
+        
     }
     
 }

@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BpmSupreme extends Scraper implements ApiService {
     
@@ -83,7 +84,9 @@ public class BpmSupreme extends Scraper implements ApiService {
                     String trackId = downloadInfo.attr("id")
                        .replace("icon_download_", "");
                     String linkForApi = "https://www.bpmsupreme.com/store/output_file/" + trackId;
-                    String downloadUrl = getDownloadUrl(linkForApi);
+                    List<String> info = getDownloadInfo(linkForApi);
+                    String downloadUrl = info.get(0);
+                    cookieForAPI = info.get(1);
                     String trackType = downloadInfo.text();
                     logger.log(title + " (" + trackType + ") | "
                        + downloadUrl);
@@ -91,6 +94,16 @@ public class BpmSupreme extends Scraper implements ApiService {
                 }
             }
         }
+    }
+    
+    @Override
+    public void operationWithLinksAfterScrape(List<String> scrapedLinks) {
+        List<String> formattedLinks = scrapedLinks
+           .stream()
+           .map(url -> url.replaceAll(" ", "%20"))
+           .collect(Collectors.toList());
+        scrapedLinks.clear();
+        scrapedLinks.addAll(formattedLinks);
     }
     
     @Override

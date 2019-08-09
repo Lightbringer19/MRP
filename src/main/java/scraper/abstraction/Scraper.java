@@ -27,7 +27,7 @@ public abstract class Scraper extends Thread
    implements ScrapingInterface, DownloadInterface, ScraperInterface {
     
     protected static MongoControl mongoControl = new MongoControl();
-    private static String cookieForAPI;
+    protected static String cookieForAPI;
     protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
     protected static WebDriver driver;
     protected static FirefoxOptions firefoxOptions;
@@ -90,10 +90,7 @@ public abstract class Scraper extends Thread
                 if (newReleaseOnThePool) {
                     // TODO: 02.08.2019
                     // if (true) {
-                    // Get Cookies
-                    cookieForAPI = driver.manage().getCookies().stream()
-                       .map(cookie -> cookie.getName() + "=" + cookie.getValue())
-                       .collect(Collectors.joining("; "));
+                    setCookieForAPI();
                     //  Find next date
                     String downloadDate = getDownloadDate(firstDate);
                     // MAIN OPERATION EXECUTION
@@ -194,8 +191,20 @@ public abstract class Scraper extends Thread
                                             String releaseName) {
         List<String> scrapedLinks = scrapeLinks(firstDate, downloadDate);
         if (scrapedLinks.size() > 0) {
+            writeLinksToDB(scrapedLinks,
+               releaseName + " " + formatDownloadDate(downloadDate));
             downloadLinks(scrapedLinks,
                releaseName + " " + formatDownloadDate(downloadDate));
+        }
+    }
+    
+    private void writeLinksToDB(List<String> scrapedLinks, String releaseName) {
+        boolean noScrapedReleaseInDB = mongoControl.scrapedReleases
+           .find(eq("releaseName", releaseName)).first() == null;
+        if (noScrapedReleaseInDB) {
+            mongoControl.scrapedReleases
+               .insertOne(new Document("releaseName", releaseName)
+                  .append("scrapedLinks", scrapedLinks));
         }
     }
     
@@ -212,6 +221,12 @@ public abstract class Scraper extends Thread
         String pageSource = (String) ((JavascriptExecutor) driver).executeScript(javascript,
            driver.findElement(By.tagName("html")));
         return "<html>" + pageSource + "</html>";
+    }
+    
+    private void setCookieForAPI() {
+        cookieForAPI = driver.manage().getCookies().stream()
+           .map(cookie -> cookie.getName() + "=" + cookie.getValue())
+           .collect(Collectors.joining("; "));
     }
     
     @Override

@@ -48,7 +48,8 @@ public interface DownloadInterface {
             String fileName;
             if (url.contains("headlinermusicclub") || url.contains("av.bpm")) {
                 fileName = url.substring(url.lastIndexOf("/"))
-                   .replace("?download", "");
+                   .replace("?download", "")
+                   .replaceAll("%20", " ");
             } else {
                 fileName = response.getFirstHeader("Content-Disposition").getValue()
                    .replace("attachment; filename=", "")
@@ -59,7 +60,7 @@ public interface DownloadInterface {
                    .replaceAll("&amp;", "&");
             }
             File mp3File = new File(releaseFolderPath + fileName);
-            getLogger().log("Downloading file: " + fileName + " " + url
+            getLogger().log("Downloading file: " + fileName + " | " + downloadUrl
                + " | " + response.getStatusLine());
             @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
             response.getEntity().writeTo(outputStream);
