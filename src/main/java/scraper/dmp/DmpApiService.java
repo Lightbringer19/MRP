@@ -20,17 +20,17 @@ class DmpApiService {
        throws IOException, ParseException {
         String uri = "https://www.digitalmusicpool.com" + scraped;
         String response = getClean(uri, cookie);
-        // Log.write(response, "Scraper");
+        // Log.write(response, "DMP Scraper");
         String TrackID = scraped.substring(scraped.lastIndexOf("/") + 1);
         String downloadKey = null;
         if (response.contains("Beginning Download")) {
             downloadKey = getDownloadKey(response, TrackID);
         } else if (response.contains("You have exceeded the download limit for this track")) {
-            Log.write("Limit, Skip Track", "Scraper");
+            Log.write("Limit, Skip Track", "DMP Scraper");
         } else {
             Request requestInfo = getRequestInfo(response, scraped);
             String postResponse = postClean(uri, cookie, requestInfo.toString());
-            // Log.write(postResponse, "Scraper");
+            // Log.write(postResponse, "DMP Scraper");
             JSONObject post = (JSONObject) new JSONParser().parse(postResponse);
             downloadKey = post.get("DownloadFileKey").toString();
         }
@@ -42,7 +42,7 @@ class DmpApiService {
             String body = MessageFormat.format(bodyTemp, TrackID, downloadKey);
             String post = postClean("https://www.digitalmusicpool.com/download", cookie, body);
             String url = ((JSONObject) new JSONParser().parse(post)).get("url").toString();
-            Log.write("Got Url: " + url, "Scraper");
+            Log.write("Got Url: " + url, "DMP Scraper");
             return url;
         }
         

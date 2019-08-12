@@ -152,8 +152,8 @@ task ScheduleWatcher {
     dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '1.0.')
 }
 //SCRAPERS
-task AutoDMPScraper {
-    dependsOn newRelease('monitors.', 'Auto_DMP_Scraper_Monitor', '1.1.')
+task DMPScraper {
+    dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '1.2.')
 }
 task EwScraper {
     dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '2.0.')

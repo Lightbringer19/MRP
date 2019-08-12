@@ -1,23 +1,34 @@
 package scraper.dmp;
 
 import lombok.AllArgsConstructor;
+import lombok.Cleanup;
 import lombok.Data;
 import mongodb.MongoControl;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import utils.FUtils;
+import utils.CheckDate;
+import utils.CustomExecutor;
 import utils.Log;
+import utils.Logger;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
+import static scheduler.ScheduleWatcher.addToScheduleDB;
 import static scraper.dmp.DmpApiService.getDownloadUrl;
 import static scraper.dmp.DmpDriver.cookieForAPI;
 
@@ -34,16 +45,16 @@ class DmpScraper {
         boolean newReleaseNotInDB = mongoControl.scrapedDMP
            .find(eq("releaseDate", newDate)).first() == null;
         if (newReleaseNotInDB) {
-            Log.write("Found New Release: " + newDate, "Scraper");
+            Log.write("Found New Release: " + newDate, "DMP Scraper");
             mongoControl.scrapedDMP.insertOne(new org.bson.Document("releaseDate", newDate));
             String dateForDownloadRaw = dates.get(1);
             Collection<String> linksToDownload = scrapedDmpPage
                .getScraped().get(dateForDownloadRaw);
-            Log.write("Scraping Previous Release: " + dateForDownloadRaw, "Scraper");
+            Log.write("Scraping Previous Release: " + dateForDownloadRaw, "DMP Scraper");
             // GET URLS VIA API
             List<String> downloadURLS = getDownloadUrls(linksToDownload);
             // DOWNLOAD RELEASE FROM PREVIOUS DATE
-            addToDownloadQueue(getDateForDmpDownload(dateForDownloadRaw), downloadURLS);
+            downloadRelease(getDateForDmpDownload(dateForDownloadRaw), downloadURLS);
         }
     }
     
@@ -79,7 +90,7 @@ class DmpScraper {
        throws IOException, ParseException {
         List<String> downloadURLS = new ArrayList<>();
         for (String link : links) {
-            Log.write("Will Scrape link from: " + link, "Scraper");
+            Log.write("Will Scrape link from: " + link, "DMP Scraper");
             String downloadURL = getDownloadUrl(link, cookieForAPI);
             if (downloadURL != null) {
                 downloadURLS.add(downloadURL);
@@ -88,16 +99,48 @@ class DmpScraper {
         return downloadURLS;
     }
     
-    private static void addToDownloadQueue(String dateForReleaseName, List<String> downloadURLS) {
-        String scrapedLinks = String.join(" ", downloadURLS)
-           .replaceAll("\"", "");
+    private static void downloadRelease(String dateForReleaseName, List<String> downloadURLS) {
         String releaseName = "Digital Music Pool " + dateForReleaseName;
-        Log.write("All Scraped Links: " + scrapedLinks, "Scraper");
-        Log.write("Adding Release to QUEUE: " + releaseName, "Scraper");
-        FUtils.writeToFile(releaseName, scrapedLinks);
-        mongoControl.toDownloadCollection.insertOne(
-           new org.bson.Document("releaseName", releaseName)
-              .append("link", scrapedLinks).append("categoryName", "RECORDPOOL"));
+        new Logger("DMP Scraper").log("Downloading release: " + releaseName);
+        String releaseFolderPath =
+           "Z://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
+              "/RECORDPOOL/" + releaseName + "/";
+        new File(releaseFolderPath).mkdirs();
+        CustomExecutor downloadMaster = new CustomExecutor(15);
+        downloadURLS.stream()
+           .map(downloadUrl -> new Thread(() ->
+              downloadFile(downloadUrl, releaseFolderPath)))
+           .forEach(downloadMaster::submit);
+        downloadMaster.WaitUntilTheEnd();
+        new Logger("DMP Scraper").log("Release Downloaded: " + releaseName);
+        addToScheduleDB(new File(releaseFolderPath));
+        new Logger("DMP Scraper").log("Release Scheduled: " + releaseName);
+    }
+    
+    private static void downloadFile(String url, String releaseFolderPath) {
+        try {
+            String downloadUrl = url.replaceAll(" ", "%20");
+            @Cleanup CloseableHttpClient client = HttpClients.createDefault();
+            HttpGet get = new HttpGet(downloadUrl);
+            get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
+            @Cleanup CloseableHttpResponse response = client.execute(get);
+            System.out.println(downloadUrl + " " + response.getStatusLine().getStatusCode());
+            String fileName = response.getFirstHeader("Content-Disposition").getValue()
+               .replace("attachment; filename=", "")
+               .replace("attachment", "")
+               .replaceAll(";", "")
+               .replaceAll("\"", "")
+               .replaceAll("\\\\", "")
+               .replaceAll("&amp;", "&");
+            File mp3File = new File(releaseFolderPath + fileName);
+            new Logger("DMP Scraper").log("Downloading file: " + fileName + " | " + downloadUrl
+               + " | " + response.getStatusLine());
+            @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
+            response.getEntity().writeTo(outputStream);
+            new Logger("DMP Scraper").log("Downloaded: " + fileName);
+        } catch (Exception e) {
+            new Logger("DMP Scraper").log(e);
+        }
     }
     
     private static String getDateForDmpDownload(String date) throws java.text.ParseException {

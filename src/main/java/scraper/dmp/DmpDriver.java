@@ -24,7 +24,7 @@ public class DmpDriver extends Thread {
     }
     
     private void Login() {
-        Log.write("Login", "Scraper");
+        Log.write("Login", "DMP Scraper");
         driver.get("https://www.digitalmusicpool.com/new_releases");
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         // Enter Username
@@ -42,7 +42,7 @@ public class DmpDriver extends Thread {
         username = yamlConfig.config.getDmp_username();
         pass = yamlConfig.config.getDmp_password();
         try {
-            Log.write("Start", "Scraper");
+            Log.write("Start", "DMP Scraper");
             //set DB control
             String pathToSelenium = Constants.filesDir + "geckodriver.exe";
             System.setProperty("webdriver.gecko.driver", pathToSelenium);
@@ -53,8 +53,7 @@ public class DmpDriver extends Thread {
                .map(cookie -> cookie.getName() + "=" + cookie.getValue())
                .collect(Collectors.joining("; "));
         } catch (Exception e) {
-            Log.write(e, "Scraper");
-        } finally {
+            Log.write(e, "DMP Scraper");
             driver.quit();
         }
     }

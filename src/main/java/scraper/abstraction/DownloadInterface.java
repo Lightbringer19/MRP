@@ -16,6 +16,7 @@ import java.util.List;
 
 import static scheduler.ScheduleWatcher.addToScheduleDB;
 
+@SuppressWarnings("ALL")
 public interface DownloadInterface {
     
     default void downloadLinks(List<String> scrapedLinks, String releaseName) {
