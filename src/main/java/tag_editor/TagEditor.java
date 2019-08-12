@@ -24,8 +24,16 @@ class TagEditor {
     
     private static final String WWW_MY_RECORD_POOL_COM = "www.MyRecordPool.com";
     private static final String WWW_GROOVYTUNES_ORG = "-www.groovytunes.org";
-    private static final String WWW_electronicfresh_COM = "www.electronicfresh.com";
-    public static final String SHARING_DB_EU = " – SharingDB.eu";
+    
+    private static String[] titleFilter = {
+       "-www.groovytunes.org",
+       "www.electronicfresh.com",
+       " – SharingDB.eu",
+       "www.inevil.com",
+       "inevil.com",
+       ", SharingDB.eu",
+       "SharingDB"
+    };
     
     static void editMP3(File file) {
         try {
@@ -43,12 +51,8 @@ class TagEditor {
                 tag.setField(FieldKey.ALBUM_ARTIST, WWW_MY_RECORD_POOL_COM);
                 // title filtering
                 String title = tag.getFirst(FieldKey.TITLE);
-                if (title.contains(WWW_electronicfresh_COM) || title.contains(SHARING_DB_EU)) {
-                    title = title
-                       .replace(SHARING_DB_EU, "")
-                       .replace(WWW_electronicfresh_COM, "");
-                    tag.setField(FieldKey.TITLE, title);
-                }
+                title = filter(title, titleFilter);
+                tag.setField(FieldKey.TITLE, title);
                 // get artist and title from title
                 String artist = tag.getFirst(FieldKey.ARTIST);
                 if (artist.equals("For Promotional Use Only") || artist.equals("")) {
@@ -57,11 +61,8 @@ class TagEditor {
                     tag.setField(FieldKey.TITLE, titleSplit[1]);
                 }
                 //artist filtering
-                if (artist.contains(", SharingDB.eu")) {
-                    artist = artist
-                       .replace(", SharingDB.eu", "");
-                    tag.setField(FieldKey.ARTIST, artist);
-                }
+                artist = filter(artist, titleFilter);
+                tag.setField(FieldKey.ARTIST, artist);
                 // genre filtering
                 String genreDescription = tag.getFirst(FieldKey.GENRE);
                 String[] falseGenres = {
@@ -207,6 +208,13 @@ class TagEditor {
             pathToArt = pathToArt.replace(WWW_GROOVYTUNES_ORG, "");
         }
         return new File(pathToArt);
+    }
+    
+    static String filter(String stringToFilter, String[] filterValues) {
+        for (String filterValue : filterValues) {
+            stringToFilter = stringToFilter.replace(filterValue, "");
+        }
+        return stringToFilter;
     }
     
     private static class ImageExtractor {

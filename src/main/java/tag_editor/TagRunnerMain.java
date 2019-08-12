@@ -84,6 +84,8 @@ public class TagRunnerMain extends Thread {
             // rename folder
             folderToTag = renameFolder(folderToTag, " - electronicfresh.com");
             folderToTag = renameFolder(folderToTag, " - ElectronicFresh.com");
+            folderToTag = renameFolder(folderToTag, "www.inevil.com");
+            folderToTag = renameFolder(folderToTag, "inevil.com");
             // Edit tags in copied folder
             TagEditor.EditMP3TagsInFolder(folderToTag);
             infoFile.delete();
@@ -96,10 +98,10 @@ public class TagRunnerMain extends Thread {
         }
     }
     
-    private static File renameFolder(File folderToTag, String stringToReplace) {
+    private static File renameFolder(File folderToTag, String stringToDelete) {
         String folderName = folderToTag.getName();
-        if (folderName.contains(stringToReplace)) {
-            folderName = folderName.replace(stringToReplace, "");
+        if (folderName.contains(stringToDelete)) {
+            folderName = folderName.replace(stringToDelete, "");
             File renamedFolder = new File(
                folderToTag.getParentFile().getAbsolutePath() + "//" + folderName);
             folderToTag.renameTo(renamedFolder);
