@@ -52,7 +52,7 @@ class TagEditor {
                 // get artist and title from title
                 String artist = tag.getFirst(FieldKey.ARTIST);
                 if (artist.equals("For Promotional Use Only") || artist.equals("")) {
-                    String[] titleSplit = title.split(" {2}- ");
+                    String[] titleSplit = title.split(" - ");
                     tag.setField(FieldKey.ARTIST, titleSplit[0]);
                     tag.setField(FieldKey.TITLE, titleSplit[1]);
                 }

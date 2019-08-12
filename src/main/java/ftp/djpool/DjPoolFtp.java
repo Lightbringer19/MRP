@@ -43,11 +43,11 @@ public class DjPoolFtp extends FtpManager {
         boolean download = toDownload(releaseName, releaseNameCleaned);
         if (download) {
             // download release
-            logger.log("New Releases to Download: " + releaseName);
+            logger.log("New Releases to Download: " + releaseNameCleaned);
             // create local release folder
             String releaseLocalPath =
                "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
-                  + "/" + CATEGORY_NAME + "/" + releaseName;
+                  + "/" + CATEGORY_NAME + "/" + releaseNameCleaned;
             new File(releaseLocalPath).mkdirs();
             FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);
             for (FTPFile releaseFile : releaseFiles) {
@@ -61,7 +61,7 @@ public class DjPoolFtp extends FtpManager {
                 }
             }
             // ADD TO UPLOAD QUEUE
-            logger.log("Release Downloaded: " + releaseName);
+            logger.log("Release Downloaded: " + releaseNameCleaned);
             mongoControl.rpDownloadedCollection
                .insertOne(new Document("releaseName", releaseNameCleaned));
             // ADD TO SCHEDULE

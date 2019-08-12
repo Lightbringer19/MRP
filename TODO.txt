@@ -1,2 +1,2 @@
-Rework Download System for DJ FTP and Beatport
-Change Manual scheduler to have less logs
+Filter tags : inevil.com
+Static art links
