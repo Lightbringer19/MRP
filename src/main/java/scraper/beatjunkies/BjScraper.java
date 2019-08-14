@@ -12,17 +12,17 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
-public class Bj extends Scraper {
+public class BjScraper extends Scraper {
     
     private String htmlWithTracks;
     private List<String> dates;
     
     public static void main(String[] args) {
-        Bj bj = new Bj();
-        bj.run();
+        BjScraper bjScraper = new BjScraper();
+        bjScraper.run();
     }
     
-    public Bj() {
+    public BjScraper() {
         USERNAME = yamlConfig.getBj_username();
         PASS = yamlConfig.getBj_password();
         loginUrl = "https://beatjunkies.com/login";

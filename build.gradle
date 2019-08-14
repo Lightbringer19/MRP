@@ -173,6 +173,9 @@ task BpmSupremeScraper {
 task BpmLatinoScraper {
     dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '1.0.')
 }
+task RemixMp4Scraper {
+    dependsOn newRelease('monitors.', 'RemixMp4_Scraper_Monitor', '1.0.')
+}
 
 task BuildAll {
 //    dependsOn Tagger

@@ -25,6 +25,7 @@ public class MongoControl {
     public final MongoCollection<Document> bpmDownloaded;
     public final MongoCollection<Document> bpmLatinoDownloaded;
     public final MongoCollection<Document> scrapedReleases;
+    public final MongoCollection<Document> remixMp4Downloaded;
     
     public MongoControl() {
         mongoClient = new MongoClient("localhost", 27017);
@@ -52,6 +53,7 @@ public class MongoControl {
         hlDownloaded = ftpDB.getCollection("hl_downloaded");
         bpmDownloaded = ftpDB.getCollection("bpm_downloaded");
         bpmLatinoDownloaded = ftpDB.getCollection("bpmLatino_downloaded");
+        remixMp4Downloaded = ftpDB.getCollection("remixMp4_downloaded");
         
     }
     

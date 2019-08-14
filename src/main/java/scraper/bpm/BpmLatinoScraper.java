@@ -9,14 +9,14 @@ import scraper.abstraction.Scraper;
 
 import java.util.List;
 
-public class BpmLatino extends Scraper {
+public class BpmLatinoScraper extends Scraper {
     
     public static void main(String[] args) {
-        BpmLatino bpmLatino = new BpmLatino();
-        bpmLatino.run();
+        BpmLatinoScraper bpmLatinoScraper = new BpmLatinoScraper();
+        bpmLatinoScraper.run();
     }
     
-    public BpmLatino() {
+    public BpmLatinoScraper() {
         USERNAME = yamlConfig.getBpm_latino_username();
         PASS = yamlConfig.getBpm_latino_password();
         loginUrl = "https://bpmlatino.com/store/index.php?option=com_user&view=login&Itemid=91";

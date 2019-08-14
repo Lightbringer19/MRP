@@ -38,17 +38,6 @@ public class Mp3PoolScraper extends Scraper {
     }
     
     @Override
-    public void nextPage() {
-        String currentUrl = driver.getCurrentUrl();
-        if (currentUrl.contains("page")) {
-            int pageNumber = Integer.parseInt(currentUrl.substring(currentUrl.indexOf("=") + 1));
-            driver.get("https://mp3poolonline.com/viewadminaudio?page=" + (pageNumber + 1));
-        } else {
-            driver.get("https://mp3poolonline.com/viewadminaudio?page=1");
-        }
-    }
-    
-    @Override
     public String scrapeFirstDate(String html) {
         return Jsoup.parse(html)
            .select("div[class=innerPlayer1]").first()
@@ -88,4 +77,14 @@ public class Mp3PoolScraper extends Scraper {
               }));
     }
     
+    @Override
+    public void nextPage() {
+        String currentUrl = driver.getCurrentUrl();
+        if (currentUrl.contains("page")) {
+            int pageNumber = Integer.parseInt(currentUrl.substring(currentUrl.indexOf("=") + 1));
+            driver.get("https://mp3poolonline.com/viewadminaudio?page=" + (pageNumber + 1));
+        } else {
+            driver.get("https://mp3poolonline.com/viewadminaudio?page=1");
+        }
+    }
 }

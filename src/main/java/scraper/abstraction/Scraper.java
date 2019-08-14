@@ -19,6 +19,7 @@ import utils.Logger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -110,10 +111,11 @@ public abstract class Scraper extends Thread
     }
     
     protected void login() {
-        driver = new FirefoxDriver();
+        FirefoxOptions options = new FirefoxOptions().setLogLevel(Level.OFF);
+        driver = new FirefoxDriver(options);
         logger.log("Login");
         driver.get(loginUrl);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
         // Enter Username
         WebElement nameField = driver.findElement(nameFieldNavigator);
         nameField.sendKeys(USERNAME);

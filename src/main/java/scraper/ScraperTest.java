@@ -1,5 +1,6 @@
 package scraper;
 
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -7,6 +8,7 @@ import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.text.ParseException;
 
 public class ScraperTest {
@@ -15,36 +17,43 @@ public class ScraperTest {
         String html = FUtils.readFile(new File("Z:\\source.html"));
         Document document = Jsoup.parse(html);
         
-        String firstDate = document.select("div[class=date_box]").first().text();
+        String text = document.select("article[class=box_horizontal]").first().text();
+        String firstDate = getDate(text);
         
         System.out.println(firstDate);
         
         String downloadDate = document
-           .select("div[class=date_box]")
+           .select("article[class=box_horizontal]")
            .stream()
-           .filter(date -> !date.text().equals(firstDate))
+           .map(element -> getDate(element.text()))
+           .filter(date -> !date.equals(firstDate))
            .findFirst()
-           .map(Element::text)
            .orElse(null);
         
         System.out.println(downloadDate);
         
-        Elements trackInfos = document.select("ul[class=songlist]>li");
+        Elements trackInfos = document.select("article[class=box_horizontal]");
         for (Element trackInfo : trackInfos) {
-            String trackDate = trackInfo.select("div[class=date_box]").text();
+            String trackDate = getDate(trackInfo.text());
             if (trackDate.equals(downloadDate)) {
-                Elements downloadInfos = trackInfo
-                   .select("div[class=view_drop_block]>ul>li");
-                for (Element downloadInfo : downloadInfos) {
-                    String trackName = downloadInfo.select("p").text();
-                    String downloadUrl = downloadInfo
-                       .select("span[class=download_icon sprite ]>a")
-                       .attr("href");
-                    System.out.println(trackName + " | " + downloadUrl);
-                }
+                String trackName = trackInfo.select("h3").first().text();
+                Element downloadInfo = trackInfo.select("a[class=link_add]").first();
+                String[] typeAndID = downloadInfo.attr("onclick").replace("preview(", "")
+                   .replace(")", "").split(",");
+                String downloadUrl = MessageFormat.format(
+                   "https://www.remixmp4.com/down.php?id={0}&type_={1}",
+                   typeAndID[1], typeAndID[0]);
+                System.out.println(trackName + " | " + downloadUrl);
             }
         }
         
+    }
+    
+    @NotNull
+    public static String getDate(String text) {
+        int beginning = text.indexOf(" ", text.indexOf("Date: ")) + 1;
+        int end = text.indexOf(" ", beginning);
+        return text.substring(beginning, end);
     }
     
 }

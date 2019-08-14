@@ -10,14 +10,14 @@ import scraper.abstraction.Scraper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BpmSupreme extends Scraper implements ApiService {
+public class BpmSupremeScraper extends Scraper implements ApiService {
     
     public static void main(String[] args) {
-        BpmSupreme bpmSupreme = new BpmSupreme();
-        bpmSupreme.run();
+        BpmSupremeScraper bpmSupremeScraper = new BpmSupremeScraper();
+        bpmSupremeScraper.run();
     }
     
-    public BpmSupreme() {
+    public BpmSupremeScraper() {
         USERNAME = yamlConfig.getBpm_username();
         PASS = yamlConfig.getBpm_password();
         loginUrl = "https://www.bpmsupreme.com/login";
