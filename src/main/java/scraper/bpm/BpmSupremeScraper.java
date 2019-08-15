@@ -21,8 +21,8 @@ public class BpmSupremeScraper extends Scraper implements ApiService {
         USERNAME = yamlConfig.getBpm_username();
         PASS = yamlConfig.getBpm_password();
         loginUrl = "https://www.bpmsupreme.com/login";
-        nameFieldNavigator = By.id("login-form-email");
-        passFieldNavigator = By.id("login-form-password");
+        nameFieldNavigator = By.id("getCookie-form-email");
+        passFieldNavigator = By.id("getCookie-form-password");
         submitButtonNavigator = By.tagName("button");
     
         dateFormat = "MM/dd/yy";

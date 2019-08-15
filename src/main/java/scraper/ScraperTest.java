@@ -17,32 +17,29 @@ public class ScraperTest {
         String html = FUtils.readFile(new File("Z:\\source.html"));
         Document document = Jsoup.parse(html);
         
-        String text = document.select("article[class=box_horizontal]").first().text();
-        String firstDate = getDate(text);
+        String firstDate = document.select("tr[id*=singleSongPlayer]>td").first().text();
         
         System.out.println(firstDate);
         
         String downloadDate = document
-           .select("article[class=box_horizontal]")
+           .select("tr[id*=singleSongPlayer]")
            .stream()
-           .map(element -> getDate(element.text()))
+           .map(trackInfo -> trackInfo.select("td").first().text())
            .filter(date -> !date.equals(firstDate))
            .findFirst()
            .orElse(null);
         
         System.out.println(downloadDate);
         
-        Elements trackInfos = document.select("article[class=box_horizontal]");
+        Elements trackInfos = document.select("tr[id*=singleSongPlayer]");
         for (Element trackInfo : trackInfos) {
-            String trackDate = getDate(trackInfo.text());
+            String trackDate = trackInfo.select("td").first().text();
             if (trackDate.equals(downloadDate)) {
-                String trackName = trackInfo.select("h3").first().text();
-                Element downloadInfo = trackInfo.select("a[class=link_add]").first();
-                String[] typeAndID = downloadInfo.attr("onclick").replace("preview(", "")
-                   .replace(")", "").split(",");
+                String trackName = trackInfo.text();
+                String downloadID = trackInfo.attr("data-product");
                 String downloadUrl = MessageFormat.format(
-                   "https://www.remixmp4.com/down.php?id={0}&type_={1}",
-                   typeAndID[1], typeAndID[0]);
+                   "https://dalemasbajo.com/products/descargar_producto/{0}",
+                   downloadID);
                 System.out.println(trackName + " | " + downloadUrl);
             }
         }

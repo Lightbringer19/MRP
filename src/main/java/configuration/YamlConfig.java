@@ -58,5 +58,7 @@ public class YamlConfig {
         private String bpm_latino_password;
         private String remixmp4_username;
         private String remixmp4_password;
+        private String dalemasbajo_username;
+        private String dalemasbajo_password;
     }
 }

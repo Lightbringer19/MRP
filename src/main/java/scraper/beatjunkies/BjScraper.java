@@ -1,10 +1,8 @@
 package scraper.beatjunkies;
 
-import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
@@ -32,14 +30,9 @@ public class BjScraper extends Scraper {
         downloaded = mongoControl.bjDownloaded;
         dateFormat = "MMMM d, yyyy";
         releaseName = "Beatjunkies";
-    }
     
-    @Override
-    @SneakyThrows
-    public void firstStageForCheck() {
-        driver = new FirefoxDriver(firefoxOptions);
-        driver.get("https://beatjunkies.com/record-pool");
-        Thread.sleep(1000);
+        loginAtFirstStage = false;
+        urlForFirstStage = "https://beatjunkies.com/record-pool";
     }
     
     @Override

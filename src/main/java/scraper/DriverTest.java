@@ -1,13 +1,10 @@
 package scraper;
 
+import configuration.YamlConfig;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.ProfilesIni;
 import utils.Constants;
 
 import java.util.concurrent.TimeUnit;
@@ -16,19 +13,26 @@ public class DriverTest {
     
     private static WebDriver driver;
     
+    protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
+    
     public static void main(String[] args) {
+        String USERNAME = yamlConfig.getDalemasbajo_username();
+        String PASS = yamlConfig.getDalemasbajo_password();
         System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
-        FirefoxProfile ini = new ProfilesIni().getProfile("selenium");
-        FirefoxOptions firefoxOptions = new FirefoxOptions().setProfile(ini);
-        driver = new FirefoxDriver(firefoxOptions);
-        // driver = new FirefoxDriver();
+        // FirefoxProfile ini = new ProfilesIni().getProfile("selenium");
+        // FirefoxOptions firefoxOptions = new FirefoxOptions().setProfile(ini);
+        // driver = new FirefoxDriver(firefoxOptions);
+        driver = new FirefoxDriver();
         try {
-            driver.get("https://bpmlatino.com/store/index.php?option=com_maianmedia&view=music&Itemid=2&cat_alias=tracks&display=List");
+            driver.get("https://dalemasbajo.com/");
             driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            Thread.sleep(10000);
-            By submitButtonNavigator = By.linkText("Next");
-            WebElement webElement = driver.findElement(submitButtonNavigator);
-            webElement.click();
+            // Cookie cookie = LoginInterface.getCookie(USERNAME, PASS);
+            driver.manage().deleteAllCookies();
+            // driver.manage().addCookie(cookie);
+            driver.get("https://dalemasbajo.com/");
+            // By submitButtonNavigator = By.partialLinkText("Ingresar");
+            // WebElement webElement = driver.findElement(submitButtonNavigator);
+            // webElement.click();
             
             Thread.sleep(10000);
             // String pageSource = getPageSource();
