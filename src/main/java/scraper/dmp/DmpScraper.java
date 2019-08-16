@@ -119,7 +119,8 @@ class DmpScraper {
     
     private static void downloadFile(String url, String releaseFolderPath) {
         try {
-            String downloadUrl = url.replaceAll(" ", "%20");
+            String downloadUrl = url.replaceAll(" ", "%20")
+               .replaceAll("\"", "%22");
             @Cleanup CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(downloadUrl);
             get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
@@ -128,6 +129,7 @@ class DmpScraper {
             String fileName = response.getFirstHeader("Content-Disposition").getValue()
                .replace("attachment; filename=", "")
                .replace("attachment", "")
+               .replace("filename=", "")
                .replaceAll(";", "")
                .replaceAll("\"", "")
                .replaceAll("\\\\", "")
