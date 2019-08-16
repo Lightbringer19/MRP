@@ -12,6 +12,7 @@ import utils.Logger;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static scheduler.ScheduleWatcher.addToScheduleDB;
@@ -42,15 +43,20 @@ public interface DownloadInterface {
             String downloadUrl = url.replaceAll(" ", "%20");
             @Cleanup CloseableHttpClient client = HttpClients.createDefault();
             HttpGet get = new HttpGet(downloadUrl);
-            get.setHeader("Cookie", getCookie());
+            if (!url.contains("s3.amazonaws")) {
+                get.setHeader("Cookie", getCookie());
+            }
             get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
             @Cleanup CloseableHttpResponse response = client.execute(get);
-            System.out.println(downloadUrl + " " + response.getStatusLine().getStatusCode());
+            // System.out.println(downloadUrl + " " + response.getStatusLine().getStatusCode());
             String fileName;
-            if (url.contains("headlinermusicclub") || url.contains("av.bpm")) {
-                fileName = url.substring(url.lastIndexOf("/"))
+            if (url.contains("headlinermusicclub") || url.contains("av.bpm")
+               || url.contains("s3.amazonaws")) {
+                String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
+                fileName = java.net.URLDecoder.decode(
+                   url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name())
                    .replace("?download", "")
-                   .replaceAll("%20", " ");
+                   .replace(decode.substring(decode.indexOf("?AWSAccessKeyId")), "");
             } else {
                 fileName = response.getFirstHeader("Content-Disposition").getValue()
                    .replace("attachment; filename=", "")
@@ -61,7 +67,7 @@ public interface DownloadInterface {
                    .replaceAll("&amp;", "&");
             }
             File mp3File = new File(releaseFolderPath + fileName);
-            getLogger().log("Downloading file: " + fileName + " | " + downloadUrl
+            getLogger().log("Downloading: " + fileName + " | " + downloadUrl
                + " | " + response.getStatusLine());
             @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
             response.getEntity().writeTo(outputStream);

@@ -89,8 +89,6 @@ public abstract class Scraper extends Thread
                 boolean newReleaseOnThePool = downloaded
                    .find(eq("releaseDate", firstDate)).first() == null;
                 if (newReleaseOnThePool) {
-                    // TODO: 02.08.2019
-                    // if (true) {
                     setCookieForAPI();
                     //  Find next date
                     String downloadDate = getDownloadDate(firstDate);

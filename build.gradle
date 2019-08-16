@@ -179,6 +179,9 @@ task RemixMp4Scraper {
 task DaleMBScraper {
     dependsOn newRelease('monitors.', 'DaleMB_Scraper_Monitor', '1.0.')
 }
+task HeavyHitsScraper {
+    dependsOn newRelease('monitors.', 'HeavyHits_Scraper_Monitor', '1.0.')
+}
 
 task BuildAll {
 //    dependsOn Tagger

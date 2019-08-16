@@ -60,5 +60,7 @@ public class YamlConfig {
         private String remixmp4_password;
         private String dalemasbajo_username;
         private String dalemasbajo_password;
+        private String heavyhits_username;
+        private String heavyhits_password;
     }
 }
