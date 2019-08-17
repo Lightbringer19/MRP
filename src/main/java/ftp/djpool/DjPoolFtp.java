@@ -117,7 +117,8 @@ public class DjPoolFtp extends FtpManager {
                "LatinoMusicPool",
                "LatinoMusicPool.com",
                "LMP",
-               "DaZone"
+               "DaZone",
+               "Heavy Hits"
             };
             for (String releaseNameToSkip : SKIP) {
                 if (releaseName.toLowerCase().contains(releaseNameToSkip.toLowerCase())) {
