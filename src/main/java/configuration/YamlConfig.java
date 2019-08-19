@@ -62,5 +62,7 @@ public class YamlConfig {
         private String dalemasbajo_password;
         private String heavyhits_username;
         private String heavyhits_password;
+        private String crateconnect_username;
+        private String crateconnect_password;
     }
 }

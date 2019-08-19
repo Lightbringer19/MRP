@@ -216,7 +216,7 @@ public abstract class Scraper extends Thread
         return new SimpleDateFormat("ddMM").format(cal.getTime());
     }
     
-    private String getPageSource() {
+    public String getPageSource() {
         String javascript = "return document.getElementsByTagName('html')[0].innerHTML";
         String pageSource = (String) ((JavascriptExecutor) driver).executeScript(javascript,
            driver.findElement(By.tagName("html")));
