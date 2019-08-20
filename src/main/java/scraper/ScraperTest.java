@@ -17,12 +17,12 @@ public class ScraperTest {
         String html = FUtils.readFile(new File("Z:\\source.html"));
         Document document = Jsoup.parse(html);
         
-        String firstDate = document.select("td[class=created_at text-center]").first().text();
+        String firstDate = document.select("div[class=track-createdat]").first().text();
         
         System.out.println(firstDate);
         
         String downloadDate = document
-           .select("td[class=created_at text-center]")
+           .select("div[class=track-createdat]")
            .stream()
            .map(Element::text)
            .filter(date -> !date.equals(firstDate))
@@ -31,9 +31,9 @@ public class ScraperTest {
         
         System.out.println(downloadDate);
         
-        Elements trackInfos = document.select("tr[class=cc-song song ]");
+        Elements trackInfos = document.select("tr[class=*track-item]");
         for (Element trackInfo : trackInfos) {
-            String trackDate = trackInfo.select("td[class=created_at text-center]").first().text();
+            String trackDate = trackInfo.select("div[class=track-createdat]").first().text();
             if (trackDate.equals(downloadDate)) {
                 String trackName = trackInfo.text();
                 String downloadID = trackInfo.attr("data-id");

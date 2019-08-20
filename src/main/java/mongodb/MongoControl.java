@@ -29,6 +29,7 @@ public class MongoControl {
     public final MongoCollection<Document> daleMasBajoDownloaded;
     public final MongoCollection<Document> heavyHitsDownloaded;
     public final MongoCollection<Document> crateConnectDownloaded;
+    public final MongoCollection<Document> crack4DjsDownloaded;
     
     public MongoControl() {
         mongoClient = new MongoClient("localhost", 27017);
@@ -60,6 +61,7 @@ public class MongoControl {
         daleMasBajoDownloaded = ftpDB.getCollection("daleMasBajo_downloaded");
         heavyHitsDownloaded = ftpDB.getCollection("heavyHits_downloaded");
         crateConnectDownloaded = ftpDB.getCollection("crateConnect_downloaded");
+        crack4DjsDownloaded = ftpDB.getCollection("crack4Djs_downloaded");
         
     }
     
