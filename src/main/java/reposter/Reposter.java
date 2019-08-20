@@ -76,16 +76,17 @@ public class Reposter extends Thread {
                         ResponseInfo responseInfo = postAndGetResponse(post.toJson(), apiURI,
                            AUTHORIZATION_HEADER);
                         if (responseInfo.getCode() != 201) {
-                            Log.write("Not reposted: " + releaseName + " "
+                            Log.write("Not reposted: " + mainCategory + "| " + releaseName +
+                               " Code: "
                                + responseInfo.getCode(), "Reposter");
-                            if (mainCategory.equals("BEATPORT") && responseInfo.getCode() == 526) {
-                                Log.write("Beatport 526 error WP repost Skipped",
-                                   "Reposter");
-                                break;
-                            } else if (responseInfo.getCode() == 400) {
-                                Log.write("Error 400 WP repost Skipped", "Reposter");
-                                break;
-                            }
+                            // if (mainCategory.equals("BEATPORT") && responseInfo.getCode() == 526) {
+                            //     Log.write("Beatport 526 error WP repost Skipped",
+                            //        "Reposter");
+                            //     break;
+                            // } else if (responseInfo.getCode() == 400) {
+                            //     Log.write("Error 400 WP repost Skipped", "Reposter");
+                            //     break;
+                            // }
                             Thread.sleep(5000);
                         } else {
                             break;
@@ -154,14 +155,14 @@ public class Reposter extends Thread {
         String categoryID = null;
         if (responseInfo.getCode() == 400) {
             // cant find or create category but it exists
-            System.out.println("Category found: " + categoryToFind);
             categoryID = ((JSONObject) ((JSONObject) new JSONParser()
                .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
+            System.out.println("Category found: " + categoryToFind + " ID: " + categoryID);
             
         } else if (responseInfo.getCode() == 201) {
-            System.out.println("Category created: " + categoryToFind);
             categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
                .get("id").toString();
+            System.out.println("Category created: " + categoryToFind + " ID: " + categoryID);
         }
         return categoryID;
     }
