@@ -10,7 +10,6 @@ import json.InfoFromBoxCom;
 import json.TrackInfo;
 import json.db.InfoAboutRelease;
 import json.db.Release;
-import mongodb.MongoControl;
 import org.bson.Document;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -34,9 +33,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static collector.API_Image_Uploader.uploadImage;
+import static collector.API_Image_Uploader.upload;
+import static collector.Compressor.compress;
 import static com.mongodb.client.model.Filters.eq;
 import static com.xuggle.xuggler.IContainer.Type.READ;
+import static wordpress.Poster.MONGO_CONTROL;
 
 public class Collector {
     // public static void main(String[] args) {
@@ -46,9 +47,9 @@ public class Collector {
     //     InfoForPost collect = collect(files, "ReleaseName", "link", "artlink", new File(""), "RECORDPOOL VIDEOS");
     //     System.out.println(collect.toString());
     // }
-
-    public static InfoForPost Collect(File infoJsonFile, MongoControl mongoControl) {
-
+    
+    public static InfoForPost collect(File infoJsonFile) {
+        
         InfoExtractor infoExtractor = new InfoExtractor(infoJsonFile).extract();
         InfoFromBoxCom infoFromBoxCom = infoExtractor.getInfoFromBoxCom();
         File folderToCollect = infoExtractor.getFolderToCollect();
@@ -69,15 +70,16 @@ public class Collector {
         });
         // get art
         File[] art = folderToCollect.listFiles((dir, name) ->
-                name.toLowerCase().endsWith(".jpg"));
+           name.toLowerCase().endsWith(".jpg"));
         // upload art
         String artLink = "https://myrecordpool.com/wp-content/images/logo.jpg";
         if (postCategory.contains("RECORDPOOL")) {
-            Map<String, String> imageMap = (Map<String, String>) mongoControl
-                    .staticImageLinksCollection.find().first().get("imageMap");
+            @SuppressWarnings("unchecked")
+            Map<String, String> imageMap = (Map<String, String>) MONGO_CONTROL
+               .staticImageLinksCollection.find().first().get("imageMap");
             for (Map.Entry<String, String> entry : imageMap.entrySet()) {
                 if (infoFromBoxCom.getReleaseName().toLowerCase()
-                        .contains(entry.getKey().toLowerCase())) {
+                   .contains(entry.getKey().toLowerCase())) {
                     artLink = entry.getValue();
                 }
             }
@@ -85,45 +87,45 @@ public class Collector {
             File theArt = art[0];
             // compress art
             Log.write("Compressing Art", "Poster");
-            File compressedImage = Compressor.Compress(theArt);
+            File compressedImage = compress(theArt);
             if (compressedImage == null) {
                 Log.write("Corrupted Art deleted", "Poster");
                 theArt.delete();
             } else {
                 Log.write("Uploading Art", "Poster");
                 // upload compressed art
-                artLink = uploadImage(compressedImage);
+                artLink = upload(compressedImage);
                 compressedImage.delete();
             }
         }
         // collect info from Audio Files
         Log.write("Collecting Info About Files", "Poster");
         InfoForPost info = Collector.collect(audioFiles, infoFromBoxCom.getReleaseName(),
-                infoFromBoxCom.getDownloadLinkBoxCom(), artLink, folderToCollect, postCategory);
+           infoFromBoxCom.getDownloadLinkBoxCom(), artLink, folderToCollect, postCategory);
         // insert info to DB
-        Document foundRelease = mongoControl.releasesCollection
-                .find(eq("releaseName", info.getReleaseName())).first();
+        Document foundRelease = MONGO_CONTROL.releasesCollection
+           .find(eq("releaseName", info.getReleaseName())).first();
         if (foundRelease == null) {
-            InfoAboutRelease infoAboutRelease = getInfoAboutRelease(info);
+            InfoAboutRelease infoAboutRelease = convertInfo(info);
             Release release = new Release();
             release.setReleaseName(info.getReleaseName());
             release.setCategory(info.getPostCategory());
             release.setBoxComDownloadLink(info.getLink());
             release.setPathToLocalFolder(folderToCollect.getAbsolutePath());
             release.setInfoAboutRelease(infoAboutRelease);
-            mongoControl.releasesCollection.insertOne(release.toDoc());
+            MONGO_CONTROL.releasesCollection.insertOne(release.toDoc());
         } else {
-            InfoAboutRelease infoAboutRelease = getInfoAboutRelease(info);
+            InfoAboutRelease infoAboutRelease = convertInfo(info);
             foundRelease.put("category", info.getPostCategory());
             foundRelease.put("boxComDownloadLink", info.getLink());
             foundRelease.put("infoAboutRelease", infoAboutRelease.toDoc());
-            mongoControl.releasesCollection.replaceOne((eq("_id",
-                    foundRelease.getObjectId("_id"))), foundRelease);
+            MONGO_CONTROL.releasesCollection.replaceOne((eq("_id",
+               foundRelease.getObjectId("_id"))), foundRelease);
         }
         return info;
     }
-
-    private static InfoAboutRelease getInfoAboutRelease(InfoForPost info) {
+    
+    private static InfoAboutRelease convertInfo(InfoForPost info) {
         InfoAboutRelease infoAboutRelease = new InfoAboutRelease();
         infoAboutRelease.setLinkToArt(info.getArtLink());
         infoAboutRelease.setArtist(info.getArtist());
@@ -145,13 +147,13 @@ public class Collector {
         }
         infoAboutRelease.setTrackList(listOfTracks);
         return infoAboutRelease;
-
+        
     }
-
+    
     private static InfoForPost collect(File[] audioFiles, String releaseName, String link,
                                        String artLink, File folderToCollect, String postCategory) {
         InfoForPost info = null;
-
+        
         String Artist = "No Info";
         String Album = "No Info";
         String Genre = "No Info";
@@ -165,7 +167,7 @@ public class Collector {
         String Size;
         int playtime = 0;
         long size = 0;
-
+        
         HashMap<Integer, TrackInfo> TrackList = new HashMap<>();
         try {
             // video
@@ -184,7 +186,7 @@ public class Collector {
                 int key = 0;
                 for (File video_file : audioFiles) {
                     Log.write("File Collecting: " + video_file.getName(),
-                            "Poster");
+                       "Poster");
                     size += video_file.length();
                     Map<Integer, MetaValue> itunesMeta = null;
                     try {
@@ -217,16 +219,16 @@ public class Collector {
                     try {
                         IContainer container = IContainer.make();
                         int result = container.open(video_file.getAbsolutePath(),
-                                READ, null);
+                           READ, null);
                         trackLength = (int) container.getDuration() / 1000000;
                         playtime = getPlaytime(playtime, TrackList,
-                                key, title, artist, trackLength);
+                           key, title, artist, trackLength);
                     } catch (Exception e) {
                         Log.write(e.toString(), "Poster");
                     }
                     key++;
                     Log.write("Info About File Collected: " + video_file.getName(),
-                            "Poster");
+                       "Poster");
                 }
             }
             // ==============MUSIC==============
@@ -251,7 +253,7 @@ public class Collector {
                             mp3file = new Mp3File(audioFiles[0]);
                             Released = mp3file.getId3v1Tag().getYear();
                         } catch (UnsupportedTagException | InvalidDataException |
-                                NullPointerException ignored) {
+                           NullPointerException ignored) {
                         }
                     }
                     if (postCategory.equals("SCENE-FLAC")) {
@@ -272,7 +274,7 @@ public class Collector {
                 int key = 0;
                 for (File audio_file : audioFiles) {
                     Log.write("Collecting Info About File: " + audio_file.getName(),
-                            "Poster");
+                       "Poster");
                     size += audio_file.length();
                     AudioFile track = null;
                     try {
@@ -288,11 +290,11 @@ public class Collector {
                             // Length
                             int trackLength = track.getAudioHeader().getTrackLength();
                             playtime = getPlaytime(playtime, TrackList, key,
-                                    title, artist, trackLength);
+                               title, artist, trackLength);
                         }
                         key++;
                         Log.write("Info About File Collected: " + audio_file.getName(),
-                                "Poster");
+                           "Poster");
                     } catch (NullPointerException e) {
                         Log.write("Exception: " + e, "Poster");
                     }
@@ -312,16 +314,16 @@ public class Collector {
             }
             // set Full Info for WPPost
             info = new InfoForPost(releaseName, link, artLink, postCategory, Artist, Album,
-                    Genre, Released, Tracks, Playtime, Group,
-                    Format, Bitrate, Sample_Rate, Size, TrackList);
+               Genre, Released, Tracks, Playtime, Group,
+               Format, Bitrate, Sample_Rate, Size, TrackList);
         } catch (CannotReadException | IOException | TagException | ReadOnlyFileException
-                | InvalidAudioFrameException e) {
+           | InvalidAudioFrameException e) {
             Log.write("EXCEPTION IN COLLECTOR " + e, "Poster");
             e.printStackTrace();
         }
         return info;
     }
-
+    
     private static int getPlaytime(int playtime, HashMap<Integer, TrackInfo> trackList,
                                    int key, String title, String artist, int trackLength) {
         playtime += trackLength;
@@ -332,29 +334,29 @@ public class Collector {
         trackList.put(key, ThisTrack);
         return playtime;
     }
-
+    
     private static class InfoExtractor {
         private File infoJsonFile;
         private InfoFromBoxCom infoFromBoxCom;
         private File folderToCollect;
         private String postCategoryTEMP;
-
+        
         InfoExtractor(File infoJsonFile) {
             this.infoJsonFile = infoJsonFile;
         }
-
+        
         InfoFromBoxCom getInfoFromBoxCom() {
             return infoFromBoxCom;
         }
-
+        
         File getFolderToCollect() {
             return folderToCollect;
         }
-
+        
         String getPostCategoryTEMP() {
             return postCategoryTEMP;
         }
-
+        
         InfoExtractor extract() {
             String readFile = FUtils.readFile(infoJsonFile);
             Gson gson = new Gson();

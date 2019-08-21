@@ -14,13 +14,13 @@ import java.io.*;
 import java.util.Iterator;
 
 class Compressor {
-
-    static File Compress(File imageFile) {
+    
+    static File compress(File imageFile) {
         File compressedImageFile = imageFile;
         try {
             compressedImageFile = new File(
-                    imageFile.getParentFile().getAbsolutePath() + "\\" +
-                            CheckDate.getTimeForArt() + "compressed.jpg");
+               imageFile.getParentFile().getAbsolutePath() + "\\" +
+                  CheckDate.getTimeForArt() + "compressed.jpg");
             @Cleanup OutputStream os = new FileOutputStream(compressedImageFile);
             @Cleanup InputStream is = new FileInputStream(imageFile);
             @Cleanup ImageOutputStream ios = ImageIO.createImageOutputStream(os);
@@ -39,9 +39,9 @@ class Compressor {
                 int height = image.getHeight();
                 double ratio = (double) height / (double) width;
                 Image tmp = image.getScaledInstance(300, (int) (300 * ratio),
-                        Image.SCALE_SMOOTH);
+                   Image.SCALE_SMOOTH);
                 image = new BufferedImage(300, (int) (300 * ratio),
-                        BufferedImage.TYPE_INT_RGB);
+                   BufferedImage.TYPE_INT_RGB);
                 Graphics2D g2d = image.createGraphics();
                 g2d.drawImage(tmp, 0, 0, null);
                 g2d.dispose();
@@ -53,7 +53,7 @@ class Compressor {
                 param.setCompressionQuality(quality);
                 // write out
                 writer.write(null,
-                        new IIOImage(image, null, null), param);
+                   new IIOImage(image, null, null), param);
             } finally {
                 // close all streams
                 writer.dispose();
@@ -64,5 +64,5 @@ class Compressor {
         }
         return compressedImageFile;
     }
-
+    
 }

@@ -18,18 +18,18 @@ import java.io.InputStream;
 import static wordpress.Poster.MRP_AUTHORIZATION;
 
 class API_Image_Uploader {
-
-    static String uploadImage(File imageFile) {
+    
+    static String upload(File imageFile) {
         try {
             while (true) {
                 CloseableHttpClient client = HttpClients.createDefault();
                 String uri = "https://myrecordpool.com/wp-json/wp/v2/media";
                 HttpPost httpPost = new HttpPost(uri);
                 httpPost.addHeader("Authorization",
-                        MRP_AUTHORIZATION);
+                   MRP_AUTHORIZATION);
                 httpPost.addHeader("Content-Type", "image");
                 httpPost.addHeader("content-disposition",
-                        "attachment; filename=" + imageFile.getName());
+                   "attachment; filename=" + imageFile.getName());
                 InputStream imageToUpload = new FileInputStream(imageFile.getAbsolutePath());
                 byte[] image = IOUtils.toByteArray(imageToUpload);
                 imageToUpload.close();
@@ -40,7 +40,7 @@ class API_Image_Uploader {
                 if (response.getStatusLine().getStatusCode() != 201) {
                     System.out.println(response.getStatusLine());
                     Log.write("Not uploaded: " + imageFile.getName() + " " +
-                            response.getStatusLine(), "Poster");
+                       response.getStatusLine(), "Poster");
                     Thread.sleep(5000);
                 } else {
                     JSONObject post = (JSONObject) new JSONParser().parse(jsonResponse);
@@ -49,10 +49,10 @@ class API_Image_Uploader {
                 }
             }
         } catch (Exception e) {
-            Log.write("Exception uploadImage: " + e, "Poster");
+            Log.write("Exception uploadIMAGE: " + e, "Poster");
             Log.write(e, "API_IMAGE_Errors_Trace");
         }
         return null;
     }
-
+    
 }
