@@ -39,8 +39,8 @@ public class DownloaderTest implements DownloadInterface, ApiService {
         downloaderTest.USERNAME = yamlConfig.getBpm_username();
         downloaderTest.PASS = yamlConfig.getBpm_password();
         downloaderTest.loginUrl = "https://www.bpmsupreme.com/login";
-        downloaderTest.nameFieldNavigator = By.id("getCookie-form-email");
-        downloaderTest.passFieldNavigator = By.id("getCookie-form-password");
+        downloaderTest.nameFieldNavigator = By.id("login-form-email");
+        downloaderTest.passFieldNavigator = By.id("login-form-password");
         downloaderTest.submitButtonNavigator = By.tagName("button");
         
         try {

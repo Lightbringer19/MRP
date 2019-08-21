@@ -1,6 +1,6 @@
 package ftp.djpool;
 
-import ftp.FtpManager;
+import ftp.abstraction.FtpManager;
 import org.apache.commons.net.ftp.FTPFile;
 import org.bson.Document;
 import utils.CheckDate;
@@ -9,12 +9,17 @@ import utils.Logger;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
 import static scheduler.ScheduleWatcher.addToScheduleDB;
 
 public class DjPoolFtp extends FtpManager {
+    
+    private List<String> SKIP;
+    private Map<String, String> renameMap;
     
     public DjPoolFtp() {
         SERVER = yamlConfig.getRp_host();
@@ -26,6 +31,19 @@ public class DjPoolFtp extends FtpManager {
         logger = new Logger("DJ_POOL_FTP");
     
         longPeriod = true;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void beforeCheck() {
+        SKIP = (List<String>) mongoControl
+           .djc_skipCollection
+           .find(eq("name", "skip"))
+           .first().get("SKIP");
+        renameMap = (Map<String, String>) mongoControl
+           .djc_skipCollection
+           .find(eq("name", "rename"))
+           .first().get("rename");
     }
     
     @Override
@@ -81,45 +99,14 @@ public class DjPoolFtp extends FtpManager {
     }
     
     private String cleanReleaseName(String releaseName) {
-        return releaseName
-           .replace(" [DJC]", "")
-           .replace("TrackPack", "MyRecordPool Pack")
-           .replace("Dj City", "DJ City")
-           .replace("DMS", "Direct Music Service")
-           .replace("LoMaximo", "LoMaximoProductions");
+        renameMap.forEach(releaseName::replace);
+        return releaseName;
     }
     
     private boolean toDownload(String releaseName, String releaseNameCleaned) {
         if (releaseName.equals(".") || releaseName.equals("..")) {
             return false;
         } else {
-            String[] SKIP = {
-               "BPM Supreme",
-               "BPM Latino",
-               "MP3 Pool Online",
-               "8th Wonder",
-               "Digital Music Pool",
-               "Crate Connect",
-               "BeatJunkies",
-               "Headliner Music Pool",
-               "MyMp3Pool",
-               "HMC",
-               "DMP",
-               "ONLY_WORKS_WITH_FTP_CLIENT",
-               "Ecuaremixes.com",
-               "Latinremixes.com",
-               "Pro Latin Remix",
-               "Europa Remix",
-               "Extreme Pro Remix",
-               "IntesaMusic.net",
-               "DVJ 3B",
-               "DVJ Marcos Cabrera",
-               "LatinoMusicPool",
-               "LatinoMusicPool.com",
-               "LMP",
-               "DaZone",
-               "Heavy Hits"
-            };
             for (String releaseNameToSkip : SKIP) {
                 if (releaseName.toLowerCase().contains(releaseNameToSkip.toLowerCase())) {
                     return false;

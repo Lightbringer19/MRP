@@ -16,6 +16,7 @@ public class MongoControl {
     public final MongoCollection<Document> staticImageLinksCollection;
     public final MongoCollection<Document> dayFolderTimeCollection;
     public final MongoCollection<Document> rpDownloadedCollection;
+    public final MongoCollection<Document> djc_skipCollection;
     public final MongoCollection<Document> toDownloadCollection;
     public final MongoCollection<Document> scrapedDMP;
     public final MongoCollection<Document> ewDownloaded;
@@ -46,6 +47,7 @@ public class MongoControl {
         dayFolderTimeCollection = ftpDB.getCollection("rp_timeStamps");
         rpDownloadedCollection = ftpDB.getCollection("rp_downloaded");
         toDownloadCollection = ftpDB.getCollection("rp_toDownload");
+        djc_skipCollection = ftpDB.getCollection("djc_skip");
         
         //SCRAPING
         scrapedReleases = ftpDB.getCollection("scrapedReleases");

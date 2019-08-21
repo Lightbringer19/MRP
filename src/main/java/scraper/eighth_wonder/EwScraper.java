@@ -21,7 +21,7 @@ public class EwScraper extends Scraper {
         PASS = yamlConfig.getEw_password();
         dateFormat = "MM.dd.yy";
         loginUrl = "https://www.8thwonderpromos.com/amember/login";
-        nameFieldNavigator = By.id("amember-getCookie");
+        nameFieldNavigator = By.id("amember-login");
         passFieldNavigator = By.id("amember-pass");
         submitButtonNavigator = By.className("password-link");
         downloaded = mongoControl.ewDownloaded;

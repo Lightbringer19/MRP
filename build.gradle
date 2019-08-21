@@ -162,7 +162,7 @@ task Mp3PoolScraper {
     dependsOn newRelease('monitors.', 'Mp3Pool_Scraper_Monitor', '2.0.')
 }
 task BeatJunkiesScraper {
-    dependsOn newRelease('monitors.', 'BeatJunkies_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'BeatJunkies_Scraper_Monitor', '2.0.')
 }
 task HeadlineScraper {
     dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '1.1.')
@@ -184,6 +184,20 @@ task HeavyHitsScraper {
 }
 task CrateConnectScraper {
     dependsOn newRelease('monitors.', 'CrateConnect_Scraper_Monitor', '1.0.')
+}
+
+task BuildScrapers {
+    dependsOn DMPScraper
+    dependsOn EwScraper
+    dependsOn Mp3PoolScraper
+    dependsOn BeatJunkiesScraper
+    dependsOn HeadlineScraper
+    dependsOn BpmSupremeScraper
+    dependsOn BpmLatinoScraper
+    dependsOn RemixMp4Scraper
+    dependsOn DaleMBScraper
+    dependsOn HeavyHitsScraper
+    dependsOn CrateConnectScraper
 }
 
 task BuildAll {

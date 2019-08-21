@@ -1,6 +1,6 @@
 package ftp.beatport;
 
-import ftp.FtpManager;
+import ftp.abstraction.FtpManager;
 import org.apache.commons.net.ftp.FTPFile;
 import org.bson.Document;
 import utils.CheckDate;

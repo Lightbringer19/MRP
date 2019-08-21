@@ -1,4 +1,4 @@
-package ftp;
+package ftp.abstraction;
 
 import configuration.YamlConfig;
 import lombok.SneakyThrows;
@@ -61,6 +61,7 @@ public abstract class FtpManager extends Thread {
     
     private void checkFtp() {
         logger.log("Checking FTP for New Releases: " + CATEGORY_NAME);
+        beforeCheck();
         setPathName();
         try {
             ftpClient.connect(SERVER, PORT);
@@ -110,6 +111,9 @@ public abstract class FtpManager extends Thread {
                 logger.log(e);
             }
         }
+    }
+    
+    protected void beforeCheck() {
     }
     
     protected void setPathName() {

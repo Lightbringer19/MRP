@@ -77,7 +77,7 @@ public abstract class Scraper extends Thread
         long sec = 1000;
         long min = sec * 60;
         long hour = 60 * min;
-        timer.schedule(check, 0, 6 * hour);
+        timer.schedule(check, 0, 1 * hour);
     }
     
     private class Driver {

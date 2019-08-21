@@ -22,7 +22,7 @@ public class BpmLatinoScraper extends Scraper {
         loginUrl = "https://bpmlatino.com/store/index.php?option=com_user&view=login&Itemid=91";
         nameFieldNavigator = By.id("username");
         passFieldNavigator = By.id("passwd");
-        submitButtonNavigator = By.className("getCookie-btn1");
+        submitButtonNavigator = By.className("login-btn1");
     
         dateFormat = "MM/dd/yy";
         downloaded = mongoControl.bpmLatinoDownloaded;
