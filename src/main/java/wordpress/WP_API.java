@@ -23,7 +23,10 @@ import utils.FUtils;
 import utils.Log;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static collector.Collector.collect;
 import static com.mongodb.client.model.Filters.eq;
@@ -39,7 +42,7 @@ public class WP_API {
         InfoForPost info = collect(jsonFile);
         String htmlBodyForPost = buildHTML(info);
         WPPost post = new WPPost(info.getReleaseName(), "publish",
-           getCategoryIDForPost(info), htmlBodyForPost);
+           getCategoryIDsForPost(info), htmlBodyForPost);
         String linkToPost = createPostGetLinkToPost(post.toJson(), info.getReleaseName(),
            "https://myrecordpool.com/wp-json/wp/v2/posts",
            MRP_AUTHORIZATION);
@@ -126,26 +129,55 @@ public class WP_API {
         return html_base;
     }
     
-    private static String[] getCategoryIDForPost(InfoForPost info) {
+    @SuppressWarnings("unchecked")
+    private static String[] getCategoryIDsForPost(InfoForPost info) {
+        String releaseName = info.getReleaseName();
         String category = info.getPostCategory();
+        Map<String, String> categoriesAndIDs;
+        List<String> categories = new ArrayList<>();
         switch (category) {
             case "BEATPORT":
                 category = "115";
+                categories.add(category);
                 break;
             case "RECORDPOOL MUSIC":
                 category = "77";
+                categories.add(category);
+                categoriesAndIDs = (Map<String, String>)
+                   MONGO_CONTROL.categoriesCollection
+                      .find(eq("name", "RECORDPOOL MUSIC"))
+                      .first().get("categoriesAndIDs");
+                for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
+                    if (releaseName.contains(categoryAndID.getKey())) {
+                        categories.add(categoryAndID.getValue());
+                        break;
+                    }
+                }
                 break;
             case "RECORDPOOL VIDEOS":
                 category = "29";
+                categories.add(category);
+                categoriesAndIDs = (Map<String, String>)
+                   MONGO_CONTROL.categoriesCollection
+                      .find(eq("name", "RECORDPOOL VIDEOS"))
+                      .first().get("categoriesAndIDs");
+                for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
+                    if (releaseName.contains(categoryAndID.getKey())) {
+                        categories.add(categoryAndID.getValue());
+                        break;
+                    }
+                }
                 break;
             case "SCENE-MP3":
                 category = "184";
+                categories.add(category);
                 break;
             case "SCENE-FLAC":
                 category = "191";
+                categories.add(category);
                 break;
         }
-        return new String[]{category};
+        return categories.toArray(new String[0]);
     }
     
     private static void append(StringBuilder trackList, String valueString) {

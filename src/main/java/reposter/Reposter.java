@@ -115,7 +115,6 @@ public class Reposter extends Thread {
                 Log.write(e, "Reposter");
                 Thread.sleep(10000);
             }
-            
         }
     }
     
