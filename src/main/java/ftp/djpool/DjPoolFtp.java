@@ -99,7 +99,9 @@ public class DjPoolFtp extends FtpManager {
     }
     
     private String cleanReleaseName(String releaseName) {
-        renameMap.forEach(releaseName::replace);
+        for (Map.Entry<String, String> entry : renameMap.entrySet()) {
+            releaseName = releaseName.replace(entry.getKey(), entry.getValue());
+        }
         return releaseName;
     }
     
