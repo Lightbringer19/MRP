@@ -60,7 +60,7 @@ public class Reposter extends Thread {
                     //compose the post
                     String[] categoriesID = categoriesIDList.toArray(new String[0]);
                     String contentMessage = release.getTrackList()
-                       + "<p>Download here:<br><a href=\"" + release.getMrpPostLink()
+                       + "<p>More Info Here:<br><a href=\"" + release.getMrpPostLink()
                        + "\">" + release.getMrpPostLink() + "</a></p>";
                     WPPost post = new WPPost(releaseName, "publish",
                        categoriesID, contentMessage);
@@ -98,7 +98,7 @@ public class Reposter extends Thread {
                     blogPoster.post(contentMessage, releaseName, categoriesForBlog, mainCategory);
                     Log.write("Reposted to blog: " + releaseName, "Reposter");
                     //make repost to Reddit
-                    String content = MessageFormat.format("{0}\n\nDownload here:\n\n{1}",
+                    String content = MessageFormat.format("{0}\n\nMore Info Here:\n\n{1}",
                        release.getRedditTrackList(), release.getMrpPostLink());
                     Log.write("Making Repost to Reddit", "Reposter");
                     redditPoster.post(mainCategory, releaseName, content);

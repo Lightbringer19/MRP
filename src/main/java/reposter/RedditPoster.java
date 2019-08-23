@@ -13,7 +13,7 @@ import utils.Log;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RedditPoster {
-
+    
     private static String username;
     private static String password;
     private static String clientId;
@@ -21,22 +21,22 @@ public class RedditPoster {
     private final SubredditReference scenedownload;
     private final SubredditReference myRecordPool;
     private final SubredditReference beatportmusic;
-
+    
     public RedditPoster() {
         YamlConfig yamlConfig = new YamlConfig();
         username = yamlConfig.config.getReddit_username();
         password = yamlConfig.config.getReddit_password();
         clientId = yamlConfig.config.getReddit_client_id();
         clientSecret = yamlConfig.config.getReddit_client_secret();
-
+        
         Credentials oauthCreds = Credentials.script(username, password, clientId, clientSecret);
-        UserAgent userAgent = new UserAgent("windows", "mrp.reposter", "1.0.0", username);
+        UserAgent userAgent = new UserAgent("windows", "reposter.mrp", "1.0.0", username);
         RedditClient reddit = OAuthHelper.automatic(new OkHttpNetworkAdapter(userAgent), oauthCreds);
         scenedownload = reddit.subreddit("scenedownload");
         myRecordPool = reddit.subreddit("MyRecordPool");
         beatportmusic = reddit.subreddit("beatportmusic");
     }
-
+    
     public void post(String category, String title, String content) throws InterruptedException {
         int sleepMultiplier = 1;
         while (true) {
@@ -59,6 +59,6 @@ public class RedditPoster {
                 sleepMultiplier *= 2;
             }
         }
-
+        
     }
 }
