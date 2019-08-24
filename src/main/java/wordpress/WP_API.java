@@ -137,47 +137,66 @@ public class WP_API {
         List<String> categories = new ArrayList<>();
         switch (category) {
             case "BEATPORT":
-                category = "115";
-                categories.add(category);
+                categories.add("115");
+                // TODO: 24.08.2019 Genre
+                String genreFiltered = info.getGenre()
+                   .replaceAll("[^a-zA-Z ]", "").trim();
+                String genre = createCategory(genreFiltered, "5514");
+                // TODO: 24.08.2019 Artist
+                // info.getArtist()
                 break;
             case "RECORDPOOL MUSIC":
-                category = "77";
-                categories.add(category);
-                categoriesAndIDs = (Map<String, String>)
-                   MONGO_CONTROL.categoriesCollection
-                      .find(eq("name", "RECORDPOOL MUSIC"))
-                      .first().get("categoriesAndIDs");
-                for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
-                    if (releaseName.contains(categoryAndID.getKey())) {
-                        categories.add(categoryAndID.getValue());
-                        break;
-                    }
-                }
+                categories.add("77");
+                setCategories(releaseName, categories, category);
                 break;
             case "RECORDPOOL VIDEOS":
-                category = "29";
-                categories.add(category);
-                categoriesAndIDs = (Map<String, String>)
-                   MONGO_CONTROL.categoriesCollection
-                      .find(eq("name", "RECORDPOOL VIDEOS"))
-                      .first().get("categoriesAndIDs");
-                for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
-                    if (releaseName.contains(categoryAndID.getKey())) {
-                        categories.add(categoryAndID.getValue());
-                        break;
-                    }
-                }
+                categories.add("29");
+                setCategories(releaseName, categories, category);
                 break;
             case "SCENE-MP3":
-                category = "184";
-                categories.add(category);
+                categories.add("184");
                 break;
             case "SCENE-FLAC":
-                category = "191";
-                categories.add(category);
+                categories.add("191");
                 break;
         }
         return categories.toArray(new String[0]);
+    }
+    
+    @SuppressWarnings("Duplicates")
+    @SneakyThrows
+    public static String createCategory(String category, String parentId) {
+        String apiURI = "https://myrecordpool.com/wp-json/wp/v2/categories";
+        ResponseInfo responseInfo = postAndGetResponse(new Document()
+              .append("name", category).append("parent", parentId).toJson(), apiURI,
+           MRP_AUTHORIZATION);
+        String categoryID = null;
+        if (responseInfo.getCode() == 400) {
+            categoryID = ((JSONObject) ((JSONObject) new JSONParser()
+               .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
+            System.out.println("Category found: " + category + " ID: " + categoryID);
+            
+        } else if (responseInfo.getCode() == 201) {
+            categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
+               .get("id").toString();
+            System.out.println("Category created: " + category + " ID: " + categoryID);
+        }
+        return categoryID;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static void setCategories(String releaseName, List<String> categories, String category) {
+        Map<String, String> categoriesAndIDs;
+        categoriesAndIDs = (Map<String, String>)
+           MONGO_CONTROL.categoriesCollection
+              .find(eq("name", category))
+              .first().get("categoriesAndIDs");
+        for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
+            if (releaseName.contains(categoryAndID.getKey())) {
+                categories.add(categoryAndID.getValue());
+                break;
+            }
+        }
     }
     
     private static void append(StringBuilder trackList, String valueString) {

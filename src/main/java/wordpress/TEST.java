@@ -1,6 +1,5 @@
 package wordpress;
 
-import configuration.YamlConfig;
 import json.ResponseInfo;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -9,10 +8,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static wordpress.Poster.MONGO_CONTROL;
 import static wordpress.Poster.MRP_AUTHORIZATION;
 import static wordpress.WP_API.postAndGetResponse;
 
@@ -20,19 +15,19 @@ import static wordpress.WP_API.postAndGetResponse;
 class TEST {
     @SneakyThrows
     public static void main(String[] args) {
-        YamlConfig yamlConfig = new YamlConfig();
-        MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
-        String[] categories = {
-        };
-        Map<String, String> categoriesAndIDs = new HashMap<>();
-        for (String category : categories) {
-            String parentId = "29";
-            String categoryID = createCategory(category, parentId);
-            categoriesAndIDs.put(category, categoryID);
-        }
-        MONGO_CONTROL.categoriesCollection.insertOne(
-           new Document("name", "RECORDPOOL VIDEOS")
-              .append("categoriesAndIDs", categoriesAndIDs));
+        // YamlConfig yamlConfig = new YamlConfig();
+        // MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
+        // String[] categories = {
+        // };
+        // Map<String, String> categoriesAndIDs = new HashMap<>();
+        // for (String category : categories) {
+        //     String parentId = "29";
+        //     String categoryID = createCategory(category, parentId);
+        //     categoriesAndIDs.put(category, categoryID);
+        // }
+        // MONGO_CONTROL.categoriesCollection.insertOne(
+        //    new Document("name", "RECORDPOOL VIDEOS")
+        //       .append("categoriesAndIDs", categoriesAndIDs));
         
     }
     
