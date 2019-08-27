@@ -138,12 +138,7 @@ public class WP_API {
         switch (category) {
             case "BEATPORT":
                 categories.add("115");
-                // TODO: 24.08.2019 Genre
-                String genreFiltered = info.getGenre()
-                   .replaceAll("[^a-zA-Z ]", "").trim();
-                String genre = createCategory(genreFiltered, "5514");
-                // TODO: 24.08.2019 Artist
-                // info.getArtist()
+                setCategoriesForBeatAndScene(info, categories);
                 break;
             case "RECORDPOOL MUSIC":
                 categories.add("77");
@@ -155,12 +150,44 @@ public class WP_API {
                 break;
             case "SCENE-MP3":
                 categories.add("184");
+                setCategoriesForBeatAndScene(info, categories);
                 break;
             case "SCENE-FLAC":
                 categories.add("191");
+                setCategoriesForBeatAndScene(info, categories);
                 break;
         }
         return categories.toArray(new String[0]);
+    }
+    
+    private static void setCategoriesForBeatAndScene(InfoForPost info, List<String> categories) {
+        if (!info.getGenre().equals("Mixed")) {
+            String genreFiltered = info.getGenre()
+               .replaceAll("\\)", "").replaceAll("\\(", "")
+               .replaceAll("^[0-9]", "").trim();
+            String genre = createCategory(genreFiltered, "5514");
+            categories.add(genre);
+        }
+        String artistInfo = info.getArtist().trim();
+        if (!artistInfo.equals("") && !artistInfo.equals(" ")) {
+            String artist = createCategory(artistInfo, "5513");
+            categories.add(artist);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static void setCategories(String releaseName, List<String> categories, String category) {
+        Map<String, String> categoriesAndIDs;
+        categoriesAndIDs = (Map<String, String>)
+           MONGO_CONTROL.categoriesCollection
+              .find(eq("name", category))
+              .first().get("categoriesAndIDs");
+        for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
+            if (releaseName.contains(categoryAndID.getKey())) {
+                categories.add(categoryAndID.getValue());
+                break;
+            }
+        }
     }
     
     @SuppressWarnings("Duplicates")
@@ -182,21 +209,6 @@ public class WP_API {
             System.out.println("Category created: " + category + " ID: " + categoryID);
         }
         return categoryID;
-    }
-    
-    @SuppressWarnings("unchecked")
-    private static void setCategories(String releaseName, List<String> categories, String category) {
-        Map<String, String> categoriesAndIDs;
-        categoriesAndIDs = (Map<String, String>)
-           MONGO_CONTROL.categoriesCollection
-              .find(eq("name", category))
-              .first().get("categoriesAndIDs");
-        for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
-            if (releaseName.contains(categoryAndID.getKey())) {
-                categories.add(categoryAndID.getValue());
-                break;
-            }
-        }
     }
     
     private static void append(StringBuilder trackList, String valueString) {
