@@ -151,6 +151,9 @@ task DjPoolFtp {
 task ScheduleWatcher {
     dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '1.0.')
 }
+task PostUpdater {
+    dependsOn newRelease('monitors.', 'Post_Updater_Monitor', '1.0.')
+}
 //SCRAPERS
 task DMPScraper {
     dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '1.2.')

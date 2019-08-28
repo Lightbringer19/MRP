@@ -59,8 +59,8 @@ public class WP_API {
            "Poster");
     }
     
-    private static String createPostGetLinkToPost(String JSON_BODY, String releaseName,
-                                                  String apiURI, String authorizationHeader) {
+    static String createPostGetLinkToPost(String JSON_BODY, String releaseName,
+                                          String apiURI, String authorizationHeader) {
         try {
             while (true) {
                 ResponseInfo response = postAndGetResponse(JSON_BODY, apiURI, authorizationHeader);
@@ -201,7 +201,7 @@ public class WP_API {
         if (responseInfo.getCode() == 400) {
             categoryID = ((JSONObject) ((JSONObject) new JSONParser()
                .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
-            System.out.println("Category found: " + category + " ID: " + categoryID);
+            System.out.println("Category found  : " + category + " ID: " + categoryID);
             
         } else if (responseInfo.getCode() == 201) {
             categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
