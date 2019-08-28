@@ -39,7 +39,7 @@ public class Reposter extends Thread {
         YamlConfig yamlConfig = new YamlConfig();
         AUTHORIZATION_HEADER = yamlConfig.config.getRepost_authorization();
         mongoControl = new MongoControl();
-        BlogPoster blogPoster = new BlogPoster();
+        // BlogPoster blogPoster = new BlogPoster();
         RedditPoster redditPoster = new RedditPoster();
         while (true) {
             try {
@@ -94,9 +94,9 @@ public class Reposter extends Thread {
                     }
                     Log.write("Reposted to WP: " + releaseName, "Reposter");
                     //make repost to Blogger
-                    Log.write("Making Repost to Blog", "Reposter");
-                    blogPoster.post(contentMessage, releaseName, categoriesForBlog, mainCategory);
-                    Log.write("Reposted to blog: " + releaseName, "Reposter");
+                    // Log.write("Making Repost to Blog", "Reposter");
+                    // blogPoster.post(contentMessage, releaseName, categoriesForBlog, mainCategory);
+                    // Log.write("Reposted to blog: " + releaseName, "Reposter");
                     //make repost to Reddit
                     String content = MessageFormat.format("{0}\n\nMore Info Here:\n\n{1}",
                        release.getRedditTrackList(), release.getMrpPostLink());
