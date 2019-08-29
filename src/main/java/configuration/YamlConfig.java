@@ -66,5 +66,8 @@ public class YamlConfig {
         private String crateconnect_password;
         private String crack4djs_username;
         private String crack4djs_password;
+        private String maletadvj_username;
+        private String maletadvj_password;
+        
     }
 }

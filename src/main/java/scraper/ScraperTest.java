@@ -17,29 +17,34 @@ public class ScraperTest {
         String html = FUtils.readFile(new File("Z:\\source.html"));
         Document document = Jsoup.parse(html);
         
-        String firstDate = document.select("div[class=track-createdat]").first().text();
+        String firstDate = document.select("small:contains(Creado el)")
+           .first().text()
+           .replace("- Creado el: ", "");
         
         System.out.println(firstDate);
         
         String downloadDate = document
-           .select("div[class=track-createdat]")
+           .select("small:contains(Creado el)")
            .stream()
            .map(Element::text)
+           .map(date -> date.replace("- Creado el: ", ""))
            .filter(date -> !date.equals(firstDate))
            .findFirst()
            .orElse(null);
         
         System.out.println(downloadDate);
         
-        Elements trackInfos = document.select("tr[class=*track-item]");
+        Elements trackInfos = document.select("tr[class=table_product]");
         for (Element trackInfo : trackInfos) {
-            String trackDate = trackInfo.select("div[class=track-createdat]").first().text();
+            String trackDate = trackInfo.select("small:contains(Creado el)")
+               .first().text()
+               .replace("- Creado el: ", "");
             if (trackDate.equals(downloadDate)) {
-                String trackName = trackInfo.text();
-                String downloadID = trackInfo.attr("data-id");
+                String trackName = trackInfo.select("h3").first().text();
+                String downloadID = trackInfo.attr("data-product_id");
                 String downloadUrl = MessageFormat.format(
-                   "https://crateconnect.net/index.php?option=com_crateconnect&format=raw&task=downloadZipFile&fileid={0}",
-                   downloadID);
+                   "https://maletadvj.com/products/descargar_producto/" +
+                      "{0}", downloadID);
                 System.out.println(trackName + " | " + downloadUrl);
             }
         }

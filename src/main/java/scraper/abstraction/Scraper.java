@@ -80,6 +80,24 @@ public abstract class Scraper extends Thread
         timer.schedule(check, 0, 1 * hour);
     }
     
+    protected void login() {
+        FirefoxOptions options = new FirefoxOptions().setLogLevel(Level.OFF);
+        driver = new FirefoxDriver(options);
+        logger.log("Login");
+        driver.get(loginUrl);
+        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+        beforeLogin();
+        // Enter Username
+        WebElement nameField = driver.findElement(nameFieldNavigator);
+        nameField.sendKeys(USERNAME);
+        // Enter Password
+        WebElement passwordField = driver.findElement(passFieldNavigator);
+        passwordField.sendKeys(PASS);
+        // Click Login
+        driver.findElement(submitButtonNavigator).click();
+        afterLogin();
+    }
+    
     private class Driver {
         private void check() {
             try {
@@ -106,6 +124,7 @@ public abstract class Scraper extends Thread
                 }
             }
         }
+        
     }
     
     @Override
@@ -116,24 +135,6 @@ public abstract class Scraper extends Thread
             getDriverPage();
         }
         afterFirstStage();
-    }
-    
-    protected void login() {
-        FirefoxOptions options = new FirefoxOptions().setLogLevel(Level.OFF);
-        driver = new FirefoxDriver(options);
-        logger.log("Login");
-        driver.get(loginUrl);
-        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-        beforeLogin();
-        // Enter Username
-        WebElement nameField = driver.findElement(nameFieldNavigator);
-        nameField.sendKeys(USERNAME);
-        // Enter Password
-        WebElement passwordField = driver.findElement(passFieldNavigator);
-        passwordField.sendKeys(PASS);
-        // Click Login
-        driver.findElement(submitButtonNavigator).click();
-        afterLogin();
     }
     
     @SneakyThrows

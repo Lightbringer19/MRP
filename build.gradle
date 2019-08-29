@@ -188,6 +188,9 @@ task HeavyHitsScraper {
 task CrateConnectScraper {
     dependsOn newRelease('monitors.', 'CrateConnect_Scraper_Monitor', '1.0.')
 }
+task MaletaDvjScraper {
+    dependsOn newRelease('monitors.', 'MaletaDvj_Scraper_Monitor', '1.0.')
+}
 
 task BuildScrapers {
     dependsOn DMPScraper
