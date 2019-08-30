@@ -16,6 +16,7 @@ import org.openqa.selenium.firefox.ProfilesIni;
 import utils.Constants;
 import utils.Logger;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -103,6 +104,7 @@ public abstract class Scraper extends Thread
             try {
                 firstStageForCheck();
                 String firstDate = getFirstDate();
+                boolean releaseIsOld = releaseIsOld(firstDate);
                 // If release found -> scrape all links and date
                 boolean newReleaseOnThePool = downloaded
                    .find(eq("releaseDate", firstDate)).first() == null;
@@ -115,6 +117,9 @@ public abstract class Scraper extends Thread
                     // Schedule release and add to DB
                     downloaded.insertOne(
                        new Document("releaseDate", firstDate));
+                } else if (releaseIsOld) {
+                    setCookieForAPI();
+                    mainOperation(firstDate, firstDate);
                 }
             } catch (Exception e) {
                 logger.log(e);
@@ -215,6 +220,14 @@ public abstract class Scraper extends Thread
         cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
         cal.add(Calendar.DAY_OF_MONTH, 1);
         return new SimpleDateFormat("ddMM").format(cal.getTime());
+    }
+    
+    private boolean releaseIsOld(String date) throws ParseException {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
+        cal.add(Calendar.DAY_OF_MONTH, 2);
+        long nowTime = new Date().getTime();
+        return nowTime > cal.getTime().getTime();
     }
     
     public String getPageSource() {

@@ -17,34 +17,33 @@ public class ScraperTest {
         String html = FUtils.readFile(new File("Z:\\source.html"));
         Document document = Jsoup.parse(html);
         
-        String firstDate = document.select("small:contains(Creado el)")
-           .first().text()
-           .replace("- Creado el: ", "");
+        String firstDate = document.select("table[id=dl_table]>tbody>tr").first()
+           .select("td").get(2)
+           .text();
         
         System.out.println(firstDate);
         
         String downloadDate = document
-           .select("small:contains(Creado el)")
+           .select("table[id=dl_table]>tbody>tr")
            .stream()
-           .map(Element::text)
-           .map(date -> date.replace("- Creado el: ", ""))
+           .map(element -> element.select("td").get(2).text())
            .filter(date -> !date.equals(firstDate))
            .findFirst()
            .orElse(null);
         
         System.out.println(downloadDate);
         
-        Elements trackInfos = document.select("tr[class=table_product]");
+        Elements trackInfos = document.select("table[id=dl_table]>tbody>tr");
         for (Element trackInfo : trackInfos) {
-            String trackDate = trackInfo.select("small:contains(Creado el)")
-               .first().text()
-               .replace("- Creado el: ", "");
+            String trackDate = trackInfo.select("td").get(2).text();
             if (trackDate.equals(downloadDate)) {
-                String trackName = trackInfo.select("h3").first().text();
-                String downloadID = trackInfo.attr("data-product_id");
+                String trackName = trackInfo.select("td").get(1).text();
+                String downloadPartLink = trackInfo.select("td").get(1)
+                   .select("a").attr("href");
                 String downloadUrl = MessageFormat.format(
-                   "https://maletadvj.com/products/descargar_producto/" +
-                      "{0}", downloadID);
+                   "http://www.masspoolmp3.com" +
+                      "{0}", downloadPartLink);
+                // TODO: 30.08.2019 Need API
                 System.out.println(trackName + " | " + downloadUrl);
             }
         }

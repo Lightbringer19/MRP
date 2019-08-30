@@ -57,9 +57,9 @@ public interface DownloadInterface {
                 fileName = URLDecoder.decode(
                    url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name())
                    .replace("?download", "");
-                if (fileName.contains("?AWSAccessKeyId")) {
+                if (fileName.contains("?")) {
                     fileName = fileName.replace(
-                       decode.substring(decode.indexOf("?AWSAccessKeyId")), "");
+                       decode.substring(decode.indexOf("?")), "");
                 }
             } else {
                 fileName = response.getFirstHeader("Content-Disposition").getValue()

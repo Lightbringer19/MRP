@@ -1,16 +1,39 @@
 package scraper;
 
-import scraper.abstraction.DownloadInterface;
+import scraper.heavyhits.DownloadUrlApiService;
 import utils.Logger;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
-public class JustTest implements DownloadInterface {
-    public static void main(String[] args) throws IOException {
+public class JustTest implements DownloadUrlApiService {
+    public static void main(String[] args) throws IOException, ParseException {
         // JustTest justTest = new JustTest();
-        // justTest.downloadFile("", "Z:\\TEMP FOR LATER\\");
-        // nextPage();
         
+        String url = "";
+        String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
+        String fileName = URLDecoder.decode(
+           url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name())
+           .replace("?download", "");
+        if (fileName.contains("?")) {
+            fileName = fileName.replace(
+               decode.substring(decode.indexOf("?")), "");
+        }
+        System.out.println(fileName);
+    }
+    
+    public static boolean releaseIsOld(String dateFormat, String date) throws ParseException {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
+        cal.add(Calendar.DAY_OF_MONTH, 2);
+        long nowTime = new Date().getTime();
+        return nowTime > cal.getTime().getTime();
     }
     
     public static void nextPage() {
