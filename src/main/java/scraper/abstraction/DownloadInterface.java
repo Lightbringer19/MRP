@@ -12,6 +12,7 @@ import utils.Logger;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -53,10 +54,13 @@ public interface DownloadInterface {
             if (url.contains("headlinermusicclub") || url.contains("av.bpm")
                || url.contains("s3.amazonaws")) {
                 String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
-                fileName = java.net.URLDecoder.decode(
+                fileName = URLDecoder.decode(
                    url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name())
-                   .replace("?download", "")
-                   .replace(decode.substring(decode.indexOf("?AWSAccessKeyId")), "");
+                   .replace("?download", "");
+                if (fileName.contains("?AWSAccessKeyId")) {
+                    fileName = fileName.replace(
+                       decode.substring(decode.indexOf("?AWSAccessKeyId")), "");
+                }
             } else {
                 fileName = response.getFirstHeader("Content-Disposition").getValue()
                    .replace("attachment; filename=", "")

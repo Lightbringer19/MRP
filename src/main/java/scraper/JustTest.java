@@ -9,6 +9,11 @@ public class JustTest implements DownloadInterface {
     public static void main(String[] args) throws IOException {
         // JustTest justTest = new JustTest();
         // justTest.downloadFile("", "Z:\\TEMP FOR LATER\\");
+        // nextPage();
+        
+    }
+    
+    public static void nextPage() {
         String currentUrl = "https://maletadvj.com/audios/40";
         String pageNumber = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
         String newLink;

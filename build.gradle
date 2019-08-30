@@ -154,6 +154,9 @@ task ScheduleWatcher {
 task PostUpdater {
     dependsOn newRelease('monitors.', 'Post_Updater_Monitor', '1.0.')
 }
+task DownloaderCustom {
+    dependsOn newRelease('scraper.downloader.', 'CustomDownloader', '1.0.')
+}
 //SCRAPERS
 task DMPScraper {
     dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '1.2.')
