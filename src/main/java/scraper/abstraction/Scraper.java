@@ -102,25 +102,9 @@ public abstract class Scraper extends Thread
     private class Driver {
         private void check() {
             try {
-                firstStageForCheck();
-                String firstDate = getFirstDate();
-                boolean releaseIsOld = releaseIsOld(firstDate);
-                // If release found -> scrape all links and date
-                boolean newReleaseOnThePool = downloaded
-                   .find(eq("releaseDate", firstDate)).first() == null;
-                if (newReleaseOnThePool) {
-                    setCookieForAPI();
-                    //  Find next date
-                    String downloadDate = getDownloadDate(firstDate);
-                    // MAIN OPERATION EXECUTION
-                    mainOperation(firstDate, downloadDate);
-                    // Schedule release and add to DB
-                    downloaded.insertOne(
-                       new Document("releaseDate", firstDate));
-                } else if (releaseIsOld) {
-                    setCookieForAPI();
-                    mainOperation(firstDate, firstDate);
-                }
+                firstStageCheck();
+                betweenStages();
+                secondStageCheck();
             } catch (Exception e) {
                 logger.log(e);
             } finally {
@@ -129,11 +113,37 @@ public abstract class Scraper extends Thread
                 }
             }
         }
-        
+    }
+    
+    @SneakyThrows
+    public void fullScrape() {
+        String firstDate = getFirstDate();
+        boolean releaseIsOld = releaseIsOld(firstDate);
+        // If release found -> scrape all links and date
+        boolean newReleaseOnThePool = downloaded
+           .find(eq("releaseDate", firstDate)).first() == null;
+        if (newReleaseOnThePool) {
+            setCookieForAPI();
+            //  Find next date
+            String downloadDate = getDownloadDate(firstDate);
+            // MAIN OPERATION EXECUTION
+            mainOperation(firstDate, downloadDate);
+            // Schedule release and add to DB
+            downloaded.insertOne(
+               new Document("releaseDate", firstDate));
+        } else if (releaseIsOld) {
+            setCookieForAPI();
+            mainOperation(firstDate, firstDate);
+        }
     }
     
     @Override
-    public void firstStageForCheck() {
+    public void secondStageCheck() {
+        fullScrape();
+    }
+    
+    @Override
+    public void firstStageCheck() {
         if (loginAtFirstStage) {
             login();
         } else {

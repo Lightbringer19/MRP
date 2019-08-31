@@ -10,6 +10,7 @@ public class MongoControl {
     private final MongoClient mongoClient;
     private final MongoDatabase mrpDB;
     private final MongoDatabase ftpDB;
+    public final MongoDatabase poolsDB;
     public final MongoCollection<Document> releasesCollection;
     public final MongoCollection<Document> categoriesCollection;
     public final MongoCollection<Document> tasksCollection;
@@ -53,6 +54,7 @@ public class MongoControl {
         djc_skipCollection = ftpDB.getCollection("djc_skip");
         
         //SCRAPING
+        poolsDB = mongoClient.getDatabase("POOLS");
         scrapedReleases = ftpDB.getCollection("scrapedReleases");
     
         scrapedDMP = mrpDB.getCollection("scrapedDMP");
@@ -68,6 +70,8 @@ public class MongoControl {
         crateConnectDownloaded = ftpDB.getCollection("crateConnect_downloaded");
         crack4DjsDownloaded = ftpDB.getCollection("crack4Djs_downloaded");
         maletadvjDownloaded = ftpDB.getCollection("maletadvj_downloaded");
+        
+        // NES SCRAPING DB
         
     }
     

@@ -1,4 +1,4 @@
-package scraper.crack4djs;
+package scraper.xxx.crack4djs;
 
 import lombok.SneakyThrows;
 import org.openqa.selenium.By;

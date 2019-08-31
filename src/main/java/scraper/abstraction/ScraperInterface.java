@@ -7,16 +7,22 @@ public interface ScraperInterface {
     default void beforeCheck() {
     }
     
-    default void firstStageForCheck() {
-    }
-    
-    default void afterFirstStage() {
+    default void firstStageCheck() {
     }
     
     default void beforeLogin() {
     }
     
     default void afterLogin() {
+    }
+    
+    default void afterFirstStage() {
+    }
+    
+    default void betweenStages() {
+    }
+    
+    default void secondStageCheck() {
     }
     
     default void operationWithLinksAfterScrape(List<String> scrapedLinks) {

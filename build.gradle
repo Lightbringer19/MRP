@@ -194,6 +194,9 @@ task CrateConnectScraper {
 task MaletaDvjScraper {
     dependsOn newRelease('monitors.', 'MaletaDvj_Scraper_Monitor', '1.0.')
 }
+task MassPoolScraper {
+    dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '1.0.')
+}
 
 task BuildScrapers {
     dependsOn DMPScraper

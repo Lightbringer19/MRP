@@ -68,6 +68,8 @@ public class YamlConfig {
         private String crack4djs_password;
         private String maletadvj_username;
         private String maletadvj_password;
+        private String masspool_username;
+        private String masspool_password;
         
     }
 }

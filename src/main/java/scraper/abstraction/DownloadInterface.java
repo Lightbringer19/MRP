@@ -51,8 +51,9 @@ public interface DownloadInterface {
             @Cleanup CloseableHttpResponse response = client.execute(get);
             // System.out.println(downloadUrl + " " + response.getStatusLine().getStatusCode());
             String fileName;
+            //TODO rework to simplify
             if (url.contains("headlinermusicclub") || url.contains("av.bpm")
-               || url.contains("s3.amazonaws")) {
+               || url.contains("s3.amazonaws") || url.contains("media/MusicData")) {
                 String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
                 fileName = URLDecoder.decode(
                    url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name())
