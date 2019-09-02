@@ -77,11 +77,11 @@ public abstract class FtpManager extends Thread {
                long time = dayFolder.getTimestamp().getTimeInMillis();
                //DB
                String dayReleasesPath = pathname + name;
-               Document dayDoc = mongoControl.dayFolderTimeCollection
+               Document dayDoc = mongoControl.timeStampsCollection
                  .find(eq("folderPath", dayReleasesPath)).first();
                if (dayDoc == null) {
                   //insert new DOC
-                  mongoControl.dayFolderTimeCollection
+                  mongoControl.timeStampsCollection
                     .insertOne(new Document("folderPath", dayReleasesPath)
                       .append("timeStamp", time));
                   // DOWNLOAD
@@ -94,7 +94,7 @@ public abstract class FtpManager extends Thread {
                   }
                   //update DB
                   dayDoc.put("timeStamp", time);
-                  mongoControl.dayFolderTimeCollection
+                  mongoControl.timeStampsCollection
                     .replaceOne(eq("_id",
                       dayDoc.getObjectId("_id")), dayDoc);
                }

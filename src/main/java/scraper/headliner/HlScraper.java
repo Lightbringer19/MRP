@@ -19,7 +19,7 @@ public class HlScraper extends Scraper {
       nameFieldNavigator = By.id("user_login1");
       passFieldNavigator = By.id("user_pass1");
       submitButtonNavigator = By.id("wp-submit1");
-      downloaded = mongoControl.hlDownloaded;
+      downloaded = mongoControl.headlinerDownloaded;
       releaseName = "Headliner Music Club";
    }
    

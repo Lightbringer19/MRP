@@ -48,6 +48,7 @@ dependencies {
     compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.10.2'
 
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.24'
+    compile group: 'io.projectreactor', name: 'reactor-core', version: '3.2.11.RELEASE'
 
 
 //    compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
@@ -121,11 +122,11 @@ task DataVisual {
 }
 // TESTING
 task MongoDB {
-    dependsOn newRelease('monitors.', 'MongoMonitor', '0.0.')
+    dependsOn newRelease('mongodb.', 'mongo', '0.0.')
 }
 // AUTOMATION
 task Manual_Scheduler {
-    dependsOn newRelease('monitors.', 'Manual_Scheduler_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'Manual_Scheduler_Monitor', '2.0.')
 }
 task Uploader {
     dependsOn newRelease('monitors.', 'Uploader_Monitor', '3.1.')
@@ -140,65 +141,75 @@ task Tagger {
     dependsOn newRelease('monitors.', 'Tagger_Monitor', '3.3.')
 }
 task SceneFTP {
-    dependsOn newRelease('monitors.', 'SCENE_FTP_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'SCENE_FTP_Monitor', '1.1.')
 }
 task BeatportFtp {
-    dependsOn newRelease('monitors.', 'Beatport_FTP_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'Beatport_FTP_Monitor', '1.1.')
 }
 task DjPoolFtp {
-    dependsOn newRelease('monitors.', 'DJ_Pool_FTP_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'DJ_Pool_FTP_Monitor', '1.1.')
 }
 task ScheduleWatcher {
-    dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '2.0.')
 }
 task PostUpdater {
     dependsOn newRelease('monitors.', 'Post_Updater_Monitor', '1.0.')
 }
 task DownloaderCustom {
-    dependsOn newRelease('scraper.downloader.', 'CustomDownloader', '1.0.')
+    dependsOn newRelease('scraper.downloader.', 'CustomDownloader', '1.1.')
 }
 //SCRAPERS
 task DMPScraper {
     dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '1.2.')
 }
 task EwScraper {
-    dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '3.0.')
 }
 task Mp3PoolScraper {
-    dependsOn newRelease('monitors.', 'Mp3Pool_Scraper_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'Mp3Pool_Scraper_Monitor', '3.0.')
 }
 task BeatJunkiesScraper {
-    dependsOn newRelease('monitors.', 'BeatJunkies_Scraper_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'BeatJunkies_Scraper_Monitor', '3.0.')
 }
 task HeadlineScraper {
-    dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '1.2.')
+    dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '2.0.')
 }
 task BpmSupremeScraper {
-    dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '1.2.')
+    dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '2.0.')
 }
 task BpmLatinoScraper {
-    dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '2.0.')
 }
 task RemixMp4Scraper {
-    dependsOn newRelease('monitors.', 'RemixMp4_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'RemixMp4_Scraper_Monitor', '2.0.')
 }
 task DaleMBScraper {
-    dependsOn newRelease('monitors.', 'DaleMB_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'DaleMB_Scraper_Monitor', '2.0.')
 }
 task HeavyHitsScraper {
-    dependsOn newRelease('monitors.', 'HeavyHits_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'HeavyHits_Scraper_Monitor', '2.0.')
 }
 task CrateConnectScraper {
-    dependsOn newRelease('monitors.', 'CrateConnect_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'CrateConnect_Scraper_Monitor', '2.0.')
 }
 task MaletaDvjScraper {
-    dependsOn newRelease('monitors.', 'MaletaDvj_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'MaletaDvj_Scraper_Monitor', '2.0.')
 }
 task MassPoolScraper {
-    dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '1.1.')
 }
 
 task BuildScrapers {
+}
+
+task BuildAll {
+    dependsOn MongoDB
+    dependsOn Manual_Scheduler
+    dependsOn SceneFTP
+    dependsOn BeatportFtp
+    dependsOn DjPoolFtp
+    dependsOn ScheduleWatcher
+    dependsOn DownloaderCustom
     dependsOn DMPScraper
     dependsOn EwScraper
     dependsOn Mp3PoolScraper
@@ -210,24 +221,6 @@ task BuildScrapers {
     dependsOn DaleMBScraper
     dependsOn HeavyHitsScraper
     dependsOn CrateConnectScraper
-}
-
-task BuildAll {
-//    dependsOn Tagger
-//    dependsOn Uploader
-
-//    dependsOn Poster
-//    dependsOn Reposter
-
-//    dependsOn AutoDMPScraper
-
-//    dependsOn SceneFTP
-
-    dependsOn BeatportFtp
-    dependsOn DjPoolFtp
-
-//    dependsOn BeatJunkiesScraper
-//    dependsOn FtpAndSchedule
-//    dependsOn EwScraper
-//    dependsOn Mp3PoolScraper
+    dependsOn MaletaDvjScraper
+    dependsOn MassPoolScraper
 }

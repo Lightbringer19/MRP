@@ -67,7 +67,6 @@ public interface DownloadInterface {
             }
          }
          String pathname = releaseFolderPath + fileName;
-         System.out.println(pathname);
          File mp3File = new File(pathname);
          getLogger().log("Downloading: " + fileName + " | " + downloadUrl
            + " | " + response.getStatusLine());

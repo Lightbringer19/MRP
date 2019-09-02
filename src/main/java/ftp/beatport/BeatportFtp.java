@@ -48,7 +48,7 @@ public class BeatportFtp extends FtpManager {
          }
          // ADD TO UPLOAD QUEUE
          logger.log("Release Downloaded: " + releaseName);
-         mongoControl.rpDownloadedCollection
+         mongoControl.ftpDownloadedCollection
            .insertOne(new Document("releaseName", releaseName));
          FUtils.writeFile(Constants.tagsDir, releaseName + ".json",
            releaseLocalPath);
@@ -71,7 +71,7 @@ public class BeatportFtp extends FtpManager {
          return false;
       } else {
          // check if release downloaded
-         return mongoControl.rpDownloadedCollection
+         return mongoControl.ftpDownloadedCollection
            .find(eq("releaseName", releaseName))
            .first() == null;
       }

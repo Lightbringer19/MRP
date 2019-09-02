@@ -19,7 +19,7 @@ public class EwScraper extends Scraper {
       nameFieldNavigator = By.id("amember-login");
       passFieldNavigator = By.id("amember-pass");
       submitButtonNavigator = By.className("password-link");
-      downloaded = mongoControl.ewDownloaded;
+      downloaded = mongoControl.eightWonderDownloaded;
       releaseName = "8th Wonder Pool";
    }
    

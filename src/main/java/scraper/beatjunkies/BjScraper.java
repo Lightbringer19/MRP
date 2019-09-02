@@ -22,10 +22,10 @@ public class BjScraper extends Scraper {
       nameFieldNavigator = By.id("user_login");
       passFieldNavigator = By.id("user_pass");
       submitButtonNavigator = By.id("wp-submit");
-      downloaded = mongoControl.bjDownloaded;
+      downloaded = mongoControl.beatJunkiesDownloaded;
       dateFormat = "MMMM d, yyyy";
       releaseName = "Beatjunkies";
-      
+   
       loginAtFirstStage = false;
       urlForFirstStage = "https://beatjunkies.com/record-pool";
    }
@@ -39,7 +39,7 @@ public class BjScraper extends Scraper {
    public String scrapeFirstDate(String html) {
       Element trackContainer = Jsoup.parse(requireNonNull(html))
         .select("div[class=widget-content]").first();
-      
+   
       dates = trackContainer
         .textNodes().stream()
         .filter(textNode -> !textNode.isBlank())

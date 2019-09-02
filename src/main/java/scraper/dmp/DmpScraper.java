@@ -42,11 +42,11 @@ class DmpScraper {
       ScrapedDmpPage scrapedDmpPage = scrapePageForDatesAndLinks(html);
       List<String> dates = scrapedDmpPage.getDates();
       String newDate = dates.get(0);
-      boolean newReleaseNotInDB = mongoControl.scrapedDMP
+      boolean newReleaseNotInDB = mongoControl.dmpDownloaded
         .find(eq("releaseDate", newDate)).first() == null;
       if (newReleaseNotInDB) {
          Log.write("Found New Release: " + newDate, "DMP Scraper");
-         mongoControl.scrapedDMP.insertOne(new org.bson.Document("releaseDate", newDate));
+         mongoControl.dmpDownloaded.insertOne(new org.bson.Document("releaseDate", newDate));
          String dateForDownloadRaw = dates.get(1);
          Collection<String> linksToDownload = scrapedDmpPage
            .getScraped().get(dateForDownloadRaw);

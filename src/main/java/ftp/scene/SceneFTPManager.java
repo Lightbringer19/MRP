@@ -79,11 +79,11 @@ public class SceneFTPManager extends Thread {
             long time = dayFolder.getTimestamp().getTimeInMillis();
             //DB
             String dayReleasesPath = pathname + name;
-            Document dayDoc = mongoControl.dayFolderTimeCollection
+            Document dayDoc = mongoControl.timeStampsCollection
               .find(eq("folderPath", dayReleasesPath)).first();
             if (dayDoc == null) {
                //insert new DOC
-               mongoControl.dayFolderTimeCollection
+               mongoControl.timeStampsCollection
                  .insertOne(new Document("folderPath", dayReleasesPath)
                    .append("timeStamp", time));
                // DOWNLOAD
@@ -96,7 +96,7 @@ public class SceneFTPManager extends Thread {
                }
                //update DB
                dayDoc.put("timeStamp", time);
-               mongoControl.dayFolderTimeCollection
+               mongoControl.timeStampsCollection
                  .replaceOne(eq("_id",
                    dayDoc.getObjectId("_id")), dayDoc);
             }
@@ -158,7 +158,7 @@ public class SceneFTPManager extends Thread {
          // ADD TO UPLOAD QUEUE
          Log.write("Release Downloaded: " + releaseName,
            "SCENE_FTP");
-         mongoControl.rpDownloadedCollection
+         mongoControl.ftpDownloadedCollection
            .insertOne(new Document("releaseName", releaseName));
          FUtils.writeFile(Constants.uploadDir, releaseName + ".json",
            releaseLocalPath);
@@ -185,7 +185,7 @@ public class SceneFTPManager extends Thread {
          return false;
       } else {
          // check if release downloaded
-         return mongoControl.rpDownloadedCollection
+         return mongoControl.ftpDownloadedCollection
            .find(eq("releaseName", releaseName))
            .first() == null;
       }

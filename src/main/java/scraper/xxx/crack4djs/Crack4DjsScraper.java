@@ -20,7 +20,7 @@ public class Crack4DjsScraper extends Scraper {
       submitButtonNavigator = By.cssSelector(".submit-button-2");
    
       dateFormat = "MM/dd/yyyy";
-      downloaded = mongoControl.crack4DjsDownloaded;
+      // downloaded = mongoControl.crack4DjsDownloaded;
       releaseName = "Crack 4 DJs";
    }
    

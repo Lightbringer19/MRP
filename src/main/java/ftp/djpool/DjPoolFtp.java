@@ -29,7 +29,7 @@ public class DjPoolFtp extends FtpManager {
       
       CATEGORY_NAME = "RECORDPOOL";
       logger = new Logger("DJ_POOL_FTP");
-      
+   
       longPeriod = true;
    }
    
@@ -80,7 +80,7 @@ public class DjPoolFtp extends FtpManager {
          }
          // ADD TO UPLOAD QUEUE
          logger.log("Release Downloaded: " + releaseNameCleaned);
-         mongoControl.rpDownloadedCollection
+         mongoControl.ftpDownloadedCollection
            .insertOne(new Document("releaseName", releaseNameCleaned));
          // ADD TO SCHEDULE
          addToScheduleDB(new File(releaseLocalPath));
@@ -114,7 +114,7 @@ public class DjPoolFtp extends FtpManager {
                return false;
             }
          }
-         return mongoControl.rpDownloadedCollection
+         return mongoControl.ftpDownloadedCollection
            .find(eq("releaseName", releaseNameCleaned))
            .first() == null;
       }
