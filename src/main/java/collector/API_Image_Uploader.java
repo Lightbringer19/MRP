@@ -18,41 +18,41 @@ import java.io.InputStream;
 import static wordpress.Poster.MRP_AUTHORIZATION;
 
 class API_Image_Uploader {
-    
-    static String upload(File imageFile) {
-        try {
-            while (true) {
-                CloseableHttpClient client = HttpClients.createDefault();
-                String uri = "https://myrecordpool.com/wp-json/wp/v2/media";
-                HttpPost httpPost = new HttpPost(uri);
-                httpPost.addHeader("Authorization",
-                   MRP_AUTHORIZATION);
-                httpPost.addHeader("Content-Type", "image");
-                httpPost.addHeader("content-disposition",
-                   "attachment; filename=" + imageFile.getName());
-                InputStream imageToUpload = new FileInputStream(imageFile.getAbsolutePath());
-                byte[] image = IOUtils.toByteArray(imageToUpload);
-                imageToUpload.close();
-                httpPost.setEntity(new ByteArrayEntity(image));
-                CloseableHttpResponse response = client.execute(httpPost);
-                String jsonResponse = EntityUtils.toString(response.getEntity());
-                client.close();
-                if (response.getStatusLine().getStatusCode() != 201) {
-                    System.out.println(response.getStatusLine());
-                    Log.write("Not uploaded: " + imageFile.getName() + " " +
-                       response.getStatusLine(), "Poster");
-                    Thread.sleep(5000);
-                } else {
-                    JSONObject post = (JSONObject) new JSONParser().parse(jsonResponse);
-                    response.close();
-                    return ((JSONObject) post.get("guid")).get("raw").toString();
-                }
+   
+   static String upload(File imageFile) {
+      try {
+         while (true) {
+            CloseableHttpClient client = HttpClients.createDefault();
+            String uri = "https://myrecordpool.com/wp-json/wp/v2/media";
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.addHeader("Authorization",
+              MRP_AUTHORIZATION);
+            httpPost.addHeader("Content-Type", "image");
+            httpPost.addHeader("content-disposition",
+              "attachment; filename=" + imageFile.getName());
+            InputStream imageToUpload = new FileInputStream(imageFile.getAbsolutePath());
+            byte[] image = IOUtils.toByteArray(imageToUpload);
+            imageToUpload.close();
+            httpPost.setEntity(new ByteArrayEntity(image));
+            CloseableHttpResponse response = client.execute(httpPost);
+            String jsonResponse = EntityUtils.toString(response.getEntity());
+            client.close();
+            if (response.getStatusLine().getStatusCode() != 201) {
+               System.out.println(response.getStatusLine());
+               Log.write("Not uploaded: " + imageFile.getName() + " " +
+                 response.getStatusLine(), "Poster");
+               Thread.sleep(5000);
+            } else {
+               JSONObject post = (JSONObject) new JSONParser().parse(jsonResponse);
+               response.close();
+               return ((JSONObject) post.get("guid")).get("raw").toString();
             }
-        } catch (Exception e) {
-            Log.write("Exception uploadIMAGE: " + e, "Poster");
-            Log.write(e, "API_IMAGE_Errors_Trace");
-        }
-        return null;
-    }
-    
+         }
+      } catch (Exception e) {
+         Log.write("Exception uploadIMAGE: " + e, "Poster");
+         Log.write(e, "API_IMAGE_Errors_Trace");
+      }
+      return null;
+   }
+   
 }

@@ -22,50 +22,50 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class DataSize extends Application {
 
-    @Override
-    public void start(Stage stage) {
-        String title = "Size of Categories";
-        stage.setTitle(title);
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        BarChart<String, Number> bc =
-                new BarChart<>(xAxis, yAxis);
-        bc.setTitle(title);
-        xAxis.setLabel("Category");
-        yAxis.setLabel("GB");
+   public static void main(String[] args) {
+      try {
+         launch(args);
+      } catch (Exception e) {
+         Log.write(e, "Data");
+      }
+   }
 
-        XYChart.Series series1 = new XYChart.Series();
-        series1.setName("Size");
-        ObservableList data = series1.getData();
+   @Override
+   public void start(Stage stage) {
+      String title = "Size of Categories";
+      stage.setTitle(title);
+      CategoryAxis xAxis = new CategoryAxis();
+      NumberAxis yAxis = new NumberAxis();
+      BarChart<String, Number> bc =
+        new BarChart<>(xAxis, yAxis);
+      bc.setTitle(title);
+      xAxis.setLabel("Category");
+      yAxis.setLabel("GB");
 
-        MongoControl mongoControl = new MongoControl();
-        MongoCollection<Document> collection = mongoControl.releasesCollection;
-        AggregateIterable<Document> aggregate = collection.aggregate(Arrays.asList(
-                Aggregates.unwind("$category"),
-                Aggregates.group("$category"))
-        );
-        for (Document document : aggregate) {
-            FindIterable<Document> documents = collection.find(eq("category", document.get("_id").toString()));
-            long allSize = 0;
-            for (Document release : documents) {
-                Document infoAboutRelease = (Document) release.get("infoAboutRelease");
-                int size = Integer.valueOf(((String) infoAboutRelease.get("size")).replace(" MB", ""));
-                allSize += size;
-            }
-            // System.out.println(allSize / 1024 + "GB " + document.get("_id").toString());
-            data.add(new XYChart.Data(document.get("_id").toString(), allSize / 1024));
-        }
-        Scene scene = new Scene(bc, 800, 600);
-        bc.getData().addAll(series1);
-        stage.setScene(scene);
-        stage.show();
-    }
+      XYChart.Series series1 = new XYChart.Series();
+      series1.setName("Size");
+      ObservableList data = series1.getData();
 
-    public static void main(String[] args) {
-        try {
-            launch(args);
-        } catch (Exception e) {
-            Log.write(e, "Data");
-        }
-    }
+      MongoControl mongoControl = new MongoControl();
+      MongoCollection<Document> collection = mongoControl.releasesCollection;
+      AggregateIterable<Document> aggregate = collection.aggregate(Arrays.asList(
+        Aggregates.unwind("$category"),
+        Aggregates.group("$category"))
+      );
+      for (Document document : aggregate) {
+         FindIterable<Document> documents = collection.find(eq("category", document.get("_id").toString()));
+         long allSize = 0;
+         for (Document release : documents) {
+            Document infoAboutRelease = (Document) release.get("infoAboutRelease");
+            int size = Integer.valueOf(((String) infoAboutRelease.get("size")).replace(" MB", ""));
+            allSize += size;
+         }
+         // System.out.println(allSize / 1024 + "GB " + document.get("_id").toString());
+         data.add(new XYChart.Data(document.get("_id").toString(), allSize / 1024));
+      }
+      Scene scene = new Scene(bc, 800, 600);
+      bc.getData().addAll(series1);
+      stage.setScene(scene);
+      stage.show();
+   }
 }

@@ -8,6 +8,6 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class ResponseInfo {
-    int code;
-    String jsonBody;
+   int code;
+   String jsonBody;
 }

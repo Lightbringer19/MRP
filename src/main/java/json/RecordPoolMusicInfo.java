@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecordPoolMusicInfo {
-
-    String releaseName;
-    String category;
-    String mrpLink;
-
-    public String toJson() {
-        return new Gson().toJson(this);
-    }
+   
+   String releaseName;
+   String category;
+   String mrpLink;
+   
+   public String toJson() {
+      return new Gson().toJson(this);
+   }
 }

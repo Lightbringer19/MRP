@@ -20,69 +20,63 @@ import static scheduler.ScheduleWatcher.addToScheduleDB;
 
 @SuppressWarnings("ALL")
 public interface DownloadInterface {
-    
-    default void downloadLinks(List<String> scrapedLinks, String releaseName) {
-        getLogger().log("Downloading release: " + releaseName);
-        String releaseFolderPath =
-           "Z://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
-              "/RECORDPOOL/" + releaseName + "/";
-        new File(releaseFolderPath).mkdirs();
-        CustomExecutor downloadMaster = new CustomExecutor(15);
-        scrapedLinks.stream()
-           .map(downloadUrl -> new Thread(() ->
-              downloadFile(downloadUrl, releaseFolderPath)))
-           .forEach(downloadMaster::submit);
-        downloadMaster.WaitUntilTheEnd();
-        getLogger().log("Release Downloaded: " + releaseName);
-        addToScheduleDB(new File(releaseFolderPath));
-        getLogger().log("Release Scheduled: " + releaseName);
-    }
-    
-    @SuppressWarnings("Duplicates")
-    default void downloadFile(String url, String releaseFolderPath) {
-        try {
-            String downloadUrl = url.replaceAll(" ", "%20");
-            @Cleanup CloseableHttpClient client = HttpClients.createDefault();
-            HttpGet get = new HttpGet(downloadUrl);
-            if (!url.contains("s3.amazonaws")) {
-                get.setHeader("Cookie", getCookie());
+   
+   default void downloadLinks(List<String> scrapedLinks, String releaseName) {
+      getLogger().log("Downloading release: " + releaseName);
+      String releaseFolderPath =
+        "Z://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
+          "/RECORDPOOL/" + releaseName + "/";
+      new File(releaseFolderPath).mkdirs();
+      CustomExecutor downloadMaster = new CustomExecutor(15);
+      scrapedLinks.stream()
+        .map(downloadUrl -> new Thread(() ->
+          downloadFile(downloadUrl, releaseFolderPath)))
+        .forEach(downloadMaster::submit);
+      downloadMaster.WaitUntilTheEnd();
+      getLogger().log("Release Downloaded: " + releaseName);
+      addToScheduleDB(new File(releaseFolderPath));
+      getLogger().log("Release Scheduled: " + releaseName);
+   }
+   
+   @SuppressWarnings("Duplicates")
+   default void downloadFile(String url, String releaseFolderPath) {
+      try {
+         String downloadUrl = url.replaceAll(" ", "%20");
+         @Cleanup CloseableHttpClient client = HttpClients.createDefault();
+         HttpGet get = new HttpGet(downloadUrl);
+         get.setHeader("Cookie", getCookie());
+         get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
+         @Cleanup CloseableHttpResponse response = client.execute(get);
+         String fileName;
+         if (response.getFirstHeader("Content-Disposition") != null) {
+            fileName = response.getFirstHeader("Content-Disposition").getValue()
+              .replace("attachment; filename=", "")
+              .replace("attachment", "")
+              .replaceAll(";", "")
+              .replaceAll("\"", "")
+              .replaceAll("\\\\", "")
+              .replaceAll("&amp;", "&");
+         } else {
+            String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
+            fileName = URLDecoder.decode(
+              url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name());
+            if (fileName.contains("?")) {
+               fileName = fileName.replace(
+                 decode.substring(decode.indexOf("?")), "");
             }
-            get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
-            @Cleanup CloseableHttpResponse response = client.execute(get);
-            // System.out.println(downloadUrl + " " + response.getStatusLine().getStatusCode());
-            String fileName;
-            //TODO rework to simplify
-            if (url.contains("headlinermusicclub") || url.contains("av.bpm")
-               || url.contains("s3.amazonaws") || url.contains("media/MusicData")) {
-                String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
-                fileName = URLDecoder.decode(
-                   url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name())
-                   .replace("?download", "");
-                if (fileName.contains("?")) {
-                    fileName = fileName.replace(
-                       decode.substring(decode.indexOf("?")), "");
-                }
-            } else {
-                fileName = response.getFirstHeader("Content-Disposition").getValue()
-                   .replace("attachment; filename=", "")
-                   .replace("attachment", "")
-                   .replaceAll(";", "")
-                   .replaceAll("\"", "")
-                   .replaceAll("\\\\", "")
-                   .replaceAll("&amp;", "&");
-            }
-            File mp3File = new File(releaseFolderPath + fileName);
-            getLogger().log("Downloading: " + fileName + " | " + downloadUrl
-               + " | " + response.getStatusLine());
-            @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
-            response.getEntity().writeTo(outputStream);
-            getLogger().log("Downloaded: " + fileName);
-        } catch (Exception e) {
-            getLogger().log(e);
-        }
-    }
-    
-    String getCookie();
-    
-    Logger getLogger();
+         }
+         File mp3File = new File(releaseFolderPath + fileName);
+         getLogger().log("Downloading: " + fileName + " | " + downloadUrl
+           + " | " + response.getStatusLine());
+         @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
+         response.getEntity().writeTo(outputStream);
+         getLogger().log("Downloaded: " + fileName);
+      } catch (Exception e) {
+         getLogger().log(e);
+      }
+   }
+   
+   String getCookie();
+   
+   Logger getLogger();
 }

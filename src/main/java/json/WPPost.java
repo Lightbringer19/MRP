@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class WPPost {
-    private String title;
-    private String status;
-    private String[] categories;
-    private String content;
-
-    public String toJson() {
-        return new Gson().toJson(this);
-    }
-
+   private String title;
+   private String status;
+   private String[] categories;
+   private String content;
+   
+   public String toJson() {
+      return new Gson().toJson(this);
+   }
+   
 }

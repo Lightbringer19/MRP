@@ -19,133 +19,133 @@ import java.io.File;
 import java.io.IOException;
 
 public class Poster extends Thread {
-    
-    public static String MRP_AUTHORIZATION;
-    public static final MongoControl MONGO_CONTROL = new MongoControl();
-    
-    @Override
-    public void run() {
-        Log.write(CheckDate.getNowTime() + " Poster Start", "Poster");
-        new File(Constants.postDir).mkdirs();
-        YamlConfig yamlConfig = new YamlConfig();
-        MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
-        while (true) {
+   
+   public static final MongoControl MONGO_CONTROL = new MongoControl();
+   public static String MRP_AUTHORIZATION;
+   
+   private static void findAndDeleteCorruptedIn(File post) {
+      File[] audioFiles = getAudioFiles(post);
+      if (audioFiles != null && audioFiles.length > 0) {
+         for (File aFile : audioFiles) {
             try {
-                for (File categoryFolder : new File(Constants.postDir).listFiles()) {
-                    for (File postJsonFile : categoryFolder.listFiles()) {
-                        String category = postJsonFile.getParentFile().getName();
-                        Log.write("Processing: " + postJsonFile.getName()
-                           + "| In: " + category, "Poster");
-                        // check for corrupted files in folder
-                        findAndDeleteCorruptedIn(postJsonFile);
-                        // check for folder without audio files
-                        if (musicIsHere(postJsonFile)) {
-                            // make post
-                            Log.write("Preparing to post: " + postJsonFile.getName()
-                               + "| In: " + category, "Poster");
-                            WP_API.post(postJsonFile);
-                            postJsonFile.delete();
-                            Thread.sleep(2000);
-                        } else {
-                            postJsonFile.delete();
-                            Log.write("Deleted(no audio): " + postJsonFile.getName()
-                               + "| In: " + category, "Poster");
-                        }
-                    }
-                }
-                Log.write(CheckDate.getNowTime() + " POSTER SLEEPING", "Poster");
-                Sleep();
-            } catch (Exception e) {
-                Log.write(CheckDate.getNowTime() + " EXCEPTION " + e, "Poster");
-                Sleep();
+               AudioFile audioFile = AudioFileIO.read(aFile);
+            } catch (InvalidAudioFrameException | CannotReadException e) {
+               Log.write("Corrupted file deleted: " + aFile.getName(),
+                 "Poster");
+               aFile.delete();
+            } catch (IOException | TagException | ReadOnlyFileException e) {
+               Log.write("findAndDeleteCorruptedIn Exception: " + e,
+                 "Poster");
             }
-        }
-    }
-    
-    private static void findAndDeleteCorruptedIn(File post) {
-        File[] audioFiles = getAudioFiles(post);
-        if (audioFiles != null && audioFiles.length > 0) {
-            for (File aFile : audioFiles) {
-                try {
-                    AudioFile audioFile = AudioFileIO.read(aFile);
-                } catch (InvalidAudioFrameException | CannotReadException e) {
-                    Log.write("Corrupted file deleted: " + aFile.getName(),
-                       "Poster");
-                    aFile.delete();
-                } catch (IOException | TagException | ReadOnlyFileException e) {
-                    Log.write("findAndDeleteCorruptedIn Exception: " + e,
-                       "Poster");
-                }
+         }
+      }
+   }
+   
+   private static File[] getAudioFiles(File post) {
+      File folderToCollect = getFolderFromPostInfo(post);
+      String postCategory = getCategory(folderToCollect);
+      return getFiles(folderToCollect, postCategory);
+   }
+   
+   private static File[] getFiles(File folderToCollect, String postCategory) {
+      File[] audioFiles = null;
+      if (!postCategory.equals("RECORDPOOL VIDEOS")) {
+         audioFiles = folderToCollect.listFiles((dir, name) -> {
+            if (postCategory.equals("SCENE-FLAC")) {
+               return name.toLowerCase().endsWith(".flac");
+            } else {
+               return name.toLowerCase().endsWith(".mp3");
             }
-        }
-    }
-    
-    private static File[] getAudioFiles(File post) {
-        File folderToCollect = getFolderFromPostInfo(post);
-        String postCategory = getCategory(folderToCollect);
-        return getFiles(folderToCollect, postCategory);
-    }
-    
-    private static File[] getFiles(File folderToCollect, String postCategory) {
-        File[] audioFiles = null;
-        if (!postCategory.equals("RECORDPOOL VIDEOS")) {
-            audioFiles = folderToCollect.listFiles((dir, name) -> {
-                if (postCategory.equals("SCENE-FLAC")) {
-                    return name.toLowerCase().endsWith(".flac");
-                } else {
-                    return name.toLowerCase().endsWith(".mp3");
-                }
-            });
-        }
-        return audioFiles;
-    }
-    
-    private static boolean musicIsHere(File post) {
-        File folderToCollect = getFolderFromPostInfo(post);
-        String postCategory = getCategory(folderToCollect);
-        boolean filesHere;
-        if (postCategory.equals("RECORDPOOL VIDEOS")) {
-            filesHere = true;
-        } else {
-            File[] audioFiles = getAudioFiles(post);
-            filesHere = audioFiles.length > 0;
-        }
-        return filesHere;
-    }
-    
-    public static String getCategory(File folderToCollect) {
-        String category = folderToCollect.getParentFile().getName();
-        if (category.equals("RECORDPOOL")) {
-            category = getRecordPoolCategory(folderToCollect, category);
-        }
-        return category;
-    }
-    
-    public static String getRecordPoolCategory(File folderToCollect, String category) {
-        File[] RecordPoolFolder = folderToCollect.listFiles();
-        for (File RPfile : RecordPoolFolder) {
-            if (RPfile.getName().toLowerCase().endsWith(".mp3")) {
-                category = "RECORDPOOL MUSIC";
-                break;
+         });
+      }
+      return audioFiles;
+   }
+   
+   private static boolean musicIsHere(File post) {
+      File folderToCollect = getFolderFromPostInfo(post);
+      String postCategory = getCategory(folderToCollect);
+      boolean filesHere;
+      if (postCategory.equals("RECORDPOOL VIDEOS")) {
+         filesHere = true;
+      } else {
+         File[] audioFiles = getAudioFiles(post);
+         filesHere = audioFiles.length > 0;
+      }
+      return filesHere;
+   }
+   
+   public static String getCategory(File folderToCollect) {
+      String category = folderToCollect.getParentFile().getName();
+      if (category.equals("RECORDPOOL")) {
+         category = getRecordPoolCategory(folderToCollect, category);
+      }
+      return category;
+   }
+   
+   public static String getRecordPoolCategory(File folderToCollect, String category) {
+      File[] RecordPoolFolder = folderToCollect.listFiles();
+      for (File RPfile : RecordPoolFolder) {
+         if (RPfile.getName().toLowerCase().endsWith(".mp3")) {
+            category = "RECORDPOOL MUSIC";
+            break;
+         }
+         if (RPfile.getName().toLowerCase().endsWith(".mp4")) {
+            category = "RECORDPOOL VIDEOS";
+            break;
+         }
+      }
+      return category;
+   }
+   
+   private static File getFolderFromPostInfo(File post) {
+      String localPathToFolder = new Gson().fromJson(FUtils.readFile(post),
+        InfoFromBoxCom.class).getLocalPathToFolder();
+      return new File(localPathToFolder);
+   }
+   
+   private static void Sleep() {
+      try {
+         Thread.sleep(10 * 1000);
+      } catch (InterruptedException ignored) {
+      }
+   }
+   
+   @Override
+   public void run() {
+      Log.write(CheckDate.getNowTime() + " Poster Start", "Poster");
+      new File(Constants.postDir).mkdirs();
+      YamlConfig yamlConfig = new YamlConfig();
+      MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
+      while (true) {
+         try {
+            for (File categoryFolder : new File(Constants.postDir).listFiles()) {
+               for (File postJsonFile : categoryFolder.listFiles()) {
+                  String category = postJsonFile.getParentFile().getName();
+                  Log.write("Processing: " + postJsonFile.getName()
+                    + "| In: " + category, "Poster");
+                  // check for corrupted files in folder
+                  findAndDeleteCorruptedIn(postJsonFile);
+                  // check for folder without audio files
+                  if (musicIsHere(postJsonFile)) {
+                     // make post
+                     Log.write("Preparing to post: " + postJsonFile.getName()
+                       + "| In: " + category, "Poster");
+                     WP_API.post(postJsonFile);
+                     postJsonFile.delete();
+                     Thread.sleep(2000);
+                  } else {
+                     postJsonFile.delete();
+                     Log.write("Deleted(no audio): " + postJsonFile.getName()
+                       + "| In: " + category, "Poster");
+                  }
+               }
             }
-            if (RPfile.getName().toLowerCase().endsWith(".mp4")) {
-                category = "RECORDPOOL VIDEOS";
-                break;
-            }
-        }
-        return category;
-    }
-    
-    private static File getFolderFromPostInfo(File post) {
-        String localPathToFolder = new Gson().fromJson(FUtils.readFile(post),
-           InfoFromBoxCom.class).getLocalPathToFolder();
-        return new File(localPathToFolder);
-    }
-    
-    private static void Sleep() {
-        try {
-            Thread.sleep(10 * 1000);
-        } catch (InterruptedException ignored) {
-        }
-    }
+            Log.write(CheckDate.getNowTime() + " POSTER SLEEPING", "Poster");
+            Sleep();
+         } catch (Exception e) {
+            Log.write(CheckDate.getNowTime() + " EXCEPTION " + e, "Poster");
+            Sleep();
+         }
+      }
+   }
 }

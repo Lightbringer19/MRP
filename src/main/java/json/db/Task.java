@@ -8,14 +8,14 @@ import org.bson.Document;
 @Data
 @AllArgsConstructor
 public class Task {
-    String task;
-    String releaseId;
-
-    private String toJson() {
-        return new Gson().toJson(this);
-    }
-
-    public Document toDoc() {
-        return new Document(Document.parse(toJson()));
-    }
+   String task;
+   String releaseId;
+   
+   private String toJson() {
+      return new Gson().toJson(this);
+   }
+   
+   public Document toDoc() {
+      return new Document(Document.parse(toJson()));
+   }
 }

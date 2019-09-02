@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Scraped {
-    String releaseCategory;
-    String scrapedBoxComLink;
+   String releaseCategory;
+   String scrapedBoxComLink;
 }

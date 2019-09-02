@@ -12,38 +12,38 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InfoAboutRelease {
-    String linkToArt;
-    String artist;
-    String album;
-    String genre;
-    String released;
-    String numberOfTracks;
-    String playtime;
-    String group;
-    String format;
-    String bitrate;
-    String sampleRate;
-    String size;
-    List<Track> trackList;
-
-    @Data
-    @AllArgsConstructor
-    public static class Track {
-        String title;
-        String artist;
-        String trackDuration;
-
-        String toLine() {
-            String line = artist + " - " + title + " (" + trackDuration + ")";
-            return line;
-        }
-    }
-
-    private String toJson() {
-        return new GsonBuilder().serializeNulls().create().toJson(this);
-    }
-
-    public Document toDoc() {
-        return new Document(Document.parse(toJson()));
-    }
+   String linkToArt;
+   String artist;
+   String album;
+   String genre;
+   String released;
+   String numberOfTracks;
+   String playtime;
+   String group;
+   String format;
+   String bitrate;
+   String sampleRate;
+   String size;
+   List<Track> trackList;
+   
+   private String toJson() {
+      return new GsonBuilder().serializeNulls().create().toJson(this);
+   }
+   
+   public Document toDoc() {
+      return new Document(Document.parse(toJson()));
+   }
+   
+   @Data
+   @AllArgsConstructor
+   public static class Track {
+      String title;
+      String artist;
+      String trackDuration;
+      
+      String toLine() {
+         String line = artist + " - " + title + " (" + trackDuration + ")";
+         return line;
+      }
+   }
 }

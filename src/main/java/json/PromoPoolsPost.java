@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PromoPoolsPost {
-    private String releaseName;
-    private String releaseCategory;
-    String link;
-    String HTML;
+   String link;
+   String HTML;
+   private String releaseName;
+   private String releaseCategory;
 }

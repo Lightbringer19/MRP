@@ -15,101 +15,101 @@ import java.text.MessageFormat;
 import java.util.List;
 
 public class MassPoolScraper extends Scraper implements DownloadUrlApiService {
-    public MassPoolScraper() {
-        USERNAME = yamlConfig.getMasspool_username();
-        PASS = yamlConfig.getMasspool_password();
-    
-        loginUrl = "https://www.masspoolmp3.com/Secure/MainLogin.aspx";
-        nameFieldNavigator = By.id("Content_txtUsername");
-        passFieldNavigator = By.id("Content_txtPassword");
-        submitButtonNavigator = By.id("Content_cmdSubmit");
-    
-        dateFormat = "MM-dd-yyyy";
-        releaseName = "Mass Pool";
-    }
-    
-    public static void main(String[] args) {
-        MassPoolScraper massPoolScraper = new MassPoolScraper();
-        massPoolScraper.start();
-    }
-    
-    @Override
-    @SneakyThrows
-    public void afterFirstStage() {
-        driver.get("http://www.masspoolmp3.com/members/downloads/Dance");
-        Actions action = new Actions(driver);
-        WebElement choiceMenu = driver.findElement(
-           By.cssSelector("#dl_table_length > label:nth-child(1) > select:nth-child(1)"));
-        choiceMenu.click();
-        for (int i = 0; i < 5; i++) {
-            Thread.sleep(500);
-            action.sendKeys(choiceMenu, Keys.DOWN).build().perform();
-        }
-    }
-    
-    @Override
-    public void secondStageCheck() {
-        downloadCategory("Dance");
-        driver.get("http://www.masspoolmp3.com/members/downloads/HipHop");
-        downloadCategory("Hip-Hop");
-        driver.get("http://www.masspoolmp3.com/members/downloads/Underground");
-        downloadCategory("Underground");
-        driver.get("http://www.masspoolmp3.com/members/downloads/Trance");
-        downloadCategory("Trance-Tech");
-        driver.get("http://www.masspoolmp3.com/members/downloads/Electro-House");
-        downloadCategory("Electro-House");
-        driver.get("http://www.masspoolmp3.com/members/downloads/Latin");
-        downloadCategory("Latin-International");
-    }
-    
-    private void downloadCategory(String category) {
-        downloaded = mongoControl.poolsDB.getCollection(
-           "masspool_" + category.replaceAll("-", ""));
-        releaseName = "Mass Pool " + category;
-        logger.log("Scraping: " + category);
-        fullScrape();
-        logger.log("Scraped: " + category);
-    }
-    
-    @Override
-    public String scrapeFirstDate(String html) {
-        return Jsoup.parse(html).select("table[id=dl_table]>tbody>tr").first()
-           .select("td").get(2)
-           .text();
-    }
-    
-    @Override
-    public String previousDateOnThisPage(String html, String firstDate) {
-        return Jsoup.parse(html)
-           .select("table[id=dl_table]>tbody>tr")
-           .stream()
-           .map(element -> element.select("td").get(2).text())
-           .filter(date -> !date.equals(firstDate))
-           .findFirst()
-           .orElse(null);
-    }
-    
-    @Override
-    public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
-        Elements trackInfos = Jsoup.parse(html).select("table[id=dl_table]>tbody>tr");
-        for (Element trackInfo : trackInfos) {
-            String trackDate = trackInfo.select("td").get(2).text();
-            if (trackDate.equals(downloadDate)) {
-                String trackName = trackInfo.select("td").get(1).text();
-                String downloadPartLink = trackInfo.select("td").get(1)
-                   .select("a").attr("href");
-                String downloadUrl = MessageFormat.format(
-                   "http://www.masspoolmp3.com" +
-                      "{0}", downloadPartLink);
-                String downloadLink = getDownloadUrl(downloadUrl);
-                System.out.println(trackName + " | " + downloadLink);
-                scrapedLinks.add(downloadLink);
-            }
-        }
-    }
-    
-    @Override
-    public void nextPage() {
-        driver.findElement(By.id("dl_table_next")).click();
-    }
+   public MassPoolScraper() {
+      USERNAME = yamlConfig.getMasspool_username();
+      PASS = yamlConfig.getMasspool_password();
+      
+      loginUrl = "https://www.masspoolmp3.com/Secure/MainLogin.aspx";
+      nameFieldNavigator = By.id("Content_txtUsername");
+      passFieldNavigator = By.id("Content_txtPassword");
+      submitButtonNavigator = By.id("Content_cmdSubmit");
+      
+      dateFormat = "MM-dd-yyyy";
+      releaseName = "Mass Pool";
+   }
+   
+   public static void main(String[] args) {
+      MassPoolScraper massPoolScraper = new MassPoolScraper();
+      massPoolScraper.start();
+   }
+   
+   @Override
+   @SneakyThrows
+   public void afterFirstStage() {
+      driver.get("http://www.masspoolmp3.com/members/downloads/Dance");
+      Actions action = new Actions(driver);
+      WebElement choiceMenu = driver.findElement(
+        By.cssSelector("#dl_table_length > label:nth-child(1) > select:nth-child(1)"));
+      choiceMenu.click();
+      for (int i = 0; i < 5; i++) {
+         Thread.sleep(500);
+         action.sendKeys(choiceMenu, Keys.DOWN).build().perform();
+      }
+   }
+   
+   @Override
+   public void secondStageCheck() {
+      downloadCategory("Dance");
+      driver.get("http://www.masspoolmp3.com/members/downloads/HipHop");
+      downloadCategory("Hip-Hop");
+      driver.get("http://www.masspoolmp3.com/members/downloads/Underground");
+      downloadCategory("Underground");
+      driver.get("http://www.masspoolmp3.com/members/downloads/Trance");
+      downloadCategory("Trance-Tech");
+      driver.get("http://www.masspoolmp3.com/members/downloads/Electro-House");
+      downloadCategory("Electro-House");
+      driver.get("http://www.masspoolmp3.com/members/downloads/Latin");
+      downloadCategory("Latin-International");
+   }
+   
+   private void downloadCategory(String category) {
+      downloaded = mongoControl.poolsDB.getCollection(
+        "masspool_" + category.replaceAll("-", ""));
+      releaseName = "Mass Pool " + category;
+      logger.log("Scraping: " + category);
+      fullScrape();
+      logger.log("Scraped: " + category);
+   }
+   
+   @Override
+   public String scrapeFirstDate(String html) {
+      return Jsoup.parse(html).select("table[id=dl_table]>tbody>tr").first()
+        .select("td").get(2)
+        .text();
+   }
+   
+   @Override
+   public String previousDateOnThisPage(String html, String firstDate) {
+      return Jsoup.parse(html)
+        .select("table[id=dl_table]>tbody>tr")
+        .stream()
+        .map(element -> element.select("td").get(2).text())
+        .filter(date -> !date.equals(firstDate))
+        .findFirst()
+        .orElse(null);
+   }
+   
+   @Override
+   public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
+      Elements trackInfos = Jsoup.parse(html).select("table[id=dl_table]>tbody>tr");
+      for (Element trackInfo : trackInfos) {
+         String trackDate = trackInfo.select("td").get(2).text();
+         if (trackDate.equals(downloadDate)) {
+            String trackName = trackInfo.select("td").get(1).text();
+            String downloadPartLink = trackInfo.select("td").get(1)
+              .select("a").attr("href");
+            String downloadUrl = MessageFormat.format(
+              "http://www.masspoolmp3.com" +
+                "{0}", downloadPartLink);
+            String downloadLink = getDownloadUrl(downloadUrl);
+            System.out.println(trackName + " | " + downloadLink);
+            scrapedLinks.add(downloadLink);
+         }
+      }
+   }
+   
+   @Override
+   public void nextPage() {
+      driver.findElement(By.id("dl_table_next")).click();
+   }
 }

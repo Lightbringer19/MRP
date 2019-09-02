@@ -9,8 +9,8 @@ import org.jaudiotagger.tag.TagException;
 import java.io.IOException;
 
 class Test {
-
-    public static void main(String[] args) throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
-    }
-
+   
+   public static void main(String[] args) throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
+   }
+   
 }
