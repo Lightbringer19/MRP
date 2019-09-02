@@ -41,6 +41,7 @@ class API_Image_Uploader {
                System.out.println(response.getStatusLine());
                Log.write("Not uploaded: " + imageFile.getName() + " " +
                  response.getStatusLine(), "Poster");
+               System.out.println(jsonResponse);
                Thread.sleep(5000);
             } else {
                JSONObject post = (JSONObject) new JSONParser().parse(jsonResponse);

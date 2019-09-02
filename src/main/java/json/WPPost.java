@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class WPPost {
    private String title;
    private String status;
-   private String[] categories;
+   private Integer[] categories;
    private String content;
    
    public String toJson() {

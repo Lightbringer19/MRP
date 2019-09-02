@@ -43,7 +43,7 @@ public class PostUpdater extends Thread {
    @Override
    @SneakyThrows
    public void run() {
-      for (int postId = 115003; postId < 204958; postId++) {
+      for (int postId = 131460; postId < 204958; postId++) {
          try {
             updateOnePost(postId);
          } catch (Exception e) {
@@ -117,13 +117,13 @@ public class PostUpdater extends Thread {
          String genreFiltered = genreName
            .replaceAll("\\)", "").replaceAll("\\(", "")
            .replaceAll("^[0-9]", "").trim();
-         String genre = createCategory(genreFiltered, "5514");
-         categories.add(Integer.parseInt(genre));
+         Integer genre = createCategory(genreFiltered, "5514");
+         categories.add(genre);
       }
       String artistInfo = artistName.trim();
       if (!artistInfo.equals("") && !artistInfo.equals(" ")) {
-         String artist = createCategory(artistInfo, "5513");
-         categories.add(Integer.parseInt(artist));
+         Integer artist = createCategory(artistInfo, "5513");
+         categories.add((artist));
       }
    }
    

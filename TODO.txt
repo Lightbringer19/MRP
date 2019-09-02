@@ -1,2 +1,1 @@
-Reorganize Database - more organization required
 FTP previous month support

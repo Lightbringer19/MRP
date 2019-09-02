@@ -67,7 +67,8 @@ public class WP_API {
             if (response.getCode() != 201) {
                Log.write("Not posted: " + releaseName + " " + response.getCode(),
                  "Poster");
-               Thread.sleep(5000);
+               Thread.sleep(7000);
+               System.out.println(response.getJsonBody());
             } else {
                JSONObject post = (JSONObject) new JSONParser().parse(response.getJsonBody());
                return ((JSONObject) post.get("guid")).get("raw").toString();
@@ -130,53 +131,53 @@ public class WP_API {
    }
    
    @SuppressWarnings("unchecked")
-   private static String[] getCategoryIDsForPost(InfoForPost info) {
+   private static Integer[] getCategoryIDsForPost(InfoForPost info) {
       String releaseName = info.getReleaseName();
       String category = info.getPostCategory();
       Map<String, String> categoriesAndIDs;
-      List<String> categories = new ArrayList<>();
+      List<Integer> categories = new ArrayList<>();
       switch (category) {
          case "BEATPORT":
-            categories.add("115");
+            categories.add(Integer.valueOf("115"));
             setCategoriesForBeatAndScene(info, categories);
             break;
          case "RECORDPOOL MUSIC":
-            categories.add("77");
+            categories.add(Integer.valueOf("77"));
             setCategories(releaseName, categories, category);
             break;
          case "RECORDPOOL VIDEOS":
-            categories.add("29");
+            categories.add(Integer.valueOf("29"));
             setCategories(releaseName, categories, category);
             break;
          case "SCENE-MP3":
-            categories.add("184");
+            categories.add(Integer.valueOf("184"));
             setCategoriesForBeatAndScene(info, categories);
             break;
          case "SCENE-FLAC":
-            categories.add("191");
+            categories.add(Integer.valueOf("191"));
             setCategoriesForBeatAndScene(info, categories);
             break;
       }
-      return categories.toArray(new String[0]);
+      return categories.toArray(new Integer[0]);
    }
    
-   private static void setCategoriesForBeatAndScene(InfoForPost info, List<String> categories) {
+   private static void setCategoriesForBeatAndScene(InfoForPost info, List<Integer> categories) {
       if (!info.getGenre().equals("Mixed")) {
          String genreFiltered = info.getGenre()
            .replaceAll("\\)", "").replaceAll("\\(", "")
            .replaceAll("^[0-9]", "").trim();
-         String genre = createCategory(genreFiltered, "5514");
+         Integer genre = createCategory(genreFiltered, "5514");
          categories.add(genre);
       }
       String artistInfo = info.getArtist().trim();
       if (!artistInfo.equals("") && !artistInfo.equals(" ")) {
-         String artist = createCategory(artistInfo, "5513");
+         Integer artist = createCategory(artistInfo, "5513");
          categories.add(artist);
       }
    }
    
    @SuppressWarnings("unchecked")
-   private static void setCategories(String releaseName, List<String> categories, String category) {
+   private static void setCategories(String releaseName, List<Integer> categories, String category) {
       Map<String, String> categoriesAndIDs;
       categoriesAndIDs = (Map<String, String>)
         MONGO_CONTROL.categoriesCollection
@@ -184,7 +185,7 @@ public class WP_API {
           .first().get("categoriesAndIDs");
       for (Map.Entry<String, String> categoryAndID : categoriesAndIDs.entrySet()) {
          if (releaseName.contains(categoryAndID.getKey())) {
-            categories.add(categoryAndID.getValue());
+            categories.add(Integer.valueOf(categoryAndID.getValue()));
             break;
          }
       }
@@ -192,23 +193,32 @@ public class WP_API {
    
    @SuppressWarnings("Duplicates")
    @SneakyThrows
-   public static String createCategory(String category, String parentId) {
+   public static Integer createCategory(String category, String parentId) {
       String apiURI = "https://myrecordpool.com/wp-json/wp/v2/categories";
-      ResponseInfo responseInfo = postAndGetResponse(new Document()
-          .append("name", category).append("parent", parentId).toJson(), apiURI,
-        MRP_AUTHORIZATION);
-      String categoryID = null;
-      if (responseInfo.getCode() == 400) {
-         categoryID = ((JSONObject) ((JSONObject) new JSONParser()
-           .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
-         System.out.println("Category found  : " + category + " ID: " + categoryID);
-         
-      } else if (responseInfo.getCode() == 201) {
-         categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
-           .get("id").toString();
-         System.out.println("Category created: " + category + " ID: " + categoryID);
+      String categoryID;
+      while (true) {
+         ResponseInfo responseInfo = postAndGetResponse(new Document()
+             .append("name", category).append("parent", parentId).toJson(), apiURI,
+           MRP_AUTHORIZATION);
+         if (responseInfo.getCode() == 400) {
+            categoryID = ((JSONObject) ((JSONObject) new JSONParser()
+              .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
+            System.out.println("Category found  : " + category + " ID: " + categoryID);
+            return Integer.valueOf(categoryID);
+            
+         } else if (responseInfo.getCode() == 201) {
+            categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
+              .get("id").toString();
+            System.out.println("Category created: " + category + " ID: " + categoryID);
+            return Integer.valueOf(categoryID);
+         } else {
+            Log.write("Error on search: " + category +
+                " RESPONSE CODE: " + responseInfo.getCode(),
+              "Poster");
+            Log.write(responseInfo.getJsonBody(), "Poster");
+            Thread.sleep(3000);
+         }
       }
-      return categoryID;
    }
    
    private static void append(StringBuilder trackList, String valueString) {

@@ -54,11 +54,11 @@ public class Reposter extends Thread {
                //categories
                Log.write("Getting categories for: " + releaseName, "Reposter");
                List<String> categoriesForBlog = new ArrayList<>();
-               List<String> categoriesIDList = new ArrayList<>();
+               List<Integer> categoriesIDList = new ArrayList<>();
                setCategoriesLists(release, categoriesForBlog, categoriesIDList);
                Log.write("Reposting to WP: " + releaseName, "Reposter");
                //compose the post
-               String[] categoriesID = categoriesIDList.toArray(new String[0]);
+               Integer[] categoriesID = categoriesIDList.toArray(new Integer[0]);
                String contentMessage = release.getTrackList()
                  + "<p>More Info Here:<br><a href=\"" + release.getMrpPostLink()
                  + "\">" + release.getMrpPostLink() + "</a></p>";
@@ -79,6 +79,7 @@ public class Reposter extends Thread {
                      Log.write("Not reposted: " + mainCategory + "| " + releaseName +
                        " Code: "
                        + responseInfo.getCode(), "Reposter");
+                     System.out.println(responseInfo.getJsonBody());
                      // if (mainCategory.equals("BEATPORT") && responseInfo.getCode() == 526) {
                      //     Log.write("Beatport 526 error WP repost Skipped",
                      //        "Reposter");
@@ -87,7 +88,7 @@ public class Reposter extends Thread {
                      //     Log.write("Error 400 WP repost Skipped", "Reposter");
                      //     break;
                      // }
-                     Thread.sleep(5000);
+                     Thread.sleep(7000);
                   } else {
                      break;
                   }
@@ -119,7 +120,7 @@ public class Reposter extends Thread {
    }
    
    private static void setCategoriesLists(Release release, List<String> categoriesForBlog,
-                                          List<String> categoriesIDList) throws ParseException {
+                                          List<Integer> categoriesIDList) throws ParseException {
       categoriesForBlog.add(mainCategory);
       categoriesIDList.add(getOrCreateCategory(mainCategory));
       if (mainCategory.contains("SCENE")) {
@@ -141,29 +142,42 @@ public class Reposter extends Thread {
       return new Gson().fromJson(foundDoc.toJson(), Release.class);
    }
    
-   private static String getOrCreateCategory(String categoryToFind) throws ParseException {
+   @SneakyThrows
+   private static Integer getOrCreateCategory(String categoryToFind) {
       String apiURI = "https://recordpoolmusic.com/wp-json/wp/v2/categories";
       if (mainCategory.contains("SCENE")) {
          apiURI = apiURI.replace("recordpoolmusic", "scenedownload");
       } else if (mainCategory.contains("BEATPORT")) {
          apiURI = apiURI.replace("recordpoolmusic", "beatportmusic");
       }
-      ResponseInfo responseInfo = postAndGetResponse(new Document()
-          .append("name", categoryToFind).toJson(), apiURI,
-        AUTHORIZATION_HEADER);
-      String categoryID = null;
-      if (responseInfo.getCode() == 400) {
-         // cant find or create category but it exists
-         categoryID = ((JSONObject) ((JSONObject) new JSONParser()
-           .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
-         System.out.println("Category found: " + categoryToFind + " ID: " + categoryID);
-         
-      } else if (responseInfo.getCode() == 201) {
-         categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
-           .get("id").toString();
-         System.out.println("Category created: " + categoryToFind + " ID: " + categoryID);
+      while (true) {
+         ResponseInfo responseInfo = postAndGetResponse(new Document()
+             .append("name", categoryToFind).toJson(), apiURI,
+           AUTHORIZATION_HEADER);
+         String categoryID;
+         if (responseInfo.getCode() == 400) {
+            // cant find or create category but it exists
+            categoryID = ((JSONObject) ((JSONObject) new JSONParser()
+              .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
+            // Log.write(
+            Log.write("Category found: " + categoryToFind + " ID: " + categoryID,
+              "Reposter");
+            return Integer.valueOf(categoryID);
+         } else if (responseInfo.getCode() == 201) {
+            categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
+              .get("id").toString();
+            Log.write("Category created: " + categoryToFind + " ID: " + categoryID,
+              "Reposter");
+            return Integer.valueOf(categoryID);
+         } else {
+            Log.write("Error on search: " + categoryToFind +
+                " RESPONSE CODE: " + responseInfo.getCode(),
+              "Reposter");
+            System.out.println(responseInfo.getJsonBody());
+            Thread.sleep(3000);
+         }
       }
-      return categoryID;
+      
    }
    
    @Override
