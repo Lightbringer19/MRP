@@ -19,14 +19,19 @@ public class CustomDownloader implements DownloadInterface {
    public static void main(String[] args) {
       MongoControl mongoControl = new MongoControl();
       CustomDownloader customDownloader = new CustomDownloader();
-      System.out.println("Enter release name: ");
-      String releaseName = IN.nextLine();
-      System.out.println("Enter cookies: ");
-      COOKIE = IN.nextLine();
-      Document releaseInfo = mongoControl.scrapedReleases
-        .find(eq("releaseName", releaseName)).first();
-      List<String> scrapedLinks = (List<String>) releaseInfo.get("scrapedLinks");
-      customDownloader.downloadLinks(scrapedLinks, releaseName);
+      while (true) {
+         System.out.println("Enter release name: ");
+         String releaseName = IN.nextLine();
+         System.out.println("Enter cookies(press enter to reuse cookie): ");
+         String cookie = IN.nextLine();
+         if (!cookie.equals("")) {
+            COOKIE = cookie;
+         }
+         Document releaseInfo = mongoControl.scrapedReleases
+           .find(eq("releaseName", releaseName)).first();
+         List<String> scrapedLinks = (List<String>) releaseInfo.get("scrapedLinks");
+         customDownloader.downloadLinks(scrapedLinks, releaseName);
+      }
    }
    
    @Override

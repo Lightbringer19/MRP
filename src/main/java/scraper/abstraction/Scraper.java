@@ -106,18 +106,25 @@ public abstract class Scraper extends Thread
       // If release found -> scrape all links and date
       boolean newReleaseOnThePool = downloaded
         .find(eq("releaseDate", firstDate)).first() == null;
+      boolean oldReleaseWasDownloaded = downloaded
+        .find(eq("oldReleaseDate", firstDate)).first() != null;
       if (newReleaseOnThePool) {
          setCookieForAPI();
          //  Find next date
          String downloadDate = getDownloadDate(firstDate);
-         // MAIN OPERATION EXECUTION
-         mainOperation(firstDate, downloadDate);
-         // Schedule release and add to DB
-         downloaded.insertOne(
-           new Document("releaseDate", firstDate));
-      } else if (releaseIsOld) {
+         if (downloaded.find(eq("oldReleaseDate", downloadDate))
+           .first() == null) {
+            // MAIN OPERATION EXECUTION
+            mainOperation(firstDate, downloadDate);
+            // Schedule release and add to DB
+            downloaded.insertOne(
+              new Document("releaseDate", firstDate));
+         }
+      } else if (releaseIsOld && !oldReleaseWasDownloaded) {
          setCookieForAPI();
          mainOperation(firstDate, firstDate);
+         downloaded.insertOne(
+           new Document("oldReleaseDate", firstDate));
       }
    }
    

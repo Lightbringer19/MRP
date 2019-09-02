@@ -47,7 +47,7 @@ public interface DownloadInterface {
          get.setHeader("Cookie", getCookie());
          get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
          @Cleanup CloseableHttpResponse response = client.execute(get);
-         String fileName;
+         String fileName = "";
          if (response.getFirstHeader("Content-Disposition") != null) {
             fileName = response.getFirstHeader("Content-Disposition").getValue()
               .replace("attachment; filename=", "")
@@ -56,7 +56,8 @@ public interface DownloadInterface {
               .replaceAll("\"", "")
               .replaceAll("\\\\", "")
               .replaceAll("&amp;", "&");
-         } else {
+         }
+         if (fileName.equals("")) {
             String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
             fileName = URLDecoder.decode(
               url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name());
@@ -65,7 +66,9 @@ public interface DownloadInterface {
                  decode.substring(decode.indexOf("?")), "");
             }
          }
-         File mp3File = new File(releaseFolderPath + fileName);
+         String pathname = releaseFolderPath + fileName;
+         System.out.println(pathname);
+         File mp3File = new File(pathname);
          getLogger().log("Downloading: " + fileName + " | " + downloadUrl
            + " | " + response.getStatusLine());
          @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);

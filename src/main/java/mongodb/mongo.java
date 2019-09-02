@@ -35,8 +35,8 @@ public class mongo extends Thread {
    @Data
    public static class CategoryInfo {
       public String categoryName;
+      private int count;
       public double percent;
-      int count;
    }
 }
 

@@ -21,14 +21,16 @@ public class HlScraper extends Scraper {
       submitButtonNavigator = By.id("wp-submit1");
       downloaded = mongoControl.hlDownloaded;
       releaseName = "Headliner Music Club";
-      
-      loginAtFirstStage = false;
-      urlForFirstStage = "https://headlinermusicclub.com/welcome/";
    }
    
    public static void main(String[] args) {
       HlScraper hlScraper = new HlScraper();
       hlScraper.run();
+   }
+   
+   @Override
+   public void afterLogin() {
+      driver.get("https://headlinermusicclub.com/welcome/");
    }
    
    @Override

@@ -1,3 +1,2 @@
 Reorganize Database - more organization required
-Headliner fix (and download releases)
 FTP previous month support
