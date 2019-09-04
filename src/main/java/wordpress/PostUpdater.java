@@ -18,6 +18,7 @@ import utils.Logger;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.eq;
 import static wordpress.Poster.MONGO_CONTROL;
@@ -25,32 +26,30 @@ import static wordpress.Poster.MRP_AUTHORIZATION;
 import static wordpress.WP_API.createCategory;
 import static wordpress.WP_API.postAndGetResponse;
 
-public class PostUpdater extends Thread {
+public class PostUpdater {
    
    private static Logger logger = new Logger("Post Updater");
+   private static final Scanner IN = new Scanner(System.in);
    
    public PostUpdater() {
       YamlConfig yamlConfig = new YamlConfig();
       MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
    }
    
+   @SneakyThrows
    public static void main(String[] args) {
       PostUpdater postUpdater = new PostUpdater();
-      postUpdater.start();
-      
-   }
-   
-   @Override
-   @SneakyThrows
-   public void run() {
-      for (int postId = 131460; postId < 204958; postId++) {
+      System.out.println("Enter post ID: ");
+      int postIdEntered = IN.nextInt();
+      for (int postId = postIdEntered; postId < 204958; postId++) {
          try {
-            updateOnePost(postId);
+            postUpdater.updateOnePost(postId);
          } catch (Exception e) {
             logger.log(e);
             Thread.sleep(5000);
          }
       }
+      
    }
    
    @SuppressWarnings({"unchecked", "DuplicatedCode"})

@@ -152,8 +152,8 @@ task DjPoolFtp {
 task ScheduleWatcher {
     dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '2.0.')
 }
-task PostUpdater {
-    dependsOn newRelease('monitors.', 'Post_Updater_Monitor', '1.0.')
+task PostUpdaterApp {
+    dependsOn newRelease('wordpress.', 'PostUpdater', '1.0.')
 }
 task DownloaderCustom {
     dependsOn newRelease('scraper.downloader.', 'CustomDownloader', '1.1.')
@@ -197,6 +197,9 @@ task MaletaDvjScraper {
 }
 task MassPoolScraper {
     dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '1.1.')
+}
+task AvDistrictScraper {
+    dependsOn newRelease('monitors.', 'AvDistrict_Scraper_Monitor', '1.0.')
 }
 
 task BuildScrapers {

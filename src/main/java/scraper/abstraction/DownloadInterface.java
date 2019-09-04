@@ -66,7 +66,8 @@ public interface DownloadInterface {
                  decode.substring(decode.indexOf("?")), "");
             }
          }
-         String pathname = releaseFolderPath + fileName;
+         fileName = fileName.replaceAll("/", "");
+         String pathname = releaseFolderPath + "/" + fileName;
          File mp3File = new File(pathname);
          getLogger().log("Downloading: " + fileName + " | " + downloadUrl
            + " | " + response.getStatusLine());

@@ -70,6 +70,8 @@ public class YamlConfig {
       private String maletadvj_password;
       private String masspool_username;
       private String masspool_password;
+      private String avdistrict_username;
+      private String avdistrict_password;
       
    }
 }

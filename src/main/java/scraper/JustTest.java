@@ -1,31 +1,20 @@
 package scraper;
 
-import scraper.heavyhits.DownloadUrlApiService;
-import utils.Logger;
+import scraper.avdistrict.ApiServiceAvDistrict;
 
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class JustTest implements DownloadUrlApiService {
+public class JustTest implements ApiServiceAvDistrict {
    public static void main(String[] args) throws IOException, ParseException {
-      // JustTest justTest = new JustTest();
       
-      String url = "";
-      String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
-      String fileName = URLDecoder.decode(
-        url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name())
-        .replace("?download", "");
-      if (fileName.contains("?")) {
-         fileName = fileName.replace(
-           decode.substring(decode.indexOf("?")), "");
-      }
-      System.out.println(fileName);
+      // JustTest justTest = new JustTest();
+      // String downloadLink = justTest.getDownloadLink("27143");
+      // System.out.println(downloadLink);
    }
    
    public static boolean releaseIsOld(String dateFormat, String date) throws ParseException {
@@ -54,8 +43,8 @@ public class JustTest implements DownloadUrlApiService {
       return "";
    }
    
-   @Override
-   public Logger getLogger() {
-      return new Logger("TEST");
-   }
+   // @Override
+   // public Logger getLogger() {
+   //    return new Logger("TEST");
+   // }
 }

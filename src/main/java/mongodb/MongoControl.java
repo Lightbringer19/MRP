@@ -31,6 +31,7 @@ public class MongoControl {
    public final MongoCollection<Document> heavyHitsDownloaded;
    public final MongoCollection<Document> crateConnectDownloaded;
    public final MongoCollection<Document> maletadvjDownloaded;
+   public final MongoCollection<Document> avDistrictDownloaded;
    
    public MongoControl() {
       mongoClient = new MongoClient("localhost", 27017);
@@ -66,6 +67,7 @@ public class MongoControl {
       heavyHitsDownloaded = poolsDB.getCollection("heavyHits");
       crateConnectDownloaded = poolsDB.getCollection("crateConnect");
       maletadvjDownloaded = poolsDB.getCollection("maletadvj");
+      avDistrictDownloaded = poolsDB.getCollection("avDistrict");
    }
    
 }

@@ -8,7 +8,6 @@ import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.text.ParseException;
 
 public class ScraperTest {
@@ -17,33 +16,31 @@ public class ScraperTest {
       String html = FUtils.readFile(new File("Z:\\source.html"));
       Document document = Jsoup.parse(html);
       
-      String firstDate = document.select("table[id=dl_table]>tbody>tr").first()
-        .select("td").get(2)
-        .text();
+      String firstDate = document.select("tbody>tr>td")
+        .get(5).text();
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("table[id=dl_table]>tbody>tr")
+        .select("tbody>tr")
         .stream()
-        .map(element -> element.select("td").get(2).text())
+        .map(trackInfo -> trackInfo.select("td").get(5).text())
         .filter(date -> !date.equals(firstDate))
         .findFirst()
         .orElse(null);
       
       System.out.println(downloadDate);
       
-      Elements trackInfos = document.select("table[id=dl_table]>tbody>tr");
+      Elements trackInfos = document.select("tbody>tr");
       for (Element trackInfo : trackInfos) {
-         String trackDate = trackInfo.select("td").get(2).text();
+         String trackDate = trackInfo.select("td").get(5).text();
          if (trackDate.equals(downloadDate)) {
-            String trackName = trackInfo.select("td").get(1).text();
-            String downloadPartLink = trackInfo.select("td").get(1)
-              .select("a").attr("href");
-            String downloadUrl = MessageFormat.format(
-              "http://www.masspoolmp3.com" +
-                "{0}", downloadPartLink);
-            System.out.println(trackName + " | " + downloadUrl);
+            String trackName = trackInfo.select("td").get(1).text() +
+              trackInfo.select("td").get(2).text();
+            String videoId = trackInfo.select("td").get(0)
+              .select("a").attr("data-videoid");
+            System.out.println(videoId + " " + trackName);
+            // System.out.println(trackName + " | " + downloadUrl);
          }
       }
       

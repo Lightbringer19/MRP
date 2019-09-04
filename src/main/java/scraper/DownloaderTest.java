@@ -11,10 +11,7 @@ import scraper.bpm.ApiService;
 import utils.Constants;
 import utils.Logger;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class DownloaderTest implements DownloadInterface, ApiService {
    protected static MongoControl mongoControl = new MongoControl();
@@ -33,42 +30,44 @@ public class DownloaderTest implements DownloadInterface, ApiService {
    
    public static void main(String[] args) {
       // String[] links = {
-      // };
-      DownloaderTest downloaderTest = new DownloaderTest();
+      // // };
+      // DownloaderTest downloaderTest = new DownloaderTest();
+      // String downloadURL = "";
+      // downloaderTest.downloadLinks(Collections.singletonList(downloadURL), "TEST");
       
-      downloaderTest.USERNAME = yamlConfig.getBpm_username();
-      downloaderTest.PASS = yamlConfig.getBpm_password();
-      downloaderTest.loginUrl = "https://www.bpmsupreme.com/login";
-      downloaderTest.nameFieldNavigator = By.id("login-form-email");
-      downloaderTest.passFieldNavigator = By.id("login-form-password");
-      downloaderTest.submitButtonNavigator = By.tagName("button");
-      
-      try {
-         downloaderTest.login();
-         driver.get("https://www.bpmsupreme.com/store/newreleases/video/classic/1");
-         Thread.sleep(10_000);
-         cookieForAPI = driver.manage().getCookies().stream()
-           .map(cookie -> cookie.getName() + "=" + cookie.getValue())
-           .collect(Collectors.joining("; "));
-         
-         // String releaseName = "Bpm Supreme 0808";
-         // Document scrapedRelease = mongoControl.scrapedReleases
-         //    .find(eq("releaseName", releaseName)).first();
-         // List<String> scrapedLinks = (List<String>) scrapedRelease.get("scrapedLinks");
-         
-         List<String> downloadInfo = downloaderTest.getDownloadInfo("https://www.bpmsupreme.com/store/output_file/314217");
-         String downloadURL = downloadInfo.get(0);
-         String cookie = downloadInfo.get(1);
-         System.out.println(cookie);
-         cookieForAPI = cookie;
-         
-         downloaderTest.downloadLinks(Collections.singletonList(downloadURL), "TEST");
-         
-      } catch (Exception e) {
-         e.printStackTrace();
-      } finally {
-         driver.quit();
-      }
+      // downloaderTest.USERNAME = yamlConfig.getBpm_username();
+      // downloaderTest.PASS = yamlConfig.getBpm_password();
+      // downloaderTest.loginUrl = "https://www.bpmsupreme.com/login";
+      // downloaderTest.nameFieldNavigator = By.id("login-form-email");
+      // downloaderTest.passFieldNavigator = By.id("login-form-password");
+      // downloaderTest.submitButtonNavigator = By.tagName("button");
+      //
+      // try {
+      //    downloaderTest.login();
+      //    driver.get("https://www.bpmsupreme.com/store/newreleases/video/classic/1");
+      //    Thread.sleep(10_000);
+      //    cookieForAPI = driver.manage().getCookies().stream()
+      //      .map(cookie -> cookie.getName() + "=" + cookie.getValue())
+      //      .collect(Collectors.joining("; "));
+      //
+      //    // String releaseName = "Bpm Supreme 0808";
+      //    // Document scrapedRelease = mongoControl.scrapedReleases
+      //    //    .find(eq("releaseName", releaseName)).first();
+      //    // List<String> scrapedLinks = (List<String>) scrapedRelease.get("scrapedLinks");
+      //
+      //    List<String> downloadInfo = downloaderTest.getDownloadInfo("https://www.bpmsupreme.com/store/output_file/314217");
+      //    String downloadURL = downloadInfo.get(0);
+      //    String cookie = downloadInfo.get(1);
+      //    System.out.println(cookie);
+      //    cookieForAPI = cookie;
+      //
+      //    downloaderTest.downloadLinks(Collections.singletonList(downloadURL), "TEST");
+      //
+      // } catch (Exception e) {
+      //    e.printStackTrace();
+      // } finally {
+      //    driver.quit();
+      // }
       
    }
    
