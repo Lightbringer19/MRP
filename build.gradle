@@ -158,6 +158,9 @@ task PostUpdaterApp {
 task DownloaderCustom {
     dependsOn newRelease('scraper.downloader.', 'CustomDownloader', '1.1.')
 }
+task PostDeleter {
+    dependsOn newRelease('wordpress.', 'PostRemover', '1.0.')
+}
 //SCRAPERS
 task DMPScraper {
     dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '1.2.')
@@ -212,24 +215,6 @@ task BuildPosters {
 }
 
 task BuildAll {
-    dependsOn MongoDB
-    dependsOn Manual_Scheduler
-    dependsOn SceneFTP
-    dependsOn BeatportFtp
-    dependsOn DjPoolFtp
-    dependsOn ScheduleWatcher
     dependsOn DownloaderCustom
-    dependsOn DMPScraper
-    dependsOn EwScraper
-    dependsOn Mp3PoolScraper
-    dependsOn BeatJunkiesScraper
-    dependsOn HeadlineScraper
     dependsOn BpmSupremeScraper
-    dependsOn BpmLatinoScraper
-    dependsOn RemixMp4Scraper
-    dependsOn DaleMBScraper
-    dependsOn HeavyHitsScraper
-    dependsOn CrateConnectScraper
-    dependsOn MaletaDvjScraper
-    dependsOn MassPoolScraper
 }

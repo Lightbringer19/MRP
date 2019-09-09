@@ -52,6 +52,7 @@ public interface DownloadInterface {
             fileName = response.getFirstHeader("Content-Disposition").getValue()
               .replace("attachment; filename=", "")
               .replace("attachment", "")
+              .replace("attachement", "")
               .replaceAll(";", "")
               .replaceAll("\"", "")
               .replaceAll("\\\\", "")
