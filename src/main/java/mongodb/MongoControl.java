@@ -32,6 +32,7 @@ public class MongoControl {
    public final MongoCollection<Document> crateConnectDownloaded;
    public final MongoCollection<Document> maletadvjDownloaded;
    public final MongoCollection<Document> avDistrictDownloaded;
+   public final MongoCollection<Document> smashVisionDownloaded;
    
    public MongoControl() {
       mongoClient = new MongoClient("localhost", 27017);
@@ -68,6 +69,7 @@ public class MongoControl {
       crateConnectDownloaded = poolsDB.getCollection("crateConnect");
       maletadvjDownloaded = poolsDB.getCollection("maletadvj");
       avDistrictDownloaded = poolsDB.getCollection("avDistrict");
+      smashVisionDownloaded = poolsDB.getCollection("smashVision");
    }
    
 }

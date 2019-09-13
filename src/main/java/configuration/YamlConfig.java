@@ -72,6 +72,8 @@ public class YamlConfig {
       private String masspool_password;
       private String avdistrict_username;
       private String avdistrict_password;
+      private String smashvision_username;
+      private String smashvision_password;
       
    }
 }

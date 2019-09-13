@@ -50,9 +50,6 @@ dependencies {
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.24'
     compile group: 'io.projectreactor', name: 'reactor-core', version: '3.2.11.RELEASE'
 
-
-//    compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
-
 }
 
 class MyShadow extends ShadowJar {
@@ -203,6 +200,9 @@ task MassPoolScraper {
 }
 task AvDistrictScraper {
     dependsOn newRelease('monitors.', 'AvDistrict_Scraper_Monitor', '1.0.')
+}
+task SmashVisionScraper {
+    dependsOn newRelease('monitors.', 'SmashVision_Scraper_Monitor', '1.0.')
 }
 
 task BuildScrapers {

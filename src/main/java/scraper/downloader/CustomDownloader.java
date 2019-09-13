@@ -22,6 +22,9 @@ public class CustomDownloader implements DownloadInterface {
       while (true) {
          System.out.println("Enter release name: ");
          String releaseName = IN.nextLine();
+         if (releaseName.contains("MyMp3Pool")) {
+            System.setProperty("jsse.enableSNIExtension", "false");
+         }
          System.out.println("Enter cookies(press enter to reuse cookie): ");
          String cookie = IN.nextLine();
          if (!cookie.equals("")) {
@@ -31,6 +34,9 @@ public class CustomDownloader implements DownloadInterface {
            .find(eq("releaseName", releaseName)).first();
          List<String> scrapedLinks = (List<String>) releaseInfo.get("scrapedLinks");
          customDownloader.downloadLinks(scrapedLinks, releaseName);
+         if (releaseName.contains("MyMp3Pool")) {
+            System.setProperty("jsse.enableSNIExtension", "true");
+         }
       }
    }
    
