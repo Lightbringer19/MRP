@@ -9,21 +9,21 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import scraper.abstraction.Scraper;
-import scraper.heavyhits.DownloadUrlApiService;
+import scraper.heavyhits.HeavyHitsApiService;
 
 import java.text.MessageFormat;
 import java.util.List;
 
-public class MassPoolScraper extends Scraper implements DownloadUrlApiService {
+public class MassPoolScraper extends Scraper implements HeavyHitsApiService {
    public MassPoolScraper() {
       USERNAME = yamlConfig.getMasspool_username();
       PASS = yamlConfig.getMasspool_password();
-      
+   
       loginUrl = "https://www.masspoolmp3.com/Secure/MainLogin.aspx";
       nameFieldNavigator = By.id("Content_txtUsername");
       passFieldNavigator = By.id("Content_txtPassword");
       submitButtonNavigator = By.id("Content_cmdSubmit");
-      
+   
       dateFormat = "MM-dd-yyyy";
       releaseName = "Mass Pool";
    }

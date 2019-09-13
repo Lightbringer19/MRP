@@ -9,7 +9,7 @@ import scraper.abstraction.Scraper;
 
 import java.util.List;
 
-public class AvDistrictScraper extends Scraper implements ApiServiceAvDistrict {
+public class AvDistrictScraper extends Scraper implements AvDistrictApiService {
    public AvDistrictScraper() {
       USERNAME = yamlConfig.getAvdistrict_username();
       PASS = yamlConfig.getAvdistrict_password();

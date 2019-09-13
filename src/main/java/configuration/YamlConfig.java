@@ -74,6 +74,7 @@ public class YamlConfig {
       private String avdistrict_password;
       private String smashvision_username;
       private String smashvision_password;
-      
+      private String vjstreet_username;
+      private String vjstreet_password;
    }
 }

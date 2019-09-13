@@ -1,6 +1,6 @@
 package scraper;
 
-import scraper.avdistrict.ApiServiceAvDistrict;
+import scraper.avdistrict.AvDistrictApiService;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -9,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class JustTest implements ApiServiceAvDistrict {
+public class JustTest implements AvDistrictApiService {
    public static void main(String[] args) throws IOException, ParseException {
       
       // JustTest justTest = new JustTest();

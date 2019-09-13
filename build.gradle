@@ -204,6 +204,9 @@ task AvDistrictScraper {
 task SmashVisionScraper {
     dependsOn newRelease('monitors.', 'SmashVision_Scraper_Monitor', '1.0.')
 }
+task VjStreetScraper {
+    dependsOn newRelease('monitors.', 'VjStreet_Scraper_Monitor', '1.0.')
+}
 
 task BuildScrapers {
 }

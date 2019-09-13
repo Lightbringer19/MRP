@@ -9,7 +9,7 @@ import scraper.abstraction.Scraper;
 
 import java.util.List;
 
-public class HeavyHitsScraper extends Scraper implements DownloadUrlApiService {
+public class HeavyHitsScraper extends Scraper implements HeavyHitsApiService {
    public HeavyHitsScraper() {
       USERNAME = yamlConfig.getHeavyhits_username();
       PASS = yamlConfig.getHeavyhits_password();

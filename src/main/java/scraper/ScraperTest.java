@@ -7,7 +7,6 @@ import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.text.ParseException;
 
 public class ScraperTest {
@@ -16,20 +15,15 @@ public class ScraperTest {
       String html = FUtils.readFile(new File("Z:\\source.html"));
       Document document = Jsoup.parse(html);
       
-      Element dateElement = document.select("td[class=footable-visible footable-last-column]")
-        .first();
-      String firstDate = dateElement.text().contains("Updated:")
-        ? dateElement.select("div").get(1).text()
-        : dateElement.select("div").first().text();
+      String firstDate = document.select("tbody>tr").first()
+        .select("td").first().text();
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("td[class=footable-visible footable-last-column]")
+        .select("tbody>tr")
         .stream()
-        .map(trackInfo -> trackInfo.text().contains("Updated:")
-          ? trackInfo.select("div").get(1).text()
-          : trackInfo.select("div").first().text())
+        .map(trackInfo -> trackInfo.select("td").first().text())
         .filter(date -> !date.equals(firstDate))
         .findFirst()
         .orElse(null);
@@ -38,22 +32,14 @@ public class ScraperTest {
       
       Elements trackInfos = document.select("tbody>tr");
       for (Element trackInfo : trackInfos) {
-         Element date = trackInfo
-           .select("td[class=footable-visible footable-last-column]")
-           .first();
-         String trackDate = date.text().contains("Updated:")
-           ? date.select("div").get(1).text()
-           : date.select("div").first().text();
+         String trackDate = trackInfo.select("td").first().text();
          if (trackDate.equals(downloadDate)) {
-            String trackName =
-              trackInfo.select("div[class=grid-text]").get(0).text() + " " +
-                trackInfo.select("div[class=grid-text]").get(1).text();
-            Elements downloadButtons = trackInfo.select("div[class=btn-group]>button");
-            for (Element downloadButton : downloadButtons) {
-               String videoId = MessageFormat.format(
-                 "https://www.smashvision.net/Handlers/DownloadHandler.ashx?id={0}",
-                 downloadButton.attr("id").replace("btn_", ""));
-               System.out.println(videoId + " " + trackName);
+            for (Element downloadInfo : trackInfo
+              .select("td[class=catalog-download hidden-xs]>a")) {
+               String trackName = downloadInfo.attr("title");
+               String downloadCode = downloadInfo.attr("data-code");
+               String downloadUrl = downloadInfo.attr("href");
+               System.out.println(downloadUrl + " " + trackName);
             }
             
          }

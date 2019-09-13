@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface ApiService {
+public interface BpmApiService {
    default List<String> getDownloadInfo(String url) {
       try {
          @Cleanup CloseableHttpClient client = HttpClients.createDefault();

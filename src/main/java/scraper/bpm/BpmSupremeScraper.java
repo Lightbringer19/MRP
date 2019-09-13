@@ -10,7 +10,7 @@ import scraper.abstraction.Scraper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BpmSupremeScraper extends Scraper implements ApiService {
+public class BpmSupremeScraper extends Scraper implements BpmApiService {
    
    public BpmSupremeScraper() {
       USERNAME = yamlConfig.getBpm_username();
@@ -19,7 +19,7 @@ public class BpmSupremeScraper extends Scraper implements ApiService {
       nameFieldNavigator = By.id("login-form-email");
       passFieldNavigator = By.id("login-form-password");
       submitButtonNavigator = By.tagName("button");
-      
+   
       dateFormat = "MM/dd/yy";
       downloaded = mongoControl.bpmDownloaded;
       releaseName = "Bpm Supreme";

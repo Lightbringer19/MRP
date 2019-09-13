@@ -7,13 +7,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import scraper.abstraction.DownloadInterface;
-import scraper.bpm.ApiService;
+import scraper.bpm.BpmApiService;
 import utils.Constants;
 import utils.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-public class DownloaderTest implements DownloadInterface, ApiService {
+public class DownloaderTest implements DownloadInterface, BpmApiService {
    protected static MongoControl mongoControl = new MongoControl();
    protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
    protected static WebDriver driver;

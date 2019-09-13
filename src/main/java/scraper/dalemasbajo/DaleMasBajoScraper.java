@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-public class DaleMBScraper extends Scraper implements LoginInterface {
+public class DaleMasBajoScraper extends Scraper implements DaleMasBajoLoginInterface {
    
-   public DaleMBScraper() {
+   public DaleMasBajoScraper() {
       USERNAME = yamlConfig.getDalemasbajo_username();
       PASS = yamlConfig.getDalemasbajo_password();
-      
+   
       dateFormat = "MM/dd/yy";
       downloaded = mongoControl.daleMasBajoDownloaded;
       releaseName = "DaleMasBajo";

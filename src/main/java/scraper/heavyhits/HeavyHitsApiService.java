@@ -8,7 +8,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import utils.Logger;
 
-public interface DownloadUrlApiService {
+public interface HeavyHitsApiService {
    
    default String getDownloadUrl(String url) {
       try {
