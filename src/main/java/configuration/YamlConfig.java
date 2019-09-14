@@ -76,5 +76,7 @@ public class YamlConfig {
       private String smashvision_password;
       private String vjstreet_username;
       private String vjstreet_password;
+      private String provideos4djs_username;
+      private String provideos4djs_password;
    }
 }

@@ -9,7 +9,7 @@ import scraper.abstraction.Scraper;
 
 import java.util.List;
 
-public class HeavyHitsScraper extends Scraper implements HeavyHitsApiService {
+public class HeavyHitsScraper extends Scraper {
    public HeavyHitsScraper() {
       USERNAME = yamlConfig.getHeavyhits_username();
       PASS = yamlConfig.getHeavyhits_password();
@@ -69,7 +69,7 @@ public class HeavyHitsScraper extends Scraper implements HeavyHitsApiService {
             String downloadID = downloadButton.attr("data-id");
             String trackName = downloadButton.attr("data-f");
             String urlForApi = "https://www.heavyhits.com/hh18/library/download.php?id=" + downloadID;
-            String downloadUrl = getDownloadUrl(urlForApi);
+            String downloadUrl = getLocation(urlForApi);
             scrapedLinks.add(downloadUrl);
             System.out.println(trackName + " | " + downloadUrl);
          }

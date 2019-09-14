@@ -207,6 +207,9 @@ task SmashVisionScraper {
 task VjStreetScraper {
     dependsOn newRelease('monitors.', 'VjStreet_Scraper_Monitor', '1.0.')
 }
+task ProVideo4DJsScraper {
+    dependsOn newRelease('monitors.', 'ProVideo4DJs_Scraper_Monitor', '1.0.')
+}
 
 task BuildScrapers {
 }
@@ -214,7 +217,7 @@ task BuildScrapers {
 task BuildPosters {
     dependsOn Poster
     dependsOn Reposter
-    dependsOn PostUpdater
+    dependsOn PostUpdaterApp
 }
 
 task BuildAll {

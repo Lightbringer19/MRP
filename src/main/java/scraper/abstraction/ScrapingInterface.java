@@ -12,4 +12,7 @@ public interface ScrapingInterface {
    
    default void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
    }
+   
+   default void nextPage() {
+   }
 }

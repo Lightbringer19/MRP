@@ -9,12 +9,11 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import scraper.abstraction.Scraper;
-import scraper.heavyhits.HeavyHitsApiService;
 
 import java.text.MessageFormat;
 import java.util.List;
 
-public class MassPoolScraper extends Scraper implements HeavyHitsApiService {
+public class MassPoolScraper extends Scraper {
    public MassPoolScraper() {
       USERNAME = yamlConfig.getMasspool_username();
       PASS = yamlConfig.getMasspool_password();
@@ -101,7 +100,7 @@ public class MassPoolScraper extends Scraper implements HeavyHitsApiService {
             String downloadUrl = MessageFormat.format(
               "http://www.masspoolmp3.com" +
                 "{0}", downloadPartLink);
-            String downloadLink = getDownloadUrl(downloadUrl);
+            String downloadLink = getLocation(downloadUrl);
             System.out.println(trackName + " | " + downloadLink);
             scrapedLinks.add(downloadLink);
          }

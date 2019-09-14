@@ -15,33 +15,36 @@ public class ScraperTest {
       String html = FUtils.readFile(new File("Z:\\source.html"));
       Document document = Jsoup.parse(html);
       
-      String firstDate = document.select("tbody>tr").first()
-        .select("td").first().text();
+      String firstDate = document.select("div[class=data]").first()
+        .select("strong").first().text()
+        .replace("New Version Added: ", "");
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("tbody>tr")
+        .select("div[class=data]")
         .stream()
-        .map(trackInfo -> trackInfo.select("td").first().text())
+        .map(trackInfo -> trackInfo.select("strong").first().text()
+          .replace("New Version Added: ", ""))
         .filter(date -> !date.equals(firstDate))
         .findFirst()
         .orElse(null);
       
       System.out.println(downloadDate);
       
-      Elements trackInfos = document.select("tbody>tr");
+      Elements trackInfos = document.select(
+        "div[class=content_data_downloads]>div[id*=id]");
       for (Element trackInfo : trackInfos) {
-         String trackDate = trackInfo.select("td").first().text();
+         String trackDate = trackInfo.select("div[class=data]").first()
+           .select("strong").first().text()
+           .replace("New Version Added: ", "");
          if (trackDate.equals(downloadDate)) {
-            for (Element downloadInfo : trackInfo
-              .select("td[class=catalog-download hidden-xs]>a")) {
-               String trackName = downloadInfo.attr("title");
-               String downloadCode = downloadInfo.attr("data-code");
-               String downloadUrl = downloadInfo.attr("href");
-               System.out.println(downloadUrl + " " + trackName);
-            }
-            
+            String linkForRequest = trackInfo.select("a").first().attr("href");
+            System.out.println(linkForRequest);
+            String trackName = trackInfo.select("img").first().attr("alt");
+            // String downloadUrl = downloadInfo.attr("href");
+            // System.out.println(downloadUrl + " " + trackName);
+            System.out.println(trackName);
          }
       }
    }

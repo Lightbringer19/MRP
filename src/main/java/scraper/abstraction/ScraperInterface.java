@@ -28,7 +28,4 @@ public interface ScraperInterface {
    default void operationWithLinksAfterScrape(List<String> scrapedLinks) {
    }
    
-   default void nextPage() {
-   }
-   
 }
