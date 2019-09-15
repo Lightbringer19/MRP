@@ -21,7 +21,7 @@ public class RemixMp4Scraper extends Scraper {
       passFieldNavigator = By.name("pass");
       submitButtonNavigator = By.cssSelector(".section > form:nth-child(2) > input:nth-child(3)");
       downloaded = mongoControl.remixMp4Downloaded;
-      releaseName = "RemixMP4";
+      releaseName = "RemixMP4 Videos";
    }
    
    public static void main(String[] args) {

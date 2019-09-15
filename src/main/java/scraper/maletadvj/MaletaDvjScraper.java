@@ -23,7 +23,7 @@ public class MaletaDvjScraper extends Scraper {
       
       dateFormat = "dd/MM/yyyy";
       downloaded = mongoControl.maletadvjDownloaded;
-      releaseName = "MyRecordPool Latin";
+      releaseName = "MyRecordPool";
    }
    
    public static void main(String[] args) {
