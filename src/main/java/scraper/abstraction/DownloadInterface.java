@@ -50,14 +50,21 @@ public interface DownloadInterface {
          @Cleanup CloseableHttpResponse response = client.execute(get);
          String fileName = "";
          if (response.getFirstHeader("Content-Disposition") != null) {
-            fileName = response.getFirstHeader("Content-Disposition").getValue()
-              .replace("attachment; filename=", "")
-              .replace("attachment", "")
-              .replace("attachement", "")
-              .replaceAll(";", "")
-              .replaceAll("\"", "")
-              .replaceAll("\\\\", "")
-              .replaceAll("&amp;", "&");
+            String content = response.getFirstHeader("Content-Disposition").getValue();
+            if (content.contains("attachment; filename=")) {
+               int index = content.indexOf("\"");
+               fileName = content
+                 .substring(index + 1, content.indexOf("\"", index + 1));
+               fileName = java.net.URLDecoder.decode(fileName, StandardCharsets.UTF_8.name());
+            }
+            // fileName = content
+            //   .replace("attachment; filename=", "")
+            //   .replace("attachment", "")
+            //   .replace("attachement", "")
+            //   .replaceAll(";", "")
+            //   .replaceAll("\"", "")
+            //   .replaceAll("\\\\", "")
+            //   .replaceAll("&amp;", "&");
          }
          if (fileName.equals("")) {
             String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());

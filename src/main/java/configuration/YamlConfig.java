@@ -78,5 +78,7 @@ public class YamlConfig {
       private String vjstreet_password;
       private String provideos4djs_username;
       private String provideos4djs_password;
+      private String clubdj_username;
+      private String clubdj_password;
    }
 }

@@ -238,7 +238,7 @@ public abstract class Scraper extends Thread
       return "<html>" + pageSource + "</html>";
    }
    
-   private void setCookieForAPI() {
+   protected void setCookieForAPI() {
       cookieForAPI = driver.manage().getCookies().stream()
         .map(cookie -> cookie.getName() + "=" + cookie.getValue())
         .collect(Collectors.joining("; "));

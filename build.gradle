@@ -210,7 +210,9 @@ task VjStreetScraper {
 task ProVideo4DJsScraper {
     dependsOn newRelease('monitors.', 'ProVideo4DJs_Scraper_Monitor', '1.0.')
 }
-
+task ClubDJScraper {
+    dependsOn newRelease('monitors.', 'ClubDJ_Scraper_Monitor', '1.0.')
+}
 task BuildScrapers {
 }
 

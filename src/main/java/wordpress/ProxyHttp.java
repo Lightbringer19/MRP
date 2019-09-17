@@ -1,6 +1,7 @@
 package wordpress;
 
 import lombok.Cleanup;
+import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -93,7 +94,8 @@ public class ProxyHttp {
       return HTMLResponse;
    }
    
-   public static String getClean(String url, String cookie) throws IOException {
+   @SneakyThrows
+   public static String getClean(String url, String cookie) {
       @Cleanup CloseableHttpClient client = HttpClients.createDefault();
       HttpGet get = new HttpGet(url);
       get.setHeader("cookie", cookie);
