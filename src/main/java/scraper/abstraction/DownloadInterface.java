@@ -56,15 +56,15 @@ public interface DownloadInterface {
                fileName = content
                  .substring(index + 1, content.indexOf("\"", index + 1));
                fileName = java.net.URLDecoder.decode(fileName, StandardCharsets.UTF_8.name());
+               fileName = content
+                 .replace("attachment; filename=", "")
+                 .replace("attachment", "")
+                 .replace("attachement", "")
+                 .replaceAll(";", "")
+                 .replaceAll("\"", "")
+                 .replaceAll("\\\\", "")
+                 .replaceAll("&amp;", "&");
             }
-            // fileName = content
-            //   .replace("attachment; filename=", "")
-            //   .replace("attachment", "")
-            //   .replace("attachement", "")
-            //   .replaceAll(";", "")
-            //   .replaceAll("\"", "")
-            //   .replaceAll("\\\\", "")
-            //   .replaceAll("&amp;", "&");
          }
          if (fileName.equals("")) {
             String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());

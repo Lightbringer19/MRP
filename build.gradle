@@ -214,6 +214,23 @@ task ClubDJScraper {
     dependsOn newRelease('monitors.', 'ClubDJ_Scraper_Monitor', '1.0.')
 }
 task BuildScrapers {
+    dependsOn EwScraper
+    dependsOn Mp3PoolScraper
+    dependsOn BeatJunkiesScraper
+    dependsOn HeadlineScraper
+    dependsOn BpmSupremeScraper
+    dependsOn BpmLatinoScraper
+    dependsOn RemixMp4Scraper
+    dependsOn DaleMBScraper
+    dependsOn HeavyHitsScraper
+    dependsOn CrateConnectScraper
+    dependsOn MaletaDvjScraper
+    dependsOn MassPoolScraper
+    dependsOn AvDistrictScraper
+    dependsOn SmashVisionScraper
+    dependsOn VjStreetScraper
+    dependsOn ProVideo4DJsScraper
+    dependsOn ClubDJScraper
 }
 
 task BuildPosters {

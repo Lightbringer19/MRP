@@ -1,4 +1,4 @@
-package scraper.dmp;
+package scraper.old.dmp;
 
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
@@ -29,8 +29,8 @@ import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static scheduler.ScheduleWatcher.addToScheduleDB;
-import static scraper.dmp.DmpApiService.getDownloadUrl;
-import static scraper.dmp.DmpDriver.cookieForAPI;
+import static scraper.old.dmp.DmpApiService.getDownloadUrl;
+import static scraper.old.dmp.DmpDriver.cookieForAPI;
 
 class DmpScraper {
    

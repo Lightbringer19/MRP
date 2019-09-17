@@ -19,6 +19,7 @@ import utils.Logger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ public abstract class Scraper extends Thread
    @SuppressWarnings("Duplicates")
    public void run() {
       logger = new Logger(releaseName);
-      Timer timer = new Timer();
+      // Timer timer = new Timer();
       Driver driver = new Driver();
       beforeCheck();
       TimerTask check = new TimerTask() {
@@ -78,7 +79,14 @@ public abstract class Scraper extends Thread
       long sec = 1000;
       long min = sec * 60;
       long hour = 60 * min;
-      timer.schedule(check, 0, 1 * hour);
+      // timer.schedule(check, 0, 1 * hour);
+      while (true) {
+         check.run();
+         try {
+            sleep(ThreadLocalRandom.current().nextInt(60, 180) * min);
+         } catch (InterruptedException ignored) {
+         }
+      }
    }
    
    protected void login() {
@@ -109,6 +117,7 @@ public abstract class Scraper extends Thread
       boolean oldReleaseWasDownloaded = downloaded
         .find(eq("oldReleaseDate", firstDate)).first() != null;
       if (newReleaseOnThePool) {
+         logger.log("Downloading New Release");
          setCookieForAPI();
          //  Find next date
          String downloadDate = getDownloadDate(firstDate);
@@ -121,6 +130,7 @@ public abstract class Scraper extends Thread
               new Document("releaseDate", firstDate));
          }
       } else if (releaseIsOld && !oldReleaseWasDownloaded) {
+         logger.log("Downloading Old Release");
          setCookieForAPI();
          mainOperation(firstDate, firstDate);
          downloaded.insertOne(

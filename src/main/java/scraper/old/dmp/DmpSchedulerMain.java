@@ -1,4 +1,4 @@
-package scraper.dmp;
+package scraper.old.dmp;
 
 import lombok.SneakyThrows;
 
