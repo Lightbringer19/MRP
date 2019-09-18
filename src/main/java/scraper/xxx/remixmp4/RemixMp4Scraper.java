@@ -1,4 +1,4 @@
-package scraper.remixmp4;
+package scraper.xxx.remixmp4;
 
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;

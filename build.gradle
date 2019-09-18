@@ -196,7 +196,7 @@ task MaletaDvjScraper {
     dependsOn newRelease('monitors.', 'MaletaDvj_Scraper_Monitor', '2.0.')
 }
 task MassPoolScraper {
-    dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '1.1.')
+    dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '1.2.')
 }
 task AvDistrictScraper {
     dependsOn newRelease('monitors.', 'AvDistrict_Scraper_Monitor', '1.0.')

@@ -1,6 +1,6 @@
 package monitors;
 
-import scraper.provideo4djs.ProVideo4DJsScraper;
+import scraper.xxx.provideo4djs.ProVideo4DJsScraper;
 
 public class ProVideo4DJs_Scraper_Monitor extends Monitor {
    

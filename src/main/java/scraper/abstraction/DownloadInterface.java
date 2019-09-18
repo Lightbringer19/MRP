@@ -13,10 +13,10 @@ import utils.Logger;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static java.net.URLDecoder.decode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static scheduler.ScheduleWatcher.addToScheduleDB;
 
 @SuppressWarnings("ALL")
@@ -55,7 +55,7 @@ public interface DownloadInterface {
                int index = content.indexOf("\"");
                fileName = content
                  .substring(index + 1, content.indexOf("\"", index + 1));
-               fileName = java.net.URLDecoder.decode(fileName, StandardCharsets.UTF_8.name());
+               fileName = decode(fileName, UTF_8.name());
                fileName = content
                  .replace("attachment; filename=", "")
                  .replace("attachment", "")
@@ -67,9 +67,9 @@ public interface DownloadInterface {
             }
          }
          if (fileName.equals("")) {
-            String decode = java.net.URLDecoder.decode(url, StandardCharsets.UTF_8.name());
-            fileName = URLDecoder.decode(
-              url.substring(url.lastIndexOf("/")), StandardCharsets.UTF_8.name());
+            String decode = decode(url, UTF_8.name());
+            fileName = decode(
+              url.substring(url.lastIndexOf("/")), UTF_8.name());
             if (fileName.contains("?")) {
                fileName = fileName.replace(
                  decode.substring(decode.indexOf("?")), "");
@@ -98,8 +98,9 @@ public interface DownloadInterface {
          get.setHeader("Cookie", getCookie());
          get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
          @Cleanup CloseableHttpResponse response = client.execute(get);
-         System.out.println(url + " | " + response.getStatusLine().getStatusCode());
-         return response.getFirstHeader("Location").getValue();
+         String location = response.getFirstHeader("Location").getValue();
+         System.out.println(url + " | " + location + " | " + response.getStatusLine().getStatusCode());
+         return location;
       } catch (Exception e) {
          getLogger().log(e);
       }

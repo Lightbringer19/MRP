@@ -100,7 +100,8 @@ public class MassPoolScraper extends Scraper {
             String downloadUrl = MessageFormat.format(
               "http://www.masspoolmp3.com" +
                 "{0}", downloadPartLink);
-            String downloadLink = getLocation(downloadUrl);
+            String downloadLink = getLocation(getLocation(getLocation(downloadUrl)))
+              .replaceAll(" ", "%20");
             System.out.println(trackName + " | " + downloadLink);
             scrapedLinks.add(downloadLink);
          }

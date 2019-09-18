@@ -31,7 +31,12 @@ public class DownloaderTest implements DownloadInterface, BpmApiService {
    public static void main(String[] args) {
       // String[] links = {
       // // };
-      // DownloaderTest downloaderTest = new DownloaderTest();
+      cookieForAPI = "";
+      DownloaderTest downloaderTest = new DownloaderTest();
+      String location = downloaderTest.getLocation("");
+      String testLocation = downloaderTest.getLocation(location).replaceAll(" ", "%20");
+      System.out.println(testLocation);
+      
       // String downloadURL = "";
       // downloaderTest.downloadLinks(Collections.singletonList(downloadURL), "TEST");
       

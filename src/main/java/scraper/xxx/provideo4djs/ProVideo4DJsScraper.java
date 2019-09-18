@@ -1,4 +1,4 @@
-package scraper.provideo4djs;
+package scraper.xxx.provideo4djs;
 
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
