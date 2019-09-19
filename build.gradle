@@ -220,7 +220,7 @@ task BuildScrapers {
     dependsOn HeadlineScraper
     dependsOn BpmSupremeScraper
     dependsOn BpmLatinoScraper
-    dependsOn RemixMp4Scraper
+//    dependsOn RemixMp4Scraper
     dependsOn DaleMBScraper
     dependsOn HeavyHitsScraper
     dependsOn CrateConnectScraper
@@ -229,7 +229,7 @@ task BuildScrapers {
     dependsOn AvDistrictScraper
     dependsOn SmashVisionScraper
     dependsOn VjStreetScraper
-    dependsOn ProVideo4DJsScraper
+//    dependsOn ProVideo4DJsScraper
     dependsOn ClubDJScraper
 }
 

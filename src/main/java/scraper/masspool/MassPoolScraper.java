@@ -47,12 +47,14 @@ public class MassPoolScraper extends Scraper {
    }
    
    @Override
+   // @SneakyThrows
    public void secondStageCheck() {
       downloadCategory("Dance");
       driver.get("http://www.masspoolmp3.com/members/downloads/HipHop");
       downloadCategory("Hip-Hop");
       driver.get("http://www.masspoolmp3.com/members/downloads/Underground");
       downloadCategory("Underground");
+      // sleep(666666);
       driver.get("http://www.masspoolmp3.com/members/downloads/Trance");
       downloadCategory("Trance-Tech");
       driver.get("http://www.masspoolmp3.com/members/downloads/Electro-House");
@@ -100,10 +102,11 @@ public class MassPoolScraper extends Scraper {
             String downloadUrl = MessageFormat.format(
               "http://www.masspoolmp3.com" +
                 "{0}", downloadPartLink);
-            String downloadLink = getLocation(getLocation(getLocation(downloadUrl)))
-              .replaceAll(" ", "%20");
+            String downloadLink = getLocation(getLocation(getLocation(downloadUrl)));
             System.out.println(trackName + " | " + downloadLink);
-            scrapedLinks.add(downloadLink);
+            if (downloadLink != null) {
+               scrapedLinks.add(downloadLink);
+            }
          }
       }
    }

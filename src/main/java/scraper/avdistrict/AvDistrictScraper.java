@@ -34,7 +34,6 @@ public class AvDistrictScraper extends Scraper implements AvDistrictApiService {
    // public void beforeLogin() {
    //    driver.findElement(By.cssSelector(".btn-primary")).click();
    //    Thread.sleep(1000);
-   //
    // }
    
    @SneakyThrows

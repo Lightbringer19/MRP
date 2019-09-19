@@ -2,6 +2,7 @@ package scraper.abstraction;
 
 import com.mongodb.client.MongoCollection;
 import configuration.YamlConfig;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import mongodb.MongoControl;
 import org.bson.Document;
@@ -19,12 +20,12 @@ import utils.Logger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
+import static java.util.concurrent.ThreadLocalRandom.current;
 
 public abstract class Scraper extends Thread
   implements ScrapingInterface, DownloadInterface, ScraperInterface {
@@ -34,6 +35,7 @@ public abstract class Scraper extends Thread
    protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
    protected static WebDriver driver;
    protected static FirefoxOptions firefoxOptions;
+   
    protected String urlToGet;
    
    protected Logger logger;
@@ -57,6 +59,7 @@ public abstract class Scraper extends Thread
    protected boolean exitAfterCheck = true;
    
    public Scraper() {
+      
       System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
       FirefoxProfile ini = new ProfilesIni().getProfile("selenium");
       firefoxOptions = new FirefoxOptions().setProfile(ini);
@@ -66,26 +69,25 @@ public abstract class Scraper extends Thread
    @SuppressWarnings("Duplicates")
    public void run() {
       logger = new Logger(releaseName);
-      // Timer timer = new Timer();
       Driver driver = new Driver();
+      Timer timer = new Timer();
       beforeCheck();
-      TimerTask check = new TimerTask() {
-         @Override
-         @SneakyThrows
-         public void run() {
-            driver.check();
-         }
-      };
-      long sec = 1000;
-      long min = sec * 60;
-      long hour = 60 * min;
-      // timer.schedule(check, 0, 1 * hour);
-      while (true) {
-         check.run();
-         try {
-            sleep(ThreadLocalRandom.current().nextInt(60, 180) * min);
-         } catch (InterruptedException ignored) {
-         }
+      timer.schedule(new CheckTask(driver, timer), 0);
+   }
+   
+   @AllArgsConstructor
+   class CheckTask extends TimerTask {
+      Driver driver;
+      Timer timer;
+      
+      @Override
+      public void run() {
+         long sec = 1000;
+         long min = sec * 60;
+         long hour = 60 * min;
+         driver.check();
+         timer.schedule(new CheckTask(driver, timer),
+           current().nextInt(60, 180) * min);
       }
    }
    
@@ -125,10 +127,10 @@ public abstract class Scraper extends Thread
            .first() == null) {
             // MAIN OPERATION EXECUTION
             mainOperation(firstDate, downloadDate);
-            // Schedule release and add to DB
-            downloaded.insertOne(
-              new Document("releaseDate", firstDate));
          }
+         // Schedule release and add to DB
+         downloaded.insertOne(
+           new Document("releaseDate", firstDate));
       } else if (releaseIsOld && !oldReleaseWasDownloaded) {
          logger.log("Downloading Old Release");
          setCookieForAPI();

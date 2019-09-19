@@ -55,8 +55,7 @@ public interface DownloadInterface {
                int index = content.indexOf("\"");
                fileName = content
                  .substring(index + 1, content.indexOf("\"", index + 1));
-               fileName = decode(fileName, UTF_8.name());
-               fileName = content
+               fileName = decode(fileName, UTF_8.name())
                  .replace("attachment; filename=", "")
                  .replace("attachment", "")
                  .replace("attachement", "")
@@ -100,7 +99,7 @@ public interface DownloadInterface {
          @Cleanup CloseableHttpResponse response = client.execute(get);
          String location = response.getFirstHeader("Location").getValue();
          System.out.println(url + " | " + location + " | " + response.getStatusLine().getStatusCode());
-         return location;
+         return location.replaceAll(" ", "%20");
       } catch (Exception e) {
          getLogger().log(e);
       }
