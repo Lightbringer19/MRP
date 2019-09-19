@@ -1,6 +1,7 @@
 package ftp.djpool;
 
 import ftp.abstraction.FtpManager;
+import lombok.SneakyThrows;
 import org.apache.commons.net.ftp.FTPFile;
 import org.bson.Document;
 import utils.CheckDate;
@@ -8,20 +9,17 @@ import utils.Logger;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static scheduler.ScheduleWatcher.addToScheduleDB;
 
-public class DjPoolFtp extends FtpManager {
+public class DJCFtp extends FtpManager {
    
    private List<String> SKIP;
    private Map<String, String> renameMap;
    
-   public DjPoolFtp() {
+   public DJCFtp() {
       SERVER = yamlConfig.getRp_host();
       USERNAME = yamlConfig.getRp_username();
       PASSWORD = yamlConfig.getRp_password();
@@ -31,6 +29,24 @@ public class DjPoolFtp extends FtpManager {
       logger = new Logger("DJ_POOL_FTP");
    
       longPeriod = true;
+   }
+   
+   @Override
+   @SneakyThrows
+   public void mainOperation() {
+      //this month check
+      SimpleDateFormat formatter = new SimpleDateFormat("MM-MMM", Locale.US);
+      String month = formatter
+        .format(new Date()).toUpperCase();
+      pathname = "/AUDIO/DATES/2019/" + month + "/";
+      checkFtp();
+      // past month check
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.MONTH, -1);
+      String previousMonth = formatter
+        .format(cal.getTime()).toUpperCase();
+      pathname = "/AUDIO/DATES/2019/" + previousMonth + "/";
+      checkFtp();
    }
    
    @Override
@@ -44,13 +60,6 @@ public class DjPoolFtp extends FtpManager {
         .djc_skipCollection
         .find(eq("name", "rename"))
         .first().get("rename");
-   }
-   
-   @Override
-   protected void setPathName() {
-      String month = new SimpleDateFormat("MM-MMM", Locale.US)
-        .format(new Date()).toUpperCase();
-      pathname = "/AUDIO/DATES/2019/" + month + "/";
    }
    
    @Override

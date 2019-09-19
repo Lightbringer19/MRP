@@ -138,13 +138,13 @@ task Tagger {
     dependsOn newRelease('monitors.', 'Tagger_Monitor', '3.3.')
 }
 task SceneFTP {
-    dependsOn newRelease('monitors.', 'SCENE_FTP_Monitor', '1.1.')
+    dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '1.1.')
 }
 task BeatportFtp {
     dependsOn newRelease('monitors.', 'Beatport_FTP_Monitor', '1.1.')
 }
-task DjPoolFtp {
-    dependsOn newRelease('monitors.', 'DJ_Pool_FTP_Monitor', '1.1.')
+task DJCFtp {
+    dependsOn newRelease('monitors.', 'DJC_FTP_Monitor', '1.2.')
 }
 task ScheduleWatcher {
     dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '2.0.')

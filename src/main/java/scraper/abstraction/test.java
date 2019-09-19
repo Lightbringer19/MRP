@@ -1,27 +1,28 @@
 package scraper.abstraction;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ThreadLocalRandom;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class test {
-   static Timer timer = new Timer();
    
-   public static void main(String[] args) {
+   public static void main(String[] args) throws ParseException {
+      SimpleDateFormat formatter = new SimpleDateFormat("MM-MMM", Locale.US);
+      String month = formatter
+        .format(new Date()).toUpperCase();
+      String pathname = "/AUDIO/DATES/2019/" + month + "/";
+      System.out.println(pathname);
       
-      // long sec = 1000;
-      // long min = sec * 60;
-      // long hour = 60 * min;
+      Calendar cal = Calendar.getInstance();
+      // cal.setTime(formatter.parse(month));
+      cal.add(Calendar.MONTH, -1);
       
-      timer.schedule(new TheTask(), 0);
-      
+      String previousMonth = formatter
+        .format(cal.getTime()).toUpperCase();
+      pathname = "/AUDIO/DATES/2019/" + previousMonth + "/";
+      System.out.println(pathname);
    }
    
-   static class TheTask extends TimerTask {
-      @Override
-      public void run() {
-         System.out.println("TEST");
-         timer.schedule(new TheTask(), ThreadLocalRandom.current().nextInt(1, 5) * 1000);
-      }
-   }
 }

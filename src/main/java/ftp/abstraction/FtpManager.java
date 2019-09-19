@@ -41,7 +41,7 @@ public abstract class FtpManager extends Thread {
          @Override
          @SneakyThrows
          public void run() {
-            checkFtp();
+            mainOperation();
          }
       };
       
@@ -59,10 +59,13 @@ public abstract class FtpManager extends Thread {
       timer.schedule(ftpCheck, 0, period);
    }
    
-   private void checkFtp() {
+   public void mainOperation() {
+      checkFtp();
+   }
+   
+   public void checkFtp() {
       logger.log("Checking FTP for New Releases: " + CATEGORY_NAME);
       beforeCheck();
-      setPathName();
       try {
          ftpClient.connect(SERVER, PORT);
          ftpClient.login(USERNAME, PASSWORD);
@@ -114,9 +117,6 @@ public abstract class FtpManager extends Thread {
    }
    
    protected void beforeCheck() {
-   }
-   
-   protected void setPathName() {
    }
    
    private void downloadNewReleases(String dayReleasesPath) throws IOException {
