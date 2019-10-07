@@ -167,6 +167,7 @@ public abstract class Scraper extends Thread
       }
    }
    
+   @SneakyThrows
    private void getDriverPage() {
       driver = new FirefoxDriver(firefoxOptions);
       driver.get(urlForFirstStage);

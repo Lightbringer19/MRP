@@ -28,9 +28,9 @@ class TagEditor {
    private static String[] titleFilter = {
      "-www.groovytunes.org",
      "www.electronicfresh.com",
-     " – SharingDB.eu",
      "www.inevil.com",
      "inevil.com",
+     " – SharingDB.eu",
      ", SharingDB.eu",
      "SharingDB"
    };
@@ -66,9 +66,9 @@ class TagEditor {
             // genre filtering
             String genreDescription = tag.getFirst(FieldKey.GENRE);
             String[] falseGenres = {
-              "SharingDB", "www.original-mass.net", "hotreleases", "electronicfresh"};
-            for (String genre : falseGenres) {
-               boolean contains = genreDescription.contains(genre);
+              "sharing", "www.original-mass.net", "hotreleases", "electronicfresh"};
+            for (String falseGenre : falseGenres) {
+               boolean contains = genreDescription.toLowerCase().contains(falseGenre);
                if (contains) {
                   tag.deleteField(FieldKey.GENRE);
                }

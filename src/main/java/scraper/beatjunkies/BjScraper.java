@@ -1,5 +1,6 @@
 package scraper.beatjunkies;
 
+import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
@@ -26,8 +27,30 @@ public class BjScraper extends Scraper {
       dateFormat = "MMMM d, yyyy";
       releaseName = "Beatjunkies";
    
-      loginAtFirstStage = false;
-      urlForFirstStage = "https://beatjunkies.com/record-pool";
+      exitAfterCheck = false;
+      // loginAtFirstStage = false;
+      // urlForFirstStage = "https://beatjunkies.com/record-pool";
+   }
+   
+   @Override
+   @SneakyThrows
+   public void beforeLogin() {
+      System.out.println("SOLVE CAPTCHA");
+      for (int i = 160; i > 0; i--) {
+         System.out.println("Time Left to Solve Captcha: " + i + " SEC");
+         sleep(1000);
+      }
+   }
+   
+   @Override
+   @SneakyThrows
+   public void afterLogin() {
+      driver.get("https://beatjunkies.com/record-pool");
+      System.out.println("SOLVE CAPTCHA");
+      for (int i = 160; i > 0; i--) {
+         System.out.println("Time Left to Solve Captcha: " + i + " SEC");
+         sleep(1000);
+      }
    }
    
    public static void main(String[] args) {
