@@ -28,6 +28,8 @@ public class YamlConfig {
       
       private String box_user_id;
       private String mrp_authorization;
+      private String mrp_user;
+      private String mrp_password;
       private String scene_host;
       private String scene_username;
       private String scene_password;

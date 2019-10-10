@@ -19,9 +19,49 @@ import java.io.File;
 import java.io.IOException;
 
 public class Poster extends Thread {
-   
    public static final MongoControl MONGO_CONTROL = new MongoControl();
+   
    public static String MRP_AUTHORIZATION;
+   public static DownloadPoster DOWNLOAD_POSTER = new DownloadPoster();
+   
+   @Override
+   public void run() {
+      Log.write(CheckDate.getNowTime() + " Poster Start", "Poster");
+      new File(Constants.postDir).mkdirs();
+      YamlConfig yamlConfig = new YamlConfig();
+      MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
+      while (true) {
+         try {
+            for (File categoryFolder : new File(Constants.postDir).listFiles()) {
+               for (File postJsonFile : categoryFolder.listFiles()) {
+                  String category = postJsonFile.getParentFile().getName();
+                  Log.write("Processing: " + postJsonFile.getName()
+                    + "| In: " + category, "Poster");
+                  // check for corrupted files in folder
+                  findAndDeleteCorruptedIn(postJsonFile);
+                  // check for folder without audio files
+                  if (musicIsHere(postJsonFile)) {
+                     // make post
+                     Log.write("Preparing to post: " + postJsonFile.getName()
+                       + "| In: " + category, "Poster");
+                     WP_API.post(postJsonFile);
+                     postJsonFile.delete();
+                     Thread.sleep(2000);
+                  } else {
+                     postJsonFile.delete();
+                     Log.write("Deleted(no audio): " + postJsonFile.getName()
+                       + "| In: " + category, "Poster");
+                  }
+               }
+            }
+            Log.write(CheckDate.getNowTime() + " POSTER SLEEPING", "Poster");
+            Sleep();
+         } catch (Exception e) {
+            Log.write(CheckDate.getNowTime() + " EXCEPTION " + e, "Poster");
+            Sleep();
+         }
+      }
+   }
    
    private static void findAndDeleteCorruptedIn(File post) {
       File[] audioFiles = getAudioFiles(post);
@@ -107,45 +147,6 @@ public class Poster extends Thread {
       try {
          Thread.sleep(10 * 1000);
       } catch (InterruptedException ignored) {
-      }
-   }
-   
-   @Override
-   public void run() {
-      Log.write(CheckDate.getNowTime() + " Poster Start", "Poster");
-      new File(Constants.postDir).mkdirs();
-      YamlConfig yamlConfig = new YamlConfig();
-      MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
-      while (true) {
-         try {
-            for (File categoryFolder : new File(Constants.postDir).listFiles()) {
-               for (File postJsonFile : categoryFolder.listFiles()) {
-                  String category = postJsonFile.getParentFile().getName();
-                  Log.write("Processing: " + postJsonFile.getName()
-                    + "| In: " + category, "Poster");
-                  // check for corrupted files in folder
-                  findAndDeleteCorruptedIn(postJsonFile);
-                  // check for folder without audio files
-                  if (musicIsHere(postJsonFile)) {
-                     // make post
-                     Log.write("Preparing to post: " + postJsonFile.getName()
-                       + "| In: " + category, "Poster");
-                     WP_API.post(postJsonFile);
-                     postJsonFile.delete();
-                     Thread.sleep(2000);
-                  } else {
-                     postJsonFile.delete();
-                     Log.write("Deleted(no audio): " + postJsonFile.getName()
-                       + "| In: " + category, "Poster");
-                  }
-               }
-            }
-            Log.write(CheckDate.getNowTime() + " POSTER SLEEPING", "Poster");
-            Sleep();
-         } catch (Exception e) {
-            Log.write(CheckDate.getNowTime() + " EXCEPTION " + e, "Poster");
-            Sleep();
-         }
       }
    }
 }
