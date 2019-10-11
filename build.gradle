@@ -150,7 +150,7 @@ task ScheduleWatcher {
     dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '2.0.')
 }
 task PostUpdaterApp {
-    dependsOn newRelease('wordpress.', 'PostUpdater', '1.0.')
+    dependsOn newRelease('wordpress.', 'PostUpdater', '2.0.')
 }
 task DownloaderCustom {
     dependsOn newRelease('scraper.downloader.', 'CustomDownloader', '1.1.')

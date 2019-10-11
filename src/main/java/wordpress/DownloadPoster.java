@@ -37,11 +37,11 @@ public class DownloadPoster {
       login();
    }
    
-   public static void main(String[] args) {
-      DownloadPoster downloadPoster = new DownloadPoster();
-      // downloadPoster.login();
-      // downloadPoster.addDownload("ANOTHER TEST", "https://www.google.com.ua/");
-   }
+   // public static void main(String[] args) {
+   //    DownloadPoster downloadPoster = new DownloadPoster();
+   //    // downloadPoster.login();
+   //    // downloadPoster.addDownload("ANOTHER TEST", "https://www.google.com.ua/");
+   // }
    
    String addDownload(String title, String uploadLink) {
       driver.get("https://myrecordpool.com/wp-admin/post-new.php?post_type=sdm_downloads");
@@ -52,7 +52,6 @@ public class DownloadPoster {
       Document document = Jsoup.parse(html);
       String postID = document.select("input[id=post_ID]").attr("value");
       System.out.println("Download ID for " + title + " : " + postID);
-      
       return postID;
    }
    

@@ -1,8 +1,14 @@
 package wordpress;
 
 import json.ResponseInfo;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.bson.Document;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,19 +21,13 @@ import static wordpress.WP_API.postAndGetResponse;
 class TEST {
    @SneakyThrows
    public static void main(String[] args) {
-      // YamlConfig yamlConfig = new YamlConfig();
-      // MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
-      // String[] categories = {
-      // };
-      // Map<String, String> categoriesAndIDs = new HashMap<>();
-      // for (String category : categories) {
-      //     String parentId = "29";
-      //     String categoryID = createCategory(category, parentId);
-      //     categoriesAndIDs.put(category, categoryID);
-      // }
-      // MONGO_CONTROL.categoriesCollection.insertOne(
-      //    new Document("name", "RECORDPOOL VIDEOS")
-      //       .append("categoriesAndIDs", categoriesAndIDs));
+      String url = "https://myrecordpool.com/wp-json/wp/v2/posts/" + 20000;
+      @Cleanup CloseableHttpClient client = HttpClients.createDefault();
+      HttpGet get = new HttpGet(url);
+      @Cleanup CloseableHttpResponse response = client.execute(get);
+      int responseCode = response.getStatusLine().getStatusCode();
+      System.out.println(responseCode);
+      System.out.println(EntityUtils.toString(response.getEntity()));
    }
    
    @SuppressWarnings("Duplicates")

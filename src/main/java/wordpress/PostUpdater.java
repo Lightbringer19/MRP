@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.eq;
+import static java.text.MessageFormat.format;
+import static org.bson.Document.parse;
 import static wordpress.Poster.MONGO_CONTROL;
 import static wordpress.Poster.MRP_AUTHORIZATION;
 import static wordpress.WP_API.createCategory;
@@ -30,26 +32,58 @@ public class PostUpdater {
    
    private static Logger logger = new Logger("Post Updater");
    private static final Scanner IN = new Scanner(System.in);
+   private DownloadPoster DOWNLOAD_POSTER;
    
    public PostUpdater() {
       YamlConfig yamlConfig = new YamlConfig();
       MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
+      DOWNLOAD_POSTER = new DownloadPoster();
    }
    
+   //363767
    @SneakyThrows
    public static void main(String[] args) {
       PostUpdater postUpdater = new PostUpdater();
       System.out.println("Enter post ID: ");
       int postIdEntered = IN.nextInt();
-      for (int postId = postIdEntered; postId < 204958; postId++) {
+      for (int postId = postIdEntered; postId > 16651; postId--) {
          try {
-            postUpdater.updateOnePost(postId);
+            postUpdater.updateDownloadLink(postId);
          } catch (Exception e) {
             logger.log(e);
             Thread.sleep(5000);
          }
       }
       
+   }
+   
+   private void updateDownloadLink(int postId) throws IOException {
+      logger.log("Preparing       : " + postId);
+      String url = "https://myrecordpool.com/wp-json/wp/v2/posts/" + postId;
+      @Cleanup CloseableHttpClient client = HttpClients.createDefault();
+      HttpGet get = new HttpGet(url);
+      get.addHeader("Authorization", MRP_AUTHORIZATION);
+      @Cleanup CloseableHttpResponse response = client.execute(get);
+      int responseCode = response.getStatusLine().getStatusCode();
+      if (responseCode == 200) {
+         String clean = EntityUtils.toString(response.getEntity());
+         String postContent = ((Document) new Document(parse(clean))
+           .get("content")).get("rendered").toString();
+         if (postContent.contains("<td>Artist:</td>") && !postContent.contains("smd_process_download")) {
+            String releaseName = ((Document) new Document(parse(clean))
+              .get("title")).get("rendered").toString();
+            logger.log("Updating        : (" + postId + ") | " + releaseName);
+            String downloadLink = Jsoup.parse(postContent)
+              .select("div[class=download]>a").attr("href");
+            String downloadID = DOWNLOAD_POSTER.addDownload(releaseName, downloadLink);
+            String template = "https://myrecordpool.com/?smd_process_download=1&download_id={0}";
+            String changedContent = postContent.replace(downloadLink, format(template, downloadID));
+            String updatedPostLink = updatePost(
+              new Document("content", changedContent).toJson(), postId, url);
+         }
+      } else {
+         logger.log("Error on search : " + postId + " |: " + responseCode);
+      }
    }
    
    @SuppressWarnings({"unchecked", "DuplicatedCode"})
@@ -62,7 +96,7 @@ public class PostUpdater {
       int responseCode = response.getStatusLine().getStatusCode();
       if (responseCode == 200) {
          String clean = EntityUtils.toString(response.getEntity());
-         Document post = new Document(Document.parse(clean));
+         Document post = new Document(parse(clean));
          List<Integer> categories = (List<Integer>) post.get("categories");
          if (categories.size() == 1) {
             Integer mainCategory = categories.get(0);
