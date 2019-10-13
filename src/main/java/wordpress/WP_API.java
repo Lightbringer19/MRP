@@ -170,11 +170,11 @@ public class WP_API {
          Integer genre = createCategory(genreFiltered, "5514");
          categories.add(genre);
       }
-      String artistInfo = info.getArtist().trim();
-      if (!artistInfo.equals("") && !artistInfo.equals(" ")) {
-         Integer artist = createCategory(artistInfo, "5513");
-         categories.add(artist);
-      }
+      // String artistInfo = info.getArtist().trim();
+      // if (!artistInfo.equals("") && !artistInfo.equals(" ")) {
+      //    Integer artist = createCategory(artistInfo, "5513");
+      //    categories.add(artist);
+      // }
    }
    
    @SuppressWarnings("unchecked")

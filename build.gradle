@@ -158,6 +158,9 @@ task DownloaderCustom {
 task PostDeleter {
     dependsOn newRelease('wordpress.', 'PostRemover', '1.0.')
 }
+task CategoryRemover {
+    dependsOn newRelease('wordpress.', 'CategoryDeleter', '1.0.')
+}
 //SCRAPERS
 task DMPScraper {
     dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '1.2.')
