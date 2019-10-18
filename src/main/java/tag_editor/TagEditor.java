@@ -1,5 +1,6 @@
 package tag_editor;
 
+import lombok.Data;
 import org.apache.commons.io.IOUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -82,7 +83,8 @@ class TagEditor {
                ImageExtractor imageExtractor = new ImageExtractor().invoke();
                byte[] artData = art.getBinaryData();
                if (Arrays.equals(imageExtractor.getMyrec(), artData) ||
-                 Arrays.equals(imageExtractor.getElectroFresh(), artData)) {
+                 Arrays.equals(imageExtractor.getElectroFresh(), artData) ||
+                 Arrays.equals(imageExtractor.getHeyDj(), artData)) {
                   // if promotion image is present
                   Artwork logoArt = ArtworkFactory
                     .createArtworkFromFile(
@@ -217,17 +219,11 @@ class TagEditor {
       return stringToFilter;
    }
    
+   @Data
    private static class ImageExtractor {
       private byte[] myrec;
       private byte[] electroFresh;
-      
-      byte[] getMyrec() {
-         return myrec;
-      }
-      
-      byte[] getElectroFresh() {
-         return electroFresh;
-      }
+      private byte[] heyDj;
       
       ImageExtractor invoke() throws IOException {
          InputStream myrecImage =
@@ -238,6 +234,10 @@ class TagEditor {
            new FileInputStream(Constants.filesDir + "electronicfresh.jpg");
          electroFresh = IOUtils.toByteArray(electroFreshImage);
          electroFreshImage.close();
+         InputStream heyDjImage =
+           new FileInputStream(Constants.filesDir + "heydj.jpg");
+         heyDj = IOUtils.toByteArray(heyDjImage);
+         heyDjImage.close();
          return this;
       }
    }

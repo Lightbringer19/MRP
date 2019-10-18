@@ -51,9 +51,10 @@ public class CategoryDeleter {
    public static void main(String[] args) {
       CategoryDeleter deleter = new CategoryDeleter();
       try {
-         for (int i = 1; i < 10_000; i++) {
+         while (true) {
+            // for (int i = 1; i < 10_000; i++) {
             try {
-               deleter.checkCategoryOnPage(i);
+               deleter.checkCategoryOnPage(1);
             } catch (Exception e) {
                logger.log(e);
                Thread.sleep(5000);
