@@ -15,12 +15,12 @@ public class MaletaDvjScraper extends Scraper {
    public MaletaDvjScraper() {
       USERNAME = yamlConfig.getMaletadvj_username();
       PASS = yamlConfig.getMaletadvj_password();
-      
+   
       loginUrl = "https://maletadvj.com/";
       nameFieldNavigator = By.id("email");
       passFieldNavigator = By.id("password");
       submitButtonNavigator = By.id("login-btn");
-      
+   
       dateFormat = "dd/MM/yyyy";
       downloaded = mongoControl.maletadvjDownloaded;
       releaseName = "MyRecordPool";
@@ -34,6 +34,8 @@ public class MaletaDvjScraper extends Scraper {
    @Override
    @SneakyThrows
    public void beforeLogin() {
+      driver.findElement(By.xpath("//*[@id=\"accept-terms\"]")).click();
+      Thread.sleep(500);
       driver.findElement(By.cssSelector(".mini-cart > a:nth-child(1)")).click();
       Thread.sleep(500);
    }
