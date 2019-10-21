@@ -30,7 +30,8 @@ import java.util.Map;
 
 import static collector.Collector.collect;
 import static com.mongodb.client.model.Filters.eq;
-import static wordpress.Poster.*;
+import static wordpress.Poster.MONGO_CONTROL;
+import static wordpress.Poster.MRP_AUTHORIZATION;
 
 public class WP_API {
    
@@ -39,8 +40,8 @@ public class WP_API {
    
    static void post(File jsonFile) {
       InfoForPost info = collect(jsonFile);
-      String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(), info.getLink());
-      String htmlBodyForPost = buildHTML(info, downloadID);
+      // String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(), info.getLink());
+      String htmlBodyForPost = buildHTML(info);
       WPPost post = new WPPost(info.getReleaseName(), "publish",
         getCategoryIDsForPost(info), htmlBodyForPost);
       String linkToPost = createPostGetLinkToPost(post.toJson(), info.getReleaseName(),
@@ -93,7 +94,7 @@ public class WP_API {
       return new ResponseInfo(postResponse.getStatusLine().getStatusCode(), jsonResponse);
    }
    
-   private static String buildHTML(InfoForPost info, String downloadID) {
+   private static String buildHTML(InfoForPost info) {
       String html_base = FUtils.readFile(new File(Constants.filesDir + "post.html"));
       
       html_base = html_base.replace("xartlinkx", info.getArtLink());
@@ -109,8 +110,7 @@ public class WP_API {
       html_base = html_base.replace("xbitratex", info.getBitrate());
       html_base = html_base.replace("xsampleratex", info.getSample_Rate());
       html_base = html_base.replace("xsizex", info.getSize());
-      
-      html_base = html_base.replace("xlinkx", downloadID);
+      html_base = html_base.replace("xlinkx", info.getLink());
       
       HashMap<Integer, TrackInfo> TrackList = info.getTrackList();
       StringBuilder trackList = new StringBuilder();
