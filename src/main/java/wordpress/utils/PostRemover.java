@@ -1,4 +1,4 @@
-package wordpress;
+package wordpress.utils;
 
 import configuration.YamlConfig;
 import lombok.Cleanup;
@@ -10,7 +10,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
@@ -20,13 +19,15 @@ import java.util.Scanner;
 
 public class PostRemover {
    
-   private static Scanner IN = new Scanner(System.in);
+   private static Scanner IN;
    private static String mrp_authorization;
-   private static Scheduler scheduler = Schedulers
-     .newElastic("url-scraper", 10);
+   private static Scheduler scheduler;
    
    @SneakyThrows
    public static void main(String[] args) {
+      IN = new Scanner(System.in);
+      scheduler = Schedulers
+        .newElastic("url-scraper", 10);
       YamlConfig yamlConfig = new YamlConfig();
       mrp_authorization = yamlConfig.config.getMrp_authorization();
       while (true) {
@@ -36,18 +37,22 @@ public class PostRemover {
          Flux.fromIterable(urls)
            .parallel(100)
            .runOn(scheduler)
-           .flatMap(url -> Mono.just(getId(url)))
-           .doOnNext(PostRemover::deletePost)
+           .doOnNext(PostRemover::delete)
            .sequential()
            .blockLast();
       }
    }
    
-   void delete(String url) {
-      System.out.println("Deleting: " + url);
-      String id = getId(url);
-      deletePost(id);
-      System.out.println("Deleted: " + url);
+   private static void delete(String url) {
+      try {
+         System.out.println("Deleting: " + url);
+         String id = getId(url);
+         deletePost(id);
+         System.out.println("Deleted: " + url);
+      } catch (Exception e) {
+         e.printStackTrace();
+         // System.out.println(e.toString());
+      }
    }
    
    @NotNull
@@ -83,10 +88,9 @@ public class PostRemover {
       }
    }
    
-   @NotNull
    @SneakyThrows
    public static String getId(String url) {
-      return Jsoup.connect(url).get()
+      return Jsoup.connect(url).timeout(60_000).get()
         .select("article")
         .attr("id")
         .replace("post-", "");

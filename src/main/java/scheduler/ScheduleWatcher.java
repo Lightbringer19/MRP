@@ -18,9 +18,10 @@ public class ScheduleWatcher extends Thread {
    
    private static final SimpleDateFormat DATE_FORMAT =
      new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
-   private static final MongoControl MONGO_CONTROL = new MongoControl();
+   private static MongoControl MONGO_CONTROL;
    
    public ScheduleWatcher() {
+      MONGO_CONTROL = new MongoControl();
    }
    
    public static void addToScheduleDB(File folderToSchedule) {

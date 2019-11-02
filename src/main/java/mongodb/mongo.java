@@ -8,10 +8,11 @@ import utils.Logger;
 
 public class mongo extends Thread {
    
-   public static final MongoControl MONGO_CONTROL = new MongoControl();
-   public static final Logger LOGGER = new Logger("MONGO UPDATE");
+   public static MongoControl MONGO_CONTROL;
+   public static Logger LOGGER = new Logger("MONGO UPDATE");
    
    public static void main(String[] args) {
+      MONGO_CONTROL = new MongoControl();
       // from MRP to POOLS
       // String sourceDatabaseName = "MRP";
       // String targetDatabaseName = "POOLS";

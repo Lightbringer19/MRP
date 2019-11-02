@@ -30,9 +30,9 @@ import static java.util.concurrent.ThreadLocalRandom.current;
 public abstract class Scraper extends Thread
   implements ScrapingInterface, DownloadInterface, ScraperInterface {
    
-   protected static MongoControl mongoControl = new MongoControl();
+   protected static MongoControl mongoControl;
    protected static String cookieForAPI;
-   protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
+   protected static YamlConfig.Config yamlConfig;
    protected static WebDriver driver;
    protected static FirefoxOptions firefoxOptions;
    
@@ -59,7 +59,8 @@ public abstract class Scraper extends Thread
    protected boolean exitAfterCheck = true;
    
    public Scraper() {
-      
+      yamlConfig = new YamlConfig().config;
+      mongoControl = new MongoControl();
       System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
       FirefoxProfile ini = new ProfilesIni().getProfile("selenium");
       firefoxOptions = new FirefoxOptions().setProfile(ini);

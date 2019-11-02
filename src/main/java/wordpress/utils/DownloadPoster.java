@@ -1,4 +1,4 @@
-package wordpress;
+package wordpress.utils;
 
 import configuration.YamlConfig;
 import org.jsoup.Jsoup;

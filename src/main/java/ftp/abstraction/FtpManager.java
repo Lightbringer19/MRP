@@ -24,15 +24,21 @@ public abstract class FtpManager extends Thread {
    
    protected static String CATEGORY_NAME;
    
-   protected static MongoControl mongoControl = new MongoControl();
-   protected static YamlConfig.Config yamlConfig = new YamlConfig().config;
+   protected static MongoControl mongoControl;
+   protected static YamlConfig.Config yamlConfig;
    
-   protected static FTPClient ftpClient = new FTPClient();
+   protected static FTPClient ftpClient;
    
    protected static Logger logger;
    protected static String pathname;
    
    protected boolean longPeriod = false;
+   
+   public FtpManager() {
+      mongoControl = new MongoControl();
+      yamlConfig = new YamlConfig().config;
+      ftpClient = new FTPClient();
+   }
    
    @Override
    public void run() {

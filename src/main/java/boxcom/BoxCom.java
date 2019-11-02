@@ -25,10 +25,11 @@ class BoxCom extends Thread {
    private static BoxFolder FOLDER_2019;
    private static BoxFolder TEST_FOLDER;
    
-   private static BoxSharedLink.Permissions permissions = new BoxSharedLink.Permissions();
+   private static BoxSharedLink.Permissions permissions;
    
    BoxCom() {
       // FOLDER_2019 = new BoxFolder(GetClient(), TEST_FOLDER_ID);
+      permissions = new BoxSharedLink.Permissions();
       YamlConfig yamlConfig = new YamlConfig();
       USER_ID = yamlConfig.config.getBox_user_id();
       FOLDER_2019 = new BoxFolder(GetClient(), ID_2019);

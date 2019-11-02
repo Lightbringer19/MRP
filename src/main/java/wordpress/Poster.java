@@ -14,6 +14,7 @@ import utils.CheckDate;
 import utils.Constants;
 import utils.FUtils;
 import utils.Log;
+import wordpress.utils.DownloadPoster;
 
 import java.io.File;
 import java.io.IOException;
