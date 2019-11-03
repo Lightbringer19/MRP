@@ -37,13 +37,7 @@ public class DownloadPoster {
       login();
    }
    
-   // public static void main(String[] args) {
-   //    DownloadPoster downloadPoster = new DownloadPoster();
-   //    // downloadPoster.login();
-   //    // downloadPoster.addDownload("ANOTHER TEST", "https://www.google.com.ua/");
-   // }
-   
-   String addDownload(String title, String uploadLink) {
+   public String addDownload(String title, String uploadLink) {
       driver.get("https://myrecordpool.com/wp-admin/post-new.php?post_type=sdm_downloads");
       driver.findElement(By.id("title")).sendKeys(title);
       driver.findElement(By.id("sdm_upload")).sendKeys(uploadLink);

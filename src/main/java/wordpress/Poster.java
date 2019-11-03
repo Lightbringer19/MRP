@@ -29,7 +29,7 @@ public class Poster extends Thread {
    public void run() {
       Log.write(CheckDate.getNowTime() + " Poster Start", "Poster");
       MONGO_CONTROL = new MongoControl();
-      // DOWNLOAD_POSTER = new DownloadPoster();
+      DOWNLOAD_POSTER = new DownloadPoster();
       new File(Constants.postDir).mkdirs();
       YamlConfig yamlConfig = new YamlConfig();
       MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();

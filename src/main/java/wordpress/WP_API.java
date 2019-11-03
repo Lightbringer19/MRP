@@ -23,6 +23,7 @@ import utils.FUtils;
 import utils.Log;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +31,7 @@ import java.util.Map;
 
 import static collector.Collector.collect;
 import static com.mongodb.client.model.Filters.eq;
-import static wordpress.Poster.MONGO_CONTROL;
-import static wordpress.Poster.MRP_AUTHORIZATION;
+import static wordpress.Poster.*;
 
 public class WP_API {
    
@@ -40,7 +40,6 @@ public class WP_API {
    
    static void post(File jsonFile) {
       InfoForPost info = collect(jsonFile);
-      // String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(), info.getLink());
       String htmlBodyForPost = buildHTML(info);
       WPPost post = new WPPost(info.getReleaseName(), "publish",
         getCategoryIDsForPost(info), htmlBodyForPost);
@@ -110,7 +109,15 @@ public class WP_API {
       html_base = html_base.replace("xbitratex", info.getBitrate());
       html_base = html_base.replace("xsampleratex", info.getSample_Rate());
       html_base = html_base.replace("xsizex", info.getSize());
-      html_base = html_base.replace("xlinkx", info.getLink());
+      
+      if (info.getPostCategory().equals("RECORDPOOL")) {
+         String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(), info.getLink());
+         String template = "https://myrecordpool.com/?smd_process_download=1&download_id={0}";
+         String link = MessageFormat.format(template, downloadID);
+         html_base = html_base.replace("xlinkx", link);
+      } else {
+         html_base = html_base.replace("xlinkx", info.getLink());
+      }
       
       HashMap<Integer, TrackInfo> TrackList = info.getTrackList();
       StringBuilder trackList = new StringBuilder();
