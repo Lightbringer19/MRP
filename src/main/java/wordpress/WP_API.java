@@ -167,8 +167,10 @@ public class WP_API {
          String genreFiltered = info.getGenre()
            .replaceAll("\\)", "").replaceAll("\\(", "")
            .replaceAll("^[0-9]", "").trim();
-         Integer genre = createCategory(genreFiltered, "5514");
-         categories.add(genre);
+         if (!genreFiltered.equals("")) {
+            Integer genre = createCategory(genreFiltered, "5514");
+            categories.add(genre);
+         }
       }
       // String artistInfo = info.getArtist().trim();
       // if (!artistInfo.equals("") && !artistInfo.equals(" ")) {

@@ -72,7 +72,9 @@ public class TagRunnerMain extends Thread {
          File folderToTag = tempFolder;
          // rename folder
          folderToTag = renameFolder(folderToTag, " - electronicfresh.com");
+         folderToTag = renameFolder(folderToTag, " electronicfresh.com");
          folderToTag = renameFolder(folderToTag, " - ElectronicFresh.com");
+         folderToTag = renameFolder(folderToTag, "ElectronicFresh.com");
          folderToTag = renameFolder(folderToTag, "www.inevil.com");
          folderToTag = renameFolder(folderToTag, "inevil.com");
          // Edit tags in copied folder
