@@ -25,6 +25,9 @@ public class ScheduleWatcher extends Thread {
    }
    
    public static void addToScheduleDB(File folderToSchedule) {
+      if (MONGO_CONTROL == null) {
+         MONGO_CONTROL = new MongoControl();
+      }
       Calendar cal = Calendar.getInstance();
       cal.add(Calendar.MINUTE, ThreadLocalRandom.current().nextInt(480, 720));
       String scheduleTime = DATE_FORMAT.format(cal.getTime());

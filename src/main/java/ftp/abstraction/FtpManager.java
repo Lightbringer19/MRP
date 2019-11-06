@@ -30,7 +30,7 @@ public abstract class FtpManager extends Thread {
    protected static FTPClient ftpClient;
    
    protected static Logger logger;
-   protected static String pathname;
+   protected static String monthFolder;
    
    protected boolean longPeriod = false;
    
@@ -79,22 +79,24 @@ public abstract class FtpManager extends Thread {
          ftpClient.enterLocalPassiveMode();
          ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
          
-         FTPFile[] dayFtpFolders = ftpClient.listFiles(pathname);
+         FTPFile[] dayFtpFolders = ftpClient.listFiles(monthFolder);
          for (FTPFile dayFolder : dayFtpFolders) {
             String name = dayFolder.getName();
+            logger.log("Checking day: " + name);
+            
             if (!name.equals("_ALL_TRACKS__(ONLY_WORKS_WITH_FTP_CLIENT)")) {
                long time = dayFolder.getTimestamp().getTimeInMillis();
                //DB
-               String dayReleasesPath = pathname + name;
+               String dayReleasesPath = monthFolder + name;
                Document dayDoc = mongoControl.timeStampsCollection
                  .find(eq("folderPath", dayReleasesPath)).first();
                if (dayDoc == null) {
+                  // DOWNLOAD
+                  downloadNewReleases(dayReleasesPath);
                   //insert new DOC
                   mongoControl.timeStampsCollection
                     .insertOne(new Document("folderPath", dayReleasesPath)
                       .append("timeStamp", time));
-                  // DOWNLOAD
-                  downloadNewReleases(dayReleasesPath);
                } else {
                   //check time: if time changed -> download
                   long timeStamp = (long) dayDoc.get("timeStamp");
@@ -129,6 +131,7 @@ public abstract class FtpManager extends Thread {
       logger.log("New Releases In Folder: " + dayReleasesPath);
       FTPFile[] releasesInDayFolder = ftpClient.listFiles(dayReleasesPath);
       for (FTPFile releaseFolder : releasesInDayFolder) {
+         logger.log("Checking release: " + releaseFolder.getName());
          downloadRelease(dayReleasesPath, releaseFolder);
       }
    }

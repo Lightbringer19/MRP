@@ -21,7 +21,7 @@ public class BeatportFtp extends FtpManager {
       PORT = 7777;
       
       CATEGORY_NAME = "BEATPORT";
-      pathname = "/MP3/BEATPORT__AND__WEBSITE_SECTION/";
+      monthFolder = "/MP3/BEATPORT__AND__WEBSITE_SECTION/";
       logger = new Logger("Beatport_FTP");
    }
    

@@ -38,14 +38,14 @@ public class DJCFtp extends FtpManager {
       SimpleDateFormat formatter = new SimpleDateFormat("MM-MMM", Locale.US);
       String month = formatter
         .format(new Date()).toUpperCase();
-      pathname = "/AUDIO/DATES/2019/" + month + "/";
+      monthFolder = "/AUDIO/DATES/2019/" + month + "/";
       checkFtp();
       // past month check
       Calendar cal = Calendar.getInstance();
       cal.add(Calendar.MONTH, -1);
       String previousMonth = formatter
         .format(cal.getTime()).toUpperCase();
-      pathname = "/AUDIO/DATES/2019/" + previousMonth + "/";
+      monthFolder = "/AUDIO/DATES/2019/" + previousMonth + "/";
       checkFtp();
    }
    
@@ -80,14 +80,14 @@ public class DJCFtp extends FtpManager {
          for (FTPFile releaseFile : releaseFiles) {
             if (!releaseFile.isFile()) {
                String subFolder = releaseRemotePath + releaseFile.getName() + "/";
-               for (FTPFile file : ftpClient.listFiles(releaseRemotePath)) {
+               for (FTPFile file : ftpClient.listFiles(subFolder)) {
                   downloadFile(subFolder, releaseLocalPath, file);
                }
             } else {
                downloadFile(releaseRemotePath, releaseLocalPath, releaseFile);
             }
          }
-         // ADD TO UPLOAD QUEUE
+         // ADD TO QUEUE
          logger.log("Release Downloaded: " + releaseNameCleaned);
          mongoControl.ftpDownloadedCollection
            .insertOne(new Document("releaseName", releaseNameCleaned));

@@ -110,7 +110,7 @@ public class WP_API {
       html_base = html_base.replace("xsampleratex", info.getSample_Rate());
       html_base = html_base.replace("xsizex", info.getSize());
       
-      if (info.getPostCategory().equals("RECORDPOOL")) {
+      if (info.getPostCategory().contains("RECORDPOOL")) {
          String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(), info.getLink());
          String template = "https://myrecordpool.com/?smd_process_download=1&download_id={0}";
          String link = MessageFormat.format(template, downloadID);

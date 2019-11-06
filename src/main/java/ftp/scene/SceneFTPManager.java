@@ -82,12 +82,12 @@ public class SceneFTPManager extends Thread {
             Document dayDoc = mongoControl.timeStampsCollection
               .find(eq("folderPath", dayReleasesPath)).first();
             if (dayDoc == null) {
+               // DOWNLOAD
+               downloadNewReleases(dayReleasesPath);
                //insert new DOC
                mongoControl.timeStampsCollection
                  .insertOne(new Document("folderPath", dayReleasesPath)
                    .append("timeStamp", time));
-               // DOWNLOAD
-               downloadNewReleases(dayReleasesPath);
             } else {
                //check time: if time changed -> download
                long timeStamp = (long) dayDoc.get("timeStamp");
