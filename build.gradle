@@ -132,7 +132,7 @@ task UploaderConsole {
     dependsOn newRelease('boxcom.', 'Uploader', '0.0.')
 }
 task Poster {
-    dependsOn newRelease('monitors.', 'Poster_Monitor', '3.8.')
+    dependsOn newRelease('monitors.', 'Poster_Monitor', '3.9.')
 }
 task Reposter {
     dependsOn newRelease('monitors.', 'Reposter_Monitor', '3.3.')
@@ -141,7 +141,7 @@ task Tagger {
     dependsOn newRelease('monitors.', 'Tagger_Monitor', '3.3.')
 }
 task SceneFTP {
-    dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '1.1.')
+    dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '1.2.')
 }
 task BeatportFtp {
     dependsOn newRelease('monitors.', 'Beatport_FTP_Monitor', '1.1.')

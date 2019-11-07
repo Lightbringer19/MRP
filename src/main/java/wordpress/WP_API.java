@@ -165,6 +165,10 @@ public class WP_API {
             categories.add(Integer.valueOf("191"));
             setCategoriesForBeatAndScene(info, categories);
             break;
+         case "SCENE-MVID":
+            categories.add(Integer.valueOf("78589"));
+            setCategoriesForBeatAndScene(info, categories);
+            break;
       }
       return categories.toArray(new Integer[0]);
    }

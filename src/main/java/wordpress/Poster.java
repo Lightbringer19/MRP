@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import configuration.YamlConfig;
 import json.InfoFromBoxCom;
 import mongodb.MongoControl;
+import org.apache.commons.io.FileUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -47,8 +48,15 @@ public class Poster extends Thread {
                      // make post
                      Log.write("Preparing to post: " + postJsonFile.getName()
                        + "| In: " + category, "Poster");
-                     WP_API.post(postJsonFile);
-                     postJsonFile.delete();
+                     if (srpCheck(postJsonFile)) {
+                        WP_API.post(postJsonFile);
+                        postJsonFile.delete();
+                     } else {
+                        Log.write("Not SRC group: " + postJsonFile.getName()
+                          + " | In: " + category, "Poster");
+                        FileUtils.moveFileToDirectory(postJsonFile,
+                          new File(Constants.filesDir + "NOT-POSTED\\"), true);
+                     }
                      Thread.sleep(2000);
                   } else {
                      postJsonFile.delete();
@@ -64,6 +72,17 @@ public class Poster extends Thread {
             Sleep();
          }
       }
+   }
+   
+   private boolean srpCheck(File postJsonFile) {
+      File folderToCollect = getFolderFromPostInfo(postJsonFile);
+      String postCategory = getCategory(folderToCollect);
+      if (postCategory.equals("SCENE-MVID")) {
+         String[] folderElements = folderToCollect.getName().split("-");
+         String Group = folderElements[folderElements.length - 1];
+         return Group.toLowerCase().contains("srp");
+      }
+      return true;
    }
    
    private static void findAndDeleteCorruptedIn(File post) {
@@ -92,7 +111,7 @@ public class Poster extends Thread {
    
    private static File[] getFiles(File folderToCollect, String postCategory) {
       File[] audioFiles = null;
-      if (!postCategory.equals("RECORDPOOL VIDEOS")) {
+      if (!postCategory.equals("RECORDPOOL VIDEOS") && !postCategory.equals("SCENE-MVID")) {
          audioFiles = folderToCollect.listFiles((dir, name) -> {
             if (postCategory.equals("SCENE-FLAC")) {
                return name.toLowerCase().endsWith(".flac");
@@ -108,7 +127,7 @@ public class Poster extends Thread {
       File folderToCollect = getFolderFromPostInfo(post);
       String postCategory = getCategory(folderToCollect);
       boolean filesHere;
-      if (postCategory.equals("RECORDPOOL VIDEOS")) {
+      if (postCategory.equals("RECORDPOOL VIDEOS") || postCategory.equals("SCENE-MVID")) {
          filesHere = true;
       } else {
          File[] audioFiles = getAudioFiles(post);

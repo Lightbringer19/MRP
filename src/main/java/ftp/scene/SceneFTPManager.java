@@ -54,10 +54,18 @@ public class SceneFTPManager extends Thread {
             sceneFTPManager.checkFtp("SCENE-FLAC");
          }
       };
+      TimerTask ftpCheckMvid = new TimerTask() {
+         @Override
+         @SneakyThrows
+         public void run() {
+            sceneFTPManager.checkFtp("SCENE-MVID");
+         }
+      };
       long sec = 1000;
       long min = sec * 60;
       timer.schedule(ftpCheckMp3, 0, min);
       timer.schedule(ftpCheckFlac, 0, min);
+      timer.schedule(ftpCheckMvid, 0, min);
    }
    
    private void checkFtp(String categoryToDownload) {
