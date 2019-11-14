@@ -54,18 +54,18 @@ public class SceneFTPManager extends Thread {
             sceneFTPManager.checkFtp("SCENE-FLAC");
          }
       };
-      TimerTask ftpCheckMvid = new TimerTask() {
-         @Override
-         @SneakyThrows
-         public void run() {
-            sceneFTPManager.checkFtp("SCENE-MVID");
-         }
-      };
+      // TimerTask ftpCheckMvid = new TimerTask() {
+      //    @Override
+      //    @SneakyThrows
+      //    public void run() {
+      //       sceneFTPManager.checkFtp("SCENE-MVID");
+      //    }
+      // };
       long sec = 1000;
       long min = sec * 60;
       timer.schedule(ftpCheckMp3, 0, min);
       timer.schedule(ftpCheckFlac, 0, min);
-      timer.schedule(ftpCheckMvid, 0, min);
+      // timer.schedule(ftpCheckMvid, 0, min);
    }
    
    private void checkFtp(String categoryToDownload) {
@@ -138,7 +138,9 @@ public class SceneFTPManager extends Thread {
       String releaseName = releaseFolder.getName();
       String releaseRemotePath = dayReleasesPath + "/" + releaseName + "/";
       //Skip check
-      boolean download = toDownload(releaseName);
+      Log.write("Checking Release: " + releaseName,
+        "SCENE_FTP");
+      boolean download = toDownload(releaseName, releaseRemotePath);
       if (download) {
          // download release
          Log.write("New Release to Download: " + releaseName,
@@ -148,7 +150,7 @@ public class SceneFTPManager extends Thread {
            "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
              + "/" + category + "/" + releaseName;
          new File(releaseLocalPath).mkdirs();
-         // .mp3 or .flac or any other files in the release folder
+         //download files
          FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);
          for (FTPFile releaseFile : releaseFiles) {
             if (!releaseFile.isFile()) {
@@ -177,6 +179,8 @@ public class SceneFTPManager extends Thread {
                              FTPFile releaseFile) throws IOException {
       try (OutputStream output = new FileOutputStream(
         releaseLocalPath + "/" + releaseFile.getName())) {
+         Log.write("Preparing to Download: " + releaseFile.getName(),
+           "SCENE_FTP");
          ftpClient.retrieveFile(releaseRemotePath
            + releaseFile.getName(), output);
          Log();
@@ -188,14 +192,21 @@ public class SceneFTPManager extends Thread {
       
    }
    
-   private boolean toDownload(String releaseName) {
+   private boolean toDownload(String releaseName, String releaseRemotePath) throws IOException {
       if (releaseName.contains("(incomplete)")) {
          return false;
       } else {
          // check if release downloaded
-         return mongoControl.ftpDownloadedCollection
+         boolean releaseNotInDB = mongoControl.ftpDownloadedCollection
            .find(eq("releaseName", releaseName))
            .first() == null;
+         if (releaseNotInDB) {
+            return true;
+         } else {
+            FTPFile[] ftpFiles = ftpClient.listFiles(releaseRemotePath, file ->
+              file.getName().endsWith(".rar"));
+            return ftpFiles.length <= 0;
+         }
       }
    }
    
