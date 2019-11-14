@@ -75,14 +75,17 @@ public class DJCFtp extends FtpManager {
          String releaseLocalPath =
            "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
              + "/" + CATEGORY_NAME + "/" + releaseNameCleaned;
-         new File(releaseLocalPath).mkdirs();
          FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);
+         boolean noSubFolders = true;
          for (FTPFile releaseFile : releaseFiles) {
             if (!releaseFile.isFile()) {
                String subFolder = releaseRemotePath + releaseFile.getName() + "/";
+               String subFolderLP = releaseLocalPath + " " + releaseFile.getName();
                for (FTPFile file : ftpClient.listFiles(subFolder)) {
-                  downloadFile(subFolder, releaseLocalPath, file);
+                  downloadFile(subFolder, subFolderLP, file);
                }
+               addToScheduleDB(new File(subFolderLP));
+               noSubFolders = false;
             } else {
                downloadFile(releaseRemotePath, releaseLocalPath, releaseFile);
             }
@@ -92,11 +95,14 @@ public class DJCFtp extends FtpManager {
          mongoControl.ftpDownloadedCollection
            .insertOne(new Document("releaseName", releaseNameCleaned));
          // ADD TO SCHEDULE
-         addToScheduleDB(new File(releaseLocalPath));
+         if (noSubFolders) {
+            addToScheduleDB(new File(releaseLocalPath));
+         }
       }
    }
    
    private void downloadFile(String releaseRemotePath, String releaseLocalPath, FTPFile releaseFile) throws IOException {
+      new File(releaseLocalPath).mkdirs();
       try (OutputStream output = new FileOutputStream
         (releaseLocalPath + "/" + releaseFile.getName())) {
          ftpClient.retrieveFile(releaseRemotePath + releaseFile.getName(), output);
