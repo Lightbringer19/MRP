@@ -48,11 +48,11 @@ public class Poster extends Thread {
                      // make post
                      Log.write("Preparing to post: " + postJsonFile.getName()
                        + "| In: " + category, "Poster");
-                     if (srpCheck(postJsonFile)) {
+                     if (groupCheck(postJsonFile)) {
                         WP_API.post(postJsonFile);
                         postJsonFile.delete();
                      } else {
-                        Log.write("Not SRC group: " + postJsonFile.getName()
+                        Log.write("Not SRC or gFViD group: " + postJsonFile.getName()
                           + " | In: " + category, "Poster");
                         FileUtils.moveFileToDirectory(postJsonFile,
                           new File(Constants.filesDir + "NOT-POSTED\\"), true);
@@ -74,13 +74,14 @@ public class Poster extends Thread {
       }
    }
    
-   private boolean srpCheck(File postJsonFile) {
+   private boolean groupCheck(File postJsonFile) {
       File folderToCollect = getFolderFromPostInfo(postJsonFile);
       String postCategory = getCategory(folderToCollect);
       if (postCategory.equals("SCENE-MVID")) {
          String[] folderElements = folderToCollect.getName().split("-");
          String Group = folderElements[folderElements.length - 1];
-         return Group.toLowerCase().contains("srp");
+         return Group.toLowerCase().contains("srp")
+           || Group.toLowerCase().contains("gfvid");
       }
       return true;
    }

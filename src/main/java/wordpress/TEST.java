@@ -1,6 +1,7 @@
 package wordpress;
 
 import json.ResponseInfo;
+import json.TrackInfo;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -18,7 +19,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.HashMap;
 
 import static wordpress.Poster.MRP_AUTHORIZATION;
 import static wordpress.WP_API.postAndGetResponse;
@@ -27,43 +28,57 @@ import static wordpress.WP_API.postAndGetResponse;
 class TEST {
    @SneakyThrows
    public static void main(String[] args) {
-      String nfoFilePath = "bazzi-honest-ddc-1080p-x264-2018-srpx.nfo";
-      String nfo = FileUtils.readFileToString(new File(nfoFilePath), "UTF-8")
-        .replaceAll("\\P{Print}", "")
+      String nfoFilePath = "gfvid-geim6-480p.nfo";
+      HashMap<Integer, TrackInfo> TrackList = new HashMap<>();
+      String nfoSt = FileUtils.readFileToString(new File(nfoFilePath), "UTF-8")
+        // .replaceAll("\\P{Print}", "")
         .trim();
-      String artist = getFromNfo(nfo, "Artist", "Track Title");
-      String title = getFromNfo(nfo, "Title", "Genre");
-      String genre = getFromNfo(nfo, "Genre", "Year");
-      String year = getFromNfo(nfo, "Year", "Rip date");
-      String length = getFromNfo(nfo, "Length", "Size");
-      String format = getFromNfo(nfo, "Format", "Audio");
-      String audio = getFromNfo(nfo, "Audio", "Deinterlace");
       
-      String sampleRate = Arrays.stream(audio.split(" "))
-        .filter(s -> s.contains("Hz"))
-        .findFirst()
-        .orElse("???Hz");
-      String bitrate = Arrays.stream(audio.split(" "))
-        .filter(s -> s.contains("kbps"))
-        .findFirst()
-        .orElse("???kbps");
-      
-      System.out.println(artist);
-      System.out.println(title);
-      System.out.println(genre);
-      System.out.println(year);
-      System.out.println(length);
-      System.out.println(format);
-      // System.out.println(audio);
-      System.out.println(sampleRate);
-      System.out.println(bitrate);
-      
+      // String title = getFromNfo(nfoSt, "TITLE:", "TV DATE:");
+      //
+      // String Artist = title.split(" - ")[0];
+      // String Genre = getFromNfo(nfoSt, "GENRE", "SUBGENRE");
+      // String Released = getFromNfo(nfoSt, "SHOW DATE", "RUNTIME");
+      // String Size = getFromNfo(nfoSt, "SIZE", "ARCHIVES");
+      // String Playtime = getFromNfo(nfoSt, "RUNTIME", "GENRE");
+      // String Format = getFromNfo(nfoSt, "CODEC", "BITRATE");
+      // String Bitrate = getFromNfo(nfoSt, "AUDIO", "INFOS");
+      // String Sample_Rate = getFromNfo(nfoSt, "INFOS", "FASHION");
+      //
+      // String trackList = getFromNfoSpace(nfoSt, "TRACKLIST", "NOTES");
+      // if (trackList.replaceAll("\n", "").replaceAll(" ", "").equals("")) {
+      //    TrackList.put(0, new TrackInfo(title.split(" - ")[1], Artist, Playtime));
+      //
+      // } else {
+      //    String[] tracks = trackList.split("\n");
+      //    for (int i = 0; i < tracks.length; i++) {
+      //       String[] trackSplit = tracks[i].split(" {2}");
+      //       TrackList.put(i, new TrackInfo(trackSplit[0], Artist, trackSplit[trackSplit.length - 1]));
+      //    }
+      // }
+      // String Tracks = String.valueOf(TrackList.size());
+      //
+      // System.out.println(Artist);
+      // System.out.println(Genre);
+      // System.out.println(Released);
+      // System.out.println(Size);
+      // System.out.println(Playtime);
+      // System.out.println(Format);
+      // System.out.println(Bitrate);
+      // System.out.println(Sample_Rate);
+      // System.out.println(Tracks);
+      // System.out.println(TrackList);
       // System.out.println(nfo);
    }
    
    @NotNull
    public static String getFromNfo(String nfo, String extract, String extractEnd) {
-      return nfo.substring(nfo.indexOf(" ", nfo.indexOf(extract)),
+      return nfo.substring(nfo.indexOf(":", nfo.indexOf(extract)) + 1,
+        nfo.indexOf(extractEnd)).trim();
+   }
+   
+   public static String getFromNfoSpace(String nfo, String extract, String extractEnd) {
+      return nfo.substring(nfo.indexOf("\n", nfo.indexOf(extract)),
         nfo.indexOf(extractEnd)).trim();
    }
    

@@ -169,31 +169,60 @@ public class Collector {
          if (postCategory.equals("SCENE-MVID")) {
             String[] folderElements = folderToCollect.getName().split("-");
             Group = folderElements[folderElements.length - 1];
-            if (Group.toLowerCase().contains("srp")) {
+            if (Group.toLowerCase().contains("srp")
+              || Group.toLowerCase().contains("gfvid")) {
                File[] nfo = folderToCollect.listFiles((dir, name) ->
                  name.endsWith(".nfo"));
                if (nfo != null && nfo[0] != null) {
-                  String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
-                    .replaceAll("\\P{Print}", "")
-                    .trim();
-                  Tracks = "1";
-                  Artist = getFromNfo(nfoSt, "Artist", "Track Title");
-                  String title = getFromNfo(nfoSt, "Title", "Genre");
-                  Genre = getFromNfo(nfoSt, "Genre", "Year");
-                  Released = getFromNfo(nfoSt, "Year", "Rip date");
-                  Size = getFromNfo(nfoSt, "Size", "Resolution");
-                  Playtime = getFromNfo(nfoSt, "Length", "Size");
-                  Format = getFromNfo(nfoSt, "Format", "Audio");
-                  String audio = getFromNfo(nfoSt, "Audio", "Deinterlace");
-                  Sample_Rate = Arrays.stream(audio.split(" "))
-                    .filter(s -> s.contains("Hz"))
-                    .findFirst()
-                    .orElse("???Hz");
-                  Bitrate = Arrays.stream(audio.split(" "))
-                    .filter(s -> s.contains("kbps"))
-                    .findFirst()
-                    .orElse("???kbps");
-                  TrackList.put(0, new TrackInfo(title, Artist, Playtime));
+                  if (Group.toLowerCase().contains("srp")) {
+                     String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
+                       .replaceAll("\\P{Print}", "")
+                       .trim();
+                     Tracks = "1";
+                     Artist = getFromNfo(nfoSt, "Artist", "Track Title");
+                     String title = getFromNfo(nfoSt, "Title", "Genre");
+                     Genre = getFromNfo(nfoSt, "Genre", "Year");
+                     Released = getFromNfo(nfoSt, "Year", "Rip date");
+                     Size = getFromNfo(nfoSt, "Size", "Resolution");
+                     Playtime = getFromNfo(nfoSt, "Length", "Size");
+                     Format = getFromNfo(nfoSt, "Format", "Audio");
+                     String audio = getFromNfo(nfoSt, "Audio", "Deinterlace");
+                     Sample_Rate = Arrays.stream(audio.split(" "))
+                       .filter(s -> s.contains("Hz"))
+                       .findFirst()
+                       .orElse("???Hz");
+                     Bitrate = Arrays.stream(audio.split(" "))
+                       .filter(s -> s.contains("kbps"))
+                       .findFirst()
+                       .orElse("???kbps");
+                     TrackList.put(0, new TrackInfo(title, Artist, Playtime));
+                  } else {
+                     String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
+                       .trim();
+                     String title = getFromNfo(nfoSt, "TITLE:", "TV DATE:");
+                     Artist = title.split(" - ")[0];
+                     Genre = getFromNfo(nfoSt, "GENRE", "SUBGENRE");
+                     Released = getFromNfo(nfoSt, "SHOW DATE", "RUNTIME");
+                     Size = getFromNfo(nfoSt, "SIZE", "ARCHIVES");
+                     Playtime = getFromNfo(nfoSt, "RUNTIME", "GENRE");
+                     Format = getFromNfo(nfoSt, "CODEC", "BITRATE");
+                     Bitrate = getFromNfo(nfoSt, "AUDIO", "INFOS");
+                     Sample_Rate = getFromNfo(nfoSt, "INFOS", "FASHION");
+                     String trackList = getFromNfoSpace(nfoSt, "TRACKLIST", "NOTES");
+                     if (trackList.replaceAll("\n", "")
+                       .replaceAll(" ", "").equals("")) {
+                        TrackList.put(0, new TrackInfo(title.split(" - ")[1],
+                          Artist, Playtime));
+                     } else {
+                        String[] tracks = trackList.split("\n");
+                        for (int i = 0; i < tracks.length; i++) {
+                           String[] trackSplit = tracks[i].split(" {2}");
+                           TrackList.put(i, new TrackInfo(trackSplit[0], Artist,
+                             trackSplit[trackSplit.length - 1]));
+                        }
+                     }
+                     Tracks = String.valueOf(TrackList.size());
+                  }
                }
             }
          } else {
@@ -398,7 +427,12 @@ public class Collector {
    }
    
    private static String getFromNfo(String nfo, String extract, String extractEnd) {
-      return nfo.substring(nfo.indexOf(" ", nfo.indexOf(extract)),
+      return nfo.substring(nfo.indexOf(":", nfo.indexOf(extract)) + 1,
+        nfo.indexOf(extractEnd)).trim();
+   }
+   
+   private static String getFromNfoSpace(String nfo, String extract, String extractEnd) {
+      return nfo.substring(nfo.indexOf("\n", nfo.indexOf(extract)),
         nfo.indexOf(extractEnd)).trim();
    }
 }
