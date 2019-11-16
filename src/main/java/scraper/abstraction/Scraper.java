@@ -92,6 +92,7 @@ public abstract class Scraper extends Thread
       }
    }
    
+   @SneakyThrows
    protected void login() {
       FirefoxOptions options = new FirefoxOptions().setLogLevel(Level.OFF);
       driver = new FirefoxDriver(options);
@@ -107,6 +108,7 @@ public abstract class Scraper extends Thread
       passwordField.sendKeys(PASS);
       // Click Login
       driver.findElement(submitButtonNavigator).click();
+      sleep(1_000);
       afterLogin();
    }
    

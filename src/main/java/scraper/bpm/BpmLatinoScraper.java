@@ -3,23 +3,26 @@ package scraper.bpm;
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
 
-public class BpmLatinoScraper extends Scraper {
+import static java.text.MessageFormat.format;
+
+public class BpmLatinoScraper extends Scraper implements BpmApiService {
    
    public BpmLatinoScraper() {
       USERNAME = yamlConfig.getBpm_latino_username();
       PASS = yamlConfig.getBpm_latino_password();
-      loginUrl = "https://bpmlatino.com/store/index.php?option=com_user&view=login&Itemid=91";
-      nameFieldNavigator = By.id("username");
-      passFieldNavigator = By.id("passwd");
-      submitButtonNavigator = By.className("login-btn1");
-      
-      dateFormat = "MM/dd/yy";
+      loginUrl = "https://bpmlatino.com/login";
+      nameFieldNavigator = By.id("login-form-email");
+      passFieldNavigator = By.id("login-form-password");
+      submitButtonNavigator = By.xpath("/html/body/main/div/form/footer");
+   
+      dateFormat = "yyyy-MM-dd";
       downloaded = mongoControl.bpmLatinoDownloaded;
       releaseName = "Bpm Supreme Latino";
    }
@@ -31,9 +34,16 @@ public class BpmLatinoScraper extends Scraper {
    
    @Override
    @SneakyThrows
+   public void beforeLogin() {
+      sleep(1_000);
+      
+   }
+   
+   @Override
+   @SneakyThrows
    public void afterFirstStage() {
-      // urlToGet = "https://www.bpmsupreme.com/store/newreleases/audio/classic/1";
-      // driver.get(urlToGet);
+      urlToGet = "https://app.bpmlatino.com/new-releases/classic/audio";
+      driver.get(urlToGet);
       Thread.sleep(10_000);
    }
    
@@ -43,8 +53,7 @@ public class BpmLatinoScraper extends Scraper {
       logger.log("Downloading Music Release");
       scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
       // SCRAPE VIDEOS AND DOWNLOAD
-      urlToGet = "https://bpmlatino.com/store/index" +
-        ".php?option=com_maianmedia&view=music&Itemid=2&cat_alias=videos&display=List";
+      urlToGet = "https://app.bpmlatino.com/new-releases/classic/video";
       driver.get(urlToGet);
       Thread.sleep(10_000);
       logger.log("Looking for Video Release");
@@ -54,46 +63,51 @@ public class BpmLatinoScraper extends Scraper {
    
    @Override
    public String scrapeFirstDate(String html) {
-      return Jsoup.parse(html).select("div[class=date_box]").first().text();
+      return Jsoup.parse(html).select("div[class=col-created_at]").first().text();
    }
    
    @Override
    public String previousDateOnThisPage(String html, String firstDate) {
       return Jsoup.parse(html)
-        .select("div[class=date_box]")
+        .select("div[class=col-created_at]")
         .stream()
-        .filter(date -> !date.text().equals(firstDate))
-        .findFirst()
         .map(Element::text)
+        .filter(date -> !date.equals(firstDate))
+        .findFirst()
         .orElse(null);
    }
    
    @Override
    public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
-      Jsoup.parse(html).select("ul[class=songlist]>li").stream()
-        .filter(trackInfo -> trackInfo.select("div[class=date_box]").text()
-          .equals(downloadDate))
-        .flatMap(trackInfo -> trackInfo
-          .select("div[class=view_drop_block]>ul>li").stream())
-        .forEach(downloadInfo -> {
-           String downloadUrl = downloadInfo
-             .select("span[class=download_icon sprite ]>a")
-             .attr("href");
-           scrapedLinks.add(downloadUrl);
-           System.out.println(downloadInfo.select("p").text() + " | " + downloadUrl);
-        });
+      Elements trackInfos = Jsoup.parse(html).select(
+        "div[class=row-item row-item-album audio ]");
+      for (Element trackInfo : trackInfos) {
+         String trackDate = trackInfo.select("div[class=col-created_at]").first()
+           .text();
+         if (trackDate.equals(downloadDate)) {
+            String title = trackInfo.select("div[class=row-track]").text();
+            Elements tags = trackInfo.select("div[class=row-tags]>span");
+            for (Element tag : tags) {
+               String trackId = tag.attr("id").replace("New Releases_media_tag_", "");
+               String linkForApi = format(
+                 "https://api.bpmlatino.com/v1/media/{0}/download?crate=false", trackId);
+               List<String> info = getDownloadInfo(linkForApi, "latino");
+               String downloadUrl = info.get(0);
+               cookieForAPI = info.get(1);
+               String trackType = tag.text();
+               System.out.println(title + " (" + trackType + ") | "
+                 + downloadUrl);
+               scrapedLinks.add(downloadUrl);
+            }
+         }
+      }
    }
    
    @Override
    @SneakyThrows
    public void nextPage() {
-      List<WebElement> nextButtons = driver.findElements(By.className("next"));
-      for (WebElement nextButton : nextButtons) {
-         if (nextButton.getAttribute("title").equals("Next")) {
-            nextButton.click();
-            break;
-         }
-      }
+      List<WebElement> nextButtons = driver.findElements(By.tagName("li"));
+      nextButtons.get(nextButtons.size() - 2).click();
       Thread.sleep(10_000);
    }
 }

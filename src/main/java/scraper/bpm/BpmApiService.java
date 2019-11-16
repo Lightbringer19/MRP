@@ -7,6 +7,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.bson.Document;
 import utils.Logger;
 
 import java.util.ArrayList;
@@ -14,8 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.bson.Document.parse;
+
 public interface BpmApiService {
-   default List<String> getDownloadInfo(String url) {
+   default List<String> getDownloadInfo(String url, String bpmType) {
       try {
          @Cleanup CloseableHttpClient client = HttpClients.createDefault();
          HttpGet get = new HttpGet(url);
@@ -31,7 +35,15 @@ public interface BpmApiService {
            .map(header -> header.getElements()[0])
            .map(cookieElem -> cookieElem.getName() + "=" + cookieElem.getValue())
            .collect(Collectors.joining("; "));
-         String downloadURL = response.getFirstHeader("Location").getValue();
+         String downloadURL;
+         if (bpmType.equals("latino")) {
+            downloadURL =
+              ((Document) (parse(EntityUtils.toString(response.getEntity()))
+                .get("data")))
+                .get("url").toString();
+         } else {
+            downloadURL = response.getFirstHeader("Location").getValue();
+         }
          List<String> info = new ArrayList<>();
          info.add(downloadURL);
          info.add(cookieForAPI);

@@ -84,7 +84,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
                String trackId = downloadInfo.attr("id")
                  .replace("icon_download_", "");
                String linkForApi = "https://www.bpmsupreme.com/store/output_file/" + trackId;
-               List<String> info = getDownloadInfo(linkForApi);
+               List<String> info = getDownloadInfo(linkForApi, "");
                String downloadUrl = info.get(0);
                cookieForAPI = info.get(1);
                String trackType = downloadInfo.text();

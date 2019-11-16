@@ -187,7 +187,7 @@ task BpmSupremeScraper {
     dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '2.0.')
 }
 task BpmLatinoScraper {
-    dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '2.1.')
 }
 task RemixMp4Scraper {
     dependsOn newRelease('monitors.', 'RemixMp4_Scraper_Monitor', '2.0.')

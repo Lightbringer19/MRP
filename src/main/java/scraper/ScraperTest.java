@@ -12,20 +12,18 @@ import java.text.ParseException;
 public class ScraperTest {
    
    public static void main(String[] args) throws ParseException {
-      String html = FUtils.readFile(new File("Z:\\source.html"));
+      String html = FUtils.readFile(new File("source.html"));
       Document document = Jsoup.parse(html);
       
-      String firstDate = document.select("div[class=data]").first()
-        .select("strong").first().text()
-        .replace("New Version Added: ", "");
+      String firstDate = document.select("div[class=col-created_at]").first()
+        .text();
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("div[class=data]")
+        .select("div[class=col-created_at]")
         .stream()
-        .map(trackInfo -> trackInfo.select("strong").first().text()
-          .replace("New Version Added: ", ""))
+        .map(Element::text)
         .filter(date -> !date.equals(firstDate))
         .findFirst()
         .orElse(null);
@@ -33,18 +31,19 @@ public class ScraperTest {
       System.out.println(downloadDate);
       
       Elements trackInfos = document.select(
-        "div[class=content_data_downloads]>div[id*=id]");
+        "div[class=row-item row-item-album audio ]");
       for (Element trackInfo : trackInfos) {
-         String trackDate = trackInfo.select("div[class=data]").first()
-           .select("strong").first().text()
-           .replace("New Version Added: ", "");
+         String trackDate = trackInfo.select("div[class=col-created_at]").first()
+           .text();
          if (trackDate.equals(downloadDate)) {
-            String linkForRequest = trackInfo.select("a").first().attr("href");
-            System.out.println(linkForRequest);
-            String trackName = trackInfo.select("img").first().attr("alt");
-            // String downloadUrl = downloadInfo.attr("href");
-            // System.out.println(downloadUrl + " " + trackName);
-            System.out.println(trackName);
+            String title = trackInfo.select("div[class=row-track]").text();
+            Elements tags = trackInfo.select("div[class=row-tags]>span");
+            for (Element tag : tags) {
+               String id = tag.attr("id").replace("New Releases_media_tag_", "");
+               String trackType = tag.text();
+               System.out.println(title + " (" + trackType + ") | "
+                 + id);
+            }
          }
       }
    }

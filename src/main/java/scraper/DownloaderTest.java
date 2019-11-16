@@ -11,6 +11,7 @@ import scraper.bpm.BpmApiService;
 import utils.Constants;
 import utils.Logger;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class DownloaderTest implements DownloadInterface, BpmApiService {
@@ -33,9 +34,11 @@ public class DownloaderTest implements DownloadInterface, BpmApiService {
       // // };
       cookieForAPI = "";
       DownloaderTest downloaderTest = new DownloaderTest();
-      String location = downloaderTest.getLocation("");
-      String testLocation = downloaderTest.getLocation(location).replaceAll(" ", "%20");
-      System.out.println(testLocation);
+      List<String> latino = downloaderTest.getDownloadInfo("", "latino");
+      System.out.println(latino);
+      // String location = downloaderTest.getLocation("");
+      // String testLocation = downloaderTest.getLocation(location).replaceAll(" ", "%20");
+      // System.out.println(testLocation);
       
       // String downloadURL = "";
       // downloaderTest.downloadLinks(Collections.singletonList(downloadURL), "TEST");
