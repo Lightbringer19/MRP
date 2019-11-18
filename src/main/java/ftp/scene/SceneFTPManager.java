@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -40,32 +41,32 @@ public class SceneFTPManager extends Thread {
    public void run() {
       SceneFTPManager sceneFTPManager = new SceneFTPManager();
       Timer timer = new Timer();
-      TimerTask ftpCheckMp3 = new TimerTask() {
-         @Override
-         @SneakyThrows
-         public void run() {
-            sceneFTPManager.checkFtp("SCENE-MP3");
-         }
-      };
-      TimerTask ftpCheckFlac = new TimerTask() {
-         @Override
-         @SneakyThrows
-         public void run() {
-            sceneFTPManager.checkFtp("SCENE-FLAC");
-         }
-      };
-      // TimerTask ftpCheckMvid = new TimerTask() {
+      // TimerTask ftpCheckMp3 = new TimerTask() {
       //    @Override
       //    @SneakyThrows
       //    public void run() {
-      //       sceneFTPManager.checkFtp("SCENE-MVID");
+      //       sceneFTPManager.checkFtp("SCENE-MP3");
       //    }
       // };
+      // TimerTask ftpCheckFlac = new TimerTask() {
+      //    @Override
+      //    @SneakyThrows
+      //    public void run() {
+      //       sceneFTPManager.checkFtp("SCENE-FLAC");
+      //    }
+      // };
+      TimerTask ftpCheckMvid = new TimerTask() {
+         @Override
+         @SneakyThrows
+         public void run() {
+            sceneFTPManager.checkFtp("SCENE-MVID");
+         }
+      };
       long sec = 1000;
       long min = sec * 60;
-      timer.schedule(ftpCheckMp3, 0, min);
-      timer.schedule(ftpCheckFlac, 0, min);
-      // timer.schedule(ftpCheckMvid, 0, min);
+      // timer.schedule(ftpCheckMp3, 0, min);
+      // timer.schedule(ftpCheckFlac, 0, min);
+      timer.schedule(ftpCheckMvid, 0, min);
    }
    
    private void checkFtp(String categoryToDownload) {
@@ -181,15 +182,35 @@ public class SceneFTPManager extends Thread {
         releaseLocalPath + "/" + releaseFile.getName())) {
          Log.write("Preparing to Download: " + releaseFile.getName(),
            "SCENE_FTP");
+         AtomicBoolean val = new AtomicBoolean(false);
+         Thread thread = new Thread(new Runnable() {
+            @Override
+            @SneakyThrows
+            public void run() {
+               for (int i = 0; i < 300; i++) {
+                  sleep(1_000);
+                  if (i == 299) {
+                     Log.write("ABORT ABORT ABORT",
+                       "SCENE_FTP");
+                     ftpClient.abort();
+                  }
+                  if (val.get()) {
+                     break;
+                  }
+               }
+            }
+         });
+         thread.start();
          ftpClient.retrieveFile(releaseRemotePath
            + releaseFile.getName(), output);
+         val.set(true);
+         thread.join();
          Log();
          Log.write("File Downloaded: " + releaseFile.getName(),
            "SCENE_FTP");
-      } catch (FileNotFoundException e) {
+      } catch (FileNotFoundException | InterruptedException e) {
          Log.write(e, "SCENE_FTP");
       }
-      
    }
    
    private boolean toDownload(String releaseName, String releaseRemotePath) throws IOException {
@@ -200,13 +221,13 @@ public class SceneFTPManager extends Thread {
          boolean releaseNotInDB = mongoControl.ftpDownloadedCollection
            .find(eq("releaseName", releaseName))
            .first() == null;
+         // return releaseNotInDB;
          if (releaseNotInDB) {
-            return true;
-         } else {
             FTPFile[] ftpFiles = ftpClient.listFiles(releaseRemotePath, file ->
               file.getName().endsWith(".rar"));
             return ftpFiles.length <= 0;
          }
+         return false;
       }
    }
    
