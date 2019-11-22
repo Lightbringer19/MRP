@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.net.ftp.FTPFile;
 import org.bson.Document;
 import utils.CheckDate;
+import utils.FUtils;
 import utils.Logger;
 
 import java.io.*;
@@ -12,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
-import static scheduler.ScheduleWatcher.addToScheduleDB;
+import static utils.Constants.tagsDir;
 
 public class DJCFtp extends FtpManager {
    
@@ -73,7 +74,7 @@ public class DJCFtp extends FtpManager {
          logger.log("New Releases to Download: " + releaseNameCleaned);
          // create local release folder
          String releaseLocalPath =
-           "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
+           "E:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
              + "/" + CATEGORY_NAME + "/" + releaseNameCleaned;
          FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);
          boolean noSubFolders = true;
@@ -84,7 +85,7 @@ public class DJCFtp extends FtpManager {
                for (FTPFile file : ftpClient.listFiles(subFolder)) {
                   downloadFile(subFolder, subFolderLP, file);
                }
-               addToScheduleDB(new File(subFolderLP));
+               FUtils.writeFile(tagsDir, releaseName + ".json", subFolderLP);
                noSubFolders = false;
             } else {
                downloadFile(releaseRemotePath, releaseLocalPath, releaseFile);
@@ -96,7 +97,7 @@ public class DJCFtp extends FtpManager {
            .insertOne(new Document("releaseName", releaseNameCleaned));
          // ADD TO SCHEDULE
          if (noSubFolders) {
-            addToScheduleDB(new File(releaseLocalPath));
+            FUtils.writeFile(tagsDir, releaseName + ".json", releaseLocalPath);
          }
       }
    }

@@ -35,7 +35,7 @@ public class BeatportFtp extends FtpManager {
          logger.log("New Releases to Download: " + releaseName);
          // create local release folder
          String releaseLocalPath =
-           "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
+           "E:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
              + "/" + CATEGORY_NAME + "/" + releaseName;
          new File(releaseLocalPath).mkdirs();
          FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);

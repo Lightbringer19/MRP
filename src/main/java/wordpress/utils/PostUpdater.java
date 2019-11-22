@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import utils.Logger;
+import wordpress.PosterInterface;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,10 +26,8 @@ import static java.text.MessageFormat.format;
 import static org.bson.Document.parse;
 import static wordpress.Poster.MONGO_CONTROL;
 import static wordpress.Poster.MRP_AUTHORIZATION;
-import static wordpress.WP_API.createCategory;
-import static wordpress.WP_API.postAndGetResponse;
 
-public class PostUpdater {
+public class PostUpdater implements PosterInterface {
    
    private static Logger logger = new Logger("Post Updater");
    private static final Scanner IN = new Scanner(System.in);

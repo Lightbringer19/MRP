@@ -41,20 +41,20 @@ public class SceneFTPManager extends Thread {
    public void run() {
       SceneFTPManager sceneFTPManager = new SceneFTPManager();
       Timer timer = new Timer();
-      // TimerTask ftpCheckMp3 = new TimerTask() {
-      //    @Override
-      //    @SneakyThrows
-      //    public void run() {
-      //       sceneFTPManager.checkFtp("SCENE-MP3");
-      //    }
-      // };
-      // TimerTask ftpCheckFlac = new TimerTask() {
-      //    @Override
-      //    @SneakyThrows
-      //    public void run() {
-      //       sceneFTPManager.checkFtp("SCENE-FLAC");
-      //    }
-      // };
+      TimerTask ftpCheckMp3 = new TimerTask() {
+         @Override
+         @SneakyThrows
+         public void run() {
+            sceneFTPManager.checkFtp("SCENE-MP3");
+         }
+      };
+      TimerTask ftpCheckFlac = new TimerTask() {
+         @Override
+         @SneakyThrows
+         public void run() {
+            sceneFTPManager.checkFtp("SCENE-FLAC");
+         }
+      };
       TimerTask ftpCheckMvid = new TimerTask() {
          @Override
          @SneakyThrows
@@ -64,9 +64,9 @@ public class SceneFTPManager extends Thread {
       };
       long sec = 1000;
       long min = sec * 60;
-      // timer.schedule(ftpCheckMp3, 0, min);
-      // timer.schedule(ftpCheckFlac, 0, min);
-      timer.schedule(ftpCheckMvid, 0, min);
+      timer.schedule(ftpCheckMp3, 0, min);
+      timer.schedule(ftpCheckFlac, 0, min);
+      // timer.schedule(ftpCheckMvid, 0, min);
    }
    
    private void checkFtp(String categoryToDownload) {
@@ -148,7 +148,7 @@ public class SceneFTPManager extends Thread {
            "SCENE_FTP");
          // create local release folder
          String releaseLocalPath =
-           "Z:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
+           "E:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
              + "/" + category + "/" + releaseName;
          new File(releaseLocalPath).mkdirs();
          //download files

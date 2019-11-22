@@ -27,6 +27,10 @@ class BoxCom extends Thread {
    
    private static BoxSharedLink.Permissions permissions;
    
+   //add security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider
+   //to java.security in lib/security
+   // and add bc provider to lib/ext
+   
    BoxCom() {
       // FOLDER_2019 = new BoxFolder(GetClient(), TEST_FOLDER_ID);
       permissions = new BoxSharedLink.Permissions();
@@ -54,6 +58,7 @@ class BoxCom extends Thread {
    
    private static BoxFolder searchForFolder(BoxFolder parentFolder, String search) {
       do {
+         System.out.println(parentFolder.toString());
          for (BoxItem.Info itemInfo : parentFolder) {
             if (itemInfo instanceof Info) {
                Info folderInfo = (Info) itemInfo;
@@ -89,9 +94,10 @@ class BoxCom extends Thread {
          }
          FileUploader.WaitUntilTheEnd();
          // Get Links
-         GetLinkAndName(newFolder, folderToUpload);
+         getLinkAndName(newFolder, folderToUpload);
       } catch (Exception e) {
          Log.write("Exception in UploadAndGetLink: " + e, "Uploader");
+         Log.write(e, "Uploader");
       }
    }
    
@@ -107,7 +113,7 @@ class BoxCom extends Thread {
       }
    }
    
-   private void GetLinkAndName(BoxFolder folder, File folderToUpload) {
+   private void getLinkAndName(BoxFolder folder, File folderToUpload) {
       BoxSharedLink sharedLink = folder.createSharedLink(OPEN, null, permissions);
       
       Info folderInfo = folder.getInfo();
@@ -123,9 +129,10 @@ class BoxCom extends Thread {
       
       // write info to the file in Buffer
       String json = new Gson().toJson(infoFromBoxCom);
-      FUtils.writeFile(Constants.postDir + folderInfo.getParent().getName(),
-        folderName + ".json", json);
+      // FUtils.writeFile(Constants.postDir + folderInfo.getParent().getName(),
+      //   folderName + ".json", json);
       // new format for collector
-      //		FUtils.writeFile(Constants.collectorDir, folderName, json);
+      FUtils.writeFile(Constants.collectorDir + folderInfo.getParent().getName(),
+        folderName + ".json", json);
    }
 }

@@ -1,13 +1,16 @@
 package wordpress;
 
-import json.InfoForPost;
+import com.google.gson.Gson;
 import json.ResponseInfo;
-import json.TrackInfo;
 import json.WPPost;
+import json.db.InfoAboutRelease;
+import json.db.InfoAboutRelease.Track;
+import json.db.Release;
 import json.db.Task;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -23,44 +26,41 @@ import utils.FUtils;
 import utils.Log;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static collector.Collector.collect;
 import static com.mongodb.client.model.Filters.eq;
 import static wordpress.Poster.*;
 
-public class WP_API {
+public interface PosterInterface {
    
-   public static void main(String[] args) {
-   }
-   
-   static void post(File jsonFile) {
-      InfoForPost info = collect(jsonFile);
-      String htmlBodyForPost = buildHTML(info);
-      WPPost post = new WPPost(info.getReleaseName(), "publish",
-        getCategoryIDsForPost(info), htmlBodyForPost);
-      String linkToPost = createPostGetLinkToPost(post.toJson(), info.getReleaseName(),
+   default void post(String releaseName) {
+      Document releaseDoc = MONGO_CONTROL.releasesCollection
+        .find(eq("releaseName", releaseName)).first();
+      releaseDoc.remove("_id");
+      Release release = new Gson().fromJson(releaseDoc.toJson(), Release.class);
+      String htmlBodyForPost = buildHTML(release);
+      WPPost post = new WPPost(release.getReleaseName(), "publish",
+        getCategoryIDsForPost(release), htmlBodyForPost);
+      String linkToPost = createPostGetLinkToPost(post.toJson(), release.getReleaseName(),
         "https://myrecordpool.com/wp-json/wp/v2/posts",
         MRP_AUTHORIZATION);
       //update release in DB with Link
-      Document release = MONGO_CONTROL.releasesCollection
-        .find(eq("releaseName", info.getReleaseName())).first();
-      release.put("mrpPostLink", linkToPost);
-      ObjectId id = release.getObjectId("_id");
-      MONGO_CONTROL.releasesCollection.replaceOne((eq("_id", id)), release);
+      releaseDoc.put("mrpPostLink", linkToPost);
+      ObjectId id = releaseDoc.getObjectId("_id");
+      MONGO_CONTROL.releasesCollection.replaceOne((eq("_id", id)), releaseDoc);
       // add REPOST TASK to que
       Task task = new Task("repost", id.toString());
       MONGO_CONTROL.tasksCollection.insertOne(task.toDoc());
-      Log.write("Posted: " + info.getReleaseName() + "| In: " + info.getPostCategory(),
+      Log.write("Posted: " + release.getReleaseName() + "| In: " + release.getCategory(),
         "Poster");
    }
    
-   static String createPostGetLinkToPost(String JSON_BODY, String releaseName,
-                                         String apiURI, String authorizationHeader) {
+   default String createPostGetLinkToPost(String JSON_BODY, String releaseName,
+                                          String apiURI, String authorizationHeader) {
       try {
          while (true) {
             ResponseInfo response = postAndGetResponse(JSON_BODY, apiURI, authorizationHeader);
@@ -81,8 +81,8 @@ public class WP_API {
    }
    
    @SneakyThrows
-   public static ResponseInfo postAndGetResponse(String JSON_BODY, String apiURI,
-                                                 String authorizationHeader) {
+   default ResponseInfo postAndGetResponse(String JSON_BODY, String apiURI,
+                                           String authorizationHeader) {
       @Cleanup CloseableHttpClient client = HttpClients.createDefault();
       HttpPost httpPost = new HttpPost(apiURI);
       httpPost.addHeader("Authorization", authorizationHeader);
@@ -93,44 +93,45 @@ public class WP_API {
       return new ResponseInfo(postResponse.getStatusLine().getStatusCode(), jsonResponse);
    }
    
-   private static String buildHTML(InfoForPost info) {
+   default String buildHTML(Release info) {
       String html_base = FUtils.readFile(new File(Constants.filesDir + "post.html"));
       
-      html_base = html_base.replace("xartlinkx", info.getArtLink());
+      InfoAboutRelease infoAboutRelease = info.getInfoAboutRelease();
+      html_base = html_base.replace("xartlinkx", infoAboutRelease.getLinkToArt());
       html_base = html_base.replace("xreleasenamex", info.getReleaseName());
-      html_base = html_base.replace("xartistx", info.getArtist());
-      html_base = html_base.replace("xalbumx", info.getAlbum());
-      html_base = html_base.replace("xgenrex", info.getGenre());
-      html_base = html_base.replace("xreleasedx", info.getReleased());
-      html_base = html_base.replace("xtracksx", info.getTracks());
-      html_base = html_base.replace("xplaytimex", info.getPlaytime());
-      html_base = html_base.replace("xgroupx", info.getGroup());
-      html_base = html_base.replace("xformatx", info.getFormat());
-      html_base = html_base.replace("xbitratex", info.getBitrate());
-      html_base = html_base.replace("xsampleratex", info.getSample_Rate());
-      html_base = html_base.replace("xsizex", info.getSize());
+      html_base = html_base.replace("xartistx", infoAboutRelease.getArtist());
+      html_base = html_base.replace("xalbumx", infoAboutRelease.getAlbum());
+      html_base = html_base.replace("xgenrex", infoAboutRelease.getGenre());
+      html_base = html_base.replace("xreleasedx", infoAboutRelease.getReleased());
+      html_base = html_base.replace("xtracksx", infoAboutRelease.getNumberOfTracks());
+      html_base = html_base.replace("xplaytimex", infoAboutRelease.getPlaytime());
+      html_base = html_base.replace("xgroupx", infoAboutRelease.getGroup());
+      html_base = html_base.replace("xformatx", infoAboutRelease.getFormat());
+      html_base = html_base.replace("xbitratex", infoAboutRelease.getBitrate());
+      html_base = html_base.replace("xsampleratex", infoAboutRelease.getSampleRate());
+      html_base = html_base.replace("xsizex", infoAboutRelease.getSize());
       
-      if (info.getPostCategory().contains("RECORDPOOL")) {
-         String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(), info.getLink());
+      if (info.getCategory().contains("RECORDPOOL")) {
+         String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(),
+           info.getBoxComDownloadLink());
          String template = "https://myrecordpool.com/?smd_process_download=1&download_id={0}";
          String link = MessageFormat.format(template, downloadID);
          html_base = html_base.replace("xlinkx", link);
       } else {
-         html_base = html_base.replace("xlinkx", info.getLink());
+         html_base = html_base.replace("xlinkx", info.getBoxComDownloadLink());
       }
       
-      HashMap<Integer, TrackInfo> TrackList = info.getTrackList();
+      List<Track> TrackList = infoAboutRelease.getTrackList();
       StringBuilder trackList = new StringBuilder();
       trackList.append("\r\n");
-      for (HashMap.Entry<Integer, TrackInfo> track : TrackList.entrySet()) {
-         int key = track.getKey() + 1;
-         TrackInfo trackInfo = track.getValue();
+      for (int i = 0; i < TrackList.size(); i++) {
+         Track track = TrackList.get(i);
          trackList.append("<tr>");
          trackList.append("\r\n");
-         append(trackList, Integer.toString(key));
-         append(trackList, trackInfo.getTitle());
-         append(trackList, trackInfo.getArtist());
-         append(trackList, trackInfo.getTime());
+         append(trackList, Integer.toString(i + 1));
+         append(trackList, track.getTitle());
+         append(trackList, track.getArtist());
+         append(trackList, track.getTrackDuration());
          trackList.append("</tr>");
       }
       html_base = html_base.replace("xtracklistx", trackList.toString());
@@ -139,9 +140,9 @@ public class WP_API {
    }
    
    @SuppressWarnings("unchecked")
-   private static Integer[] getCategoryIDsForPost(InfoForPost info) {
+   default Integer[] getCategoryIDsForPost(Release info) {
       String releaseName = info.getReleaseName();
-      String category = info.getPostCategory();
+      String category = info.getCategory();
       Map<String, String> categoriesAndIDs;
       List<Integer> categories = new ArrayList<>();
       switch (category) {
@@ -173,9 +174,9 @@ public class WP_API {
       return categories.toArray(new Integer[0]);
    }
    
-   private static void setCategoriesForBeatAndScene(InfoForPost info, List<Integer> categories) {
-      if (!info.getGenre().equals("Mixed")) {
-         String genreFiltered = info.getGenre()
+   default void setCategoriesForBeatAndScene(Release info, List<Integer> categories) {
+      if (!info.getInfoAboutRelease().getGenre().equals("Mixed")) {
+         String genreFiltered = info.getInfoAboutRelease().getGenre()
            .replaceAll("\\)", "").replaceAll("\\(", "")
            .replaceAll("^[0-9]", "").trim();
          if (!genreFiltered.equals("")) {
@@ -191,7 +192,7 @@ public class WP_API {
    }
    
    @SuppressWarnings("unchecked")
-   private static void setCategories(String releaseName, List<Integer> categories, String category) {
+   default void setCategories(String releaseName, List<Integer> categories, String category) {
       Map<String, String> categoriesAndIDs;
       categoriesAndIDs = (Map<String, String>)
         MONGO_CONTROL.categoriesCollection
@@ -207,7 +208,7 @@ public class WP_API {
    
    @SuppressWarnings("Duplicates")
    @SneakyThrows
-   public static Integer createCategory(String category, String parentId) {
+   default Integer createCategory(String category, String parentId) {
       String apiURI = "https://myrecordpool.com/wp-json/wp/v2/categories";
       String categoryID;
       while (true) {
@@ -235,10 +236,32 @@ public class WP_API {
       }
    }
    
-   private static void append(StringBuilder trackList, String valueString) {
+   default void append(StringBuilder trackList, String valueString) {
       trackList.append("<td>");
       trackList.append(valueString);
       trackList.append("</td>");
       trackList.append("\r\n");
+   }
+   
+   @SneakyThrows
+   static String getClean(String url, String cookie) {
+      @Cleanup CloseableHttpClient client = HttpClients.createDefault();
+      HttpGet get = new HttpGet(url);
+      get.setHeader("cookie", cookie);
+      @Cleanup CloseableHttpResponse response = client.execute(get);
+      return EntityUtils.toString(response.getEntity());
+   }
+   
+   static String postClean(String url, String cookie, String body) throws IOException {
+      @Cleanup CloseableHttpClient client = HttpClients.createDefault();
+      
+      HttpPost get = new HttpPost(url);
+      get.setHeader("cookie", cookie);
+      
+      get.addHeader("Content-Type", " application/x-www-form-urlencoded; charset=UTF-8");
+      get.setEntity(new StringEntity(body, ContentType.APPLICATION_FORM_URLENCODED));
+      @Cleanup CloseableHttpResponse response = client.execute(get);
+      
+      return EntityUtils.toString(response.getEntity());
    }
 }

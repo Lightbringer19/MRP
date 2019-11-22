@@ -8,6 +8,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import utils.CheckDate;
 import utils.CustomExecutor;
+import utils.FUtils;
 import utils.Logger;
 
 import java.io.File;
@@ -17,7 +18,7 @@ import java.util.List;
 
 import static java.net.URLDecoder.decode;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static scheduler.ScheduleWatcher.addToScheduleDB;
+import static utils.Constants.tagsDir;
 
 @SuppressWarnings("ALL")
 public interface DownloadInterface {
@@ -25,7 +26,7 @@ public interface DownloadInterface {
    default void downloadLinks(List<String> scrapedLinks, String releaseName) {
       getLogger().log("Downloading release: " + releaseName);
       String releaseFolderPath =
-        "Z://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
+        "E://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
           "/RECORDPOOL/" + releaseName + "/";
       new File(releaseFolderPath).mkdirs();
       CustomExecutor downloadMaster = new CustomExecutor(15);
@@ -35,8 +36,9 @@ public interface DownloadInterface {
         .forEach(downloadMaster::submit);
       downloadMaster.WaitUntilTheEnd();
       getLogger().log("Release Downloaded: " + releaseName);
-      addToScheduleDB(new File(releaseFolderPath));
-      getLogger().log("Release Scheduled: " + releaseName);
+      FUtils.writeFile(tagsDir.replace("\\Scrapers", ""), releaseName + ".json",
+        releaseFolderPath);
+      getLogger().log("Release added to tag queue: " + releaseName);
    }
    
    @SuppressWarnings("Duplicates")

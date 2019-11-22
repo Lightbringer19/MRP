@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static wordpress.ProxyHttp.getClean;
+import static wordpress.PosterInterface.getClean;
 
 public class ClubDJScraper extends Scraper {
    

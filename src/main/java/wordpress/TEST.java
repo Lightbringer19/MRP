@@ -1,6 +1,5 @@
 package wordpress;
 
-import json.ResponseInfo;
 import json.TrackInfo;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -11,21 +10,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import static wordpress.Poster.MRP_AUTHORIZATION;
-import static wordpress.WP_API.postAndGetResponse;
-
 @Log
-class TEST {
+class TEST implements PosterInterface {
    @SneakyThrows
    public static void main(String[] args) {
       String nfoFilePath = "gfvid-geim6-480p.nfo";
@@ -92,23 +84,24 @@ class TEST {
       System.out.println(EntityUtils.toString(response.getEntity()));
    }
    
-   @SuppressWarnings("Duplicates")
-   public static String createCategory(String category, String parentId) throws ParseException {
-      String apiURI = "https://myrecordpool.com/wp-json/wp/v2/categories";
-      ResponseInfo responseInfo = postAndGetResponse(new Document()
-          .append("name", category).append("parent", parentId).toJson(), apiURI,
-        MRP_AUTHORIZATION);
-      String categoryID = null;
-      if (responseInfo.getCode() == 400) {
-         categoryID = ((JSONObject) ((JSONObject) new JSONParser()
-           .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
-         System.out.println("Category found: " + category + " ID: " + categoryID);
-         
-      } else if (responseInfo.getCode() == 201) {
-         categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
-           .get("id").toString();
-         System.out.println("Category created: " + category + " ID: " + categoryID);
-      }
-      return categoryID;
-   }
+   // @Override
+   // @SuppressWarnings("Duplicates")
+   // public String createCategory(String category, String parentId) throws ParseException {
+   //    String apiURI = "https://myrecordpool.com/wp-json/wp/v2/categories";
+   //    ResponseInfo responseInfo = postAndGetResponse(new Document()
+   //        .append("name", category).append("parent", parentId).toJson(), apiURI,
+   //      MRP_AUTHORIZATION);
+   //    String categoryID = null;
+   //    if (responseInfo.getCode() == 400) {
+   //       categoryID = ((JSONObject) ((JSONObject) new JSONParser()
+   //         .parse(responseInfo.getJsonBody())).get("data")).get("term_id").toString();
+   //       System.out.println("Category found: " + category + " ID: " + categoryID);
+   //
+   //    } else if (responseInfo.getCode() == 201) {
+   //       categoryID = new Document(Document.parse(responseInfo.getJsonBody()))
+   //         .get("id").toString();
+   //       System.out.println("Category created: " + category + " ID: " + categoryID);
+   //    }
+   //    return categoryID;
+   // }
 }

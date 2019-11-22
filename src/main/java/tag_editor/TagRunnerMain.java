@@ -10,7 +10,6 @@ import java.io.File;
 
 import static tag_editor.TagEditor.editMP3;
 import static utils.Constants.tagsDir;
-import static wordpress.Poster.getRecordPoolCategory;
 
 public class TagRunnerMain extends Thread {
    @SneakyThrows
@@ -43,7 +42,17 @@ public class TagRunnerMain extends Thread {
    private static void editRecordPool(File infoFile, File folderToEdit, String category) {
       // Edit tags in folder
       Log.write("Editing Folder: " + folderToEdit.getName(), "Tagger");
-      category = getRecordPoolCategory(folderToEdit, category);
+      File[] RecordPoolFolder = folderToEdit.listFiles();
+      for (File RPfile : RecordPoolFolder) {
+         if (RPfile.getName().toLowerCase().endsWith(".mp3")) {
+            category = "RECORDPOOL MUSIC";
+            break;
+         }
+         if (RPfile.getName().toLowerCase().endsWith(".mp4")) {
+            category = "RECORDPOOL VIDEOS";
+            break;
+         }
+      }
       if (category.equals("RECORDPOOL MUSIC")) {
          for (File file : folderToEdit.listFiles()) {
             if (file.getName().toLowerCase().endsWith(".mp3")) {

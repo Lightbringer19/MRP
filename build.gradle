@@ -54,7 +54,8 @@ dependencies {
 
 class MyShadow extends ShadowJar {
     MyShadow() {
-        destinationDir = new File(System.getProperty("user.home") + File.separatorChar + "Documents")
+//        destinationDir = new File(System.getProperty("user.home") + File.separatorChar + "Documents")
+        destinationDir = new File("D:\\Coding\\GitHub\\myrecordpool\\GDS_SERVER")
         classifier = null
 //        minimize()
         from(project.convention.getPlugin(JavaPluginConvention).sourceSets.main.output)
@@ -122,54 +123,39 @@ task MongoDB {
     dependsOn newRelease('mongodb.', 'mongo', '0.0.')
 }
 // AUTOMATION
-task Manual_Scheduler {
-    dependsOn newRelease('monitors.', 'Manual_Scheduler_Monitor', '2.0.')
-}
-//task Uploader {
-//    dependsOn newRelease('monitors.', 'Uploader_Monitor', '3.1.')
-//}
-task UploaderConsole {
-    dependsOn newRelease('boxcom.', 'Uploader', '0.0.')
+task Uploader {
+    dependsOn newRelease('monitors.', 'Uploader_Monitor', '4.0.')
 }
 task Poster {
-    dependsOn newRelease('monitors.', 'Poster_Monitor', '3.9.')
+    dependsOn newRelease('monitors.', 'Poster_Monitor', '4.0.')
 }
 task Reposter {
     dependsOn newRelease('monitors.', 'Reposter_Monitor', '3.3.')
 }
 task Tagger {
-    dependsOn newRelease('monitors.', 'Tagger_Monitor', '3.3.')
+    dependsOn newRelease('monitors.', 'Tagger_Monitor', '4.0.')
+}
+task Collector {
+    dependsOn newRelease('monitors.', 'Collector_Monitor', '1.0.')
+}
+task NasAcrhiver {
+    dependsOn newRelease('monitors.', 'NasArchiver_Monitor', '1.0.')
 }
 task SceneFTP {
-    dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '1.3.')
+    dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '2.0.')
 }
 task BeatportFtp {
-    dependsOn newRelease('monitors.', 'Beatport_FTP_Monitor', '1.1.')
+    dependsOn newRelease('monitors.', 'Beatport_FTP_Monitor', '2.0.')
 }
 task DJCFtp {
-    dependsOn newRelease('monitors.', 'DJC_FTP_Monitor', '1.2.')
+    dependsOn newRelease('monitors.', 'DJC_FTP_Monitor', '2.0.')
 }
 task ScheduleWatcher {
-    dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '2.0.')
-}
-task PostUpdaterApp {
-    dependsOn newRelease('wordpress.', 'PostUpdater', '2.0.')
-}
-task DownloaderCustom {
-    dependsOn newRelease('scraper.downloader.', 'CustomDownloader', '1.1.')
-}
-task PostDeleter {
-    dependsOn newRelease('wordpress.', 'PostRemover', '1.0.')
-}
-task ReleaseAdder {
-    dependsOn newRelease('wordpress.utils.', 'ReleaseChecker', '1.0.')
-}
-task CategoryRemover {
-    dependsOn newRelease('wordpress.', 'CategoryDeleter', '2.0.')
+    dependsOn newRelease('monitors.', 'Schedule_Watcher_Monitor', '3.0.')
 }
 //SCRAPERS
 task DMPScraper {
-    dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '1.2.')
+    dependsOn newRelease('monitors.', 'DMP_Scraper_Monitor', '2.0.')
 }
 task EwScraper {
     dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '3.0.')
@@ -187,7 +173,7 @@ task BpmSupremeScraper {
     dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '2.0.')
 }
 task BpmLatinoScraper {
-    dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '2.1.')
+    dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '2.0.')
 }
 task RemixMp4Scraper {
     dependsOn newRelease('monitors.', 'RemixMp4_Scraper_Monitor', '2.0.')
@@ -223,32 +209,43 @@ task ClubDJScraper {
     dependsOn newRelease('monitors.', 'ClubDJ_Scraper_Monitor', '1.0.')
 }
 task BuildScrapers {
-    dependsOn EwScraper
-    dependsOn Mp3PoolScraper
-    dependsOn BeatJunkiesScraper
-    dependsOn HeadlineScraper
     dependsOn BpmSupremeScraper
     dependsOn BpmLatinoScraper
-//    dependsOn RemixMp4Scraper
-    dependsOn DaleMBScraper
-    dependsOn HeavyHitsScraper
-    dependsOn CrateConnectScraper
-    dependsOn MaletaDvjScraper
-    dependsOn MassPoolScraper
     dependsOn AvDistrictScraper
     dependsOn SmashVisionScraper
-    dependsOn VjStreetScraper
-//    dependsOn ProVideo4DJsScraper
+    dependsOn EwScraper
+    dependsOn MaletaDvjScraper
     dependsOn ClubDJScraper
+
+//    dependsOn DMPScraper
+    dependsOn HeadlineScraper
+    dependsOn CrateConnectScraper
+    dependsOn HeavyHitsScraper
+    dependsOn Mp3PoolScraper
+
+//    dependsOn BeatJunkiesScraper
+//    dependsOn DaleMBScraper
+//    dependsOn MassPoolScraper
+//    dependsOn VjStreetScraper
 }
 
 task BuildPosters {
     dependsOn Poster
     dependsOn Reposter
-    dependsOn PostUpdaterApp
 }
 
 task BuildAll {
-    dependsOn DownloaderCustom
-    dependsOn BpmSupremeScraper
+
+    dependsOn BuildScrapers
+
+    dependsOn Uploader
+    dependsOn Poster
+    dependsOn Reposter
+    dependsOn Tagger
+    dependsOn SceneFTP
+    dependsOn BeatportFtp
+    dependsOn DJCFtp
+    dependsOn ScheduleWatcher
+    dependsOn NasAcrhiver
+
 }

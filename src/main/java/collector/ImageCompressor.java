@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Iterator;
 
-class Compressor {
+class ImageCompressor {
    
    static File compress(File imageFile) {
       File compressedImageFile = imageFile;

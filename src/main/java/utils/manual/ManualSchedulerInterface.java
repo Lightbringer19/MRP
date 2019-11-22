@@ -7,7 +7,6 @@ import org.bson.Document;
 import java.io.File;
 
 import static com.mongodb.client.model.Filters.eq;
-import static scheduler.ScheduleWatcher.addToScheduleDB;
 
 public interface ManualSchedulerInterface {
    
@@ -19,7 +18,7 @@ public interface ManualSchedulerInterface {
       String releaseName = release.getName();
       if (releaseNotInDB(RELEASES_COLLECTION, releaseName)) {
          if (releaseNotInDB(SCHEDULE_COLLECTION, releaseName)) {
-            addToScheduleDB(release);
+            // addToScheduleDB(release);
          } else {
             System.out.println("Release in Schedule Queue: " + releaseName);
          }

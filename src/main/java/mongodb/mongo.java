@@ -6,6 +6,8 @@ import org.bson.Document;
 import reactor.core.publisher.Flux;
 import utils.Logger;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class mongo extends Thread {
    
    public static MongoControl MONGO_CONTROL;
@@ -13,6 +15,11 @@ public class mongo extends Thread {
    
    public static void main(String[] args) {
       MONGO_CONTROL = new MongoControl();
+      Document releaseName = MONGO_CONTROL.releasesCollection.find(
+        eq("releaseName", "Armando Quattrone-Calabria-IT-CD-FLAC-2018-NBFLAC"))
+        .first();
+      
+      System.out.println(releaseName.toString());
       // from MRP to POOLS
       // String sourceDatabaseName = "MRP";
       // String targetDatabaseName = "POOLS";

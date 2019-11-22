@@ -17,9 +17,9 @@ import java.io.InputStream;
 
 import static wordpress.Poster.MRP_AUTHORIZATION;
 
-class API_Image_Uploader {
+class ImageUploader {
    
-   static String upload(File imageFile) {
+   static String uploadImage(File imageFile) {
       try {
          while (true) {
             CloseableHttpClient client = HttpClients.createDefault();
@@ -40,7 +40,7 @@ class API_Image_Uploader {
             if (response.getStatusLine().getStatusCode() != 201) {
                System.out.println(response.getStatusLine());
                Log.write("Not uploaded: " + imageFile.getName() + " " +
-                 response.getStatusLine(), "Poster");
+                 response.getStatusLine(), "Collector");
                System.out.println(jsonResponse);
                Thread.sleep(5000);
             } else {
@@ -50,7 +50,7 @@ class API_Image_Uploader {
             }
          }
       } catch (Exception e) {
-         Log.write("Exception uploadIMAGE: " + e, "Poster");
+         Log.write("Exception uploadIMAGE: " + e, "Collector");
          Log.write(e, "API_IMAGE_Errors_Trace");
       }
       return null;

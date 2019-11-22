@@ -1,7 +1,7 @@
 package utils;
 
 public class Constants {
-   private final static String workDir = System.getProperty("user.dir") + "\\";
+   public final static String workDir = System.getProperty("user.dir") + "\\";
    public static final String filesDir = workDir + "Files\\";
    public static final String postDir = filesDir + "POST\\";
    public static final String uploadDir = filesDir + "UPLOAD\\";
@@ -11,5 +11,6 @@ public class Constants {
    public static final String scrapeDir = filesDir + "SCRAPED\\";
    public static final String repostDir = filesDir + "REPOST\\";
    public static final String scheduleDir = filesDir + "SCHEDULE\\";
+   public static final String archiveDir = filesDir + "ARCHIVE\\";
    
 }

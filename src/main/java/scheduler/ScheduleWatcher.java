@@ -6,39 +6,23 @@ import org.bson.Document;
 import utils.FUtils;
 import utils.Log;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.mongodb.client.model.Filters.lt;
-import static utils.Constants.tagsDir;
+import static utils.Constants.postDir;
 
 public class ScheduleWatcher extends Thread {
    
-   private static final SimpleDateFormat DATE_FORMAT =
+   public static final SimpleDateFormat DATE_FORMAT =
      new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
    private static MongoControl MONGO_CONTROL;
    
    public ScheduleWatcher() {
       MONGO_CONTROL = new MongoControl();
-   }
-   
-   public static void addToScheduleDB(File folderToSchedule) {
-      if (MONGO_CONTROL == null) {
-         MONGO_CONTROL = new MongoControl();
-      }
-      Calendar cal = Calendar.getInstance();
-      cal.add(Calendar.MINUTE, ThreadLocalRandom.current().nextInt(480, 720));
-      String scheduleTime = DATE_FORMAT.format(cal.getTime());
-      Document scheduleTask = new Document()
-        .append("releaseName", folderToSchedule.getName())
-        .append("path", folderToSchedule.getAbsolutePath())
-        .append("scheduleTime", scheduleTime)
-        .append("scheduleTimeMillis", cal.getTime().getTime());
-      Log.write("Scheduling the Release: " + folderToSchedule.getName()
-        + " To Time: " + scheduleTime, "SCHEDULER");
-      MONGO_CONTROL.scheduleCollection.insertOne(scheduleTask);
    }
    
    @Override
@@ -49,7 +33,7 @@ public class ScheduleWatcher extends Thread {
          @Override
          @SneakyThrows
          public void run() {
-            scheduleWatcher.addReleaseToTagQue();
+            scheduleWatcher.postRelease();
          }
       };
       long sec = 1000;
@@ -58,16 +42,15 @@ public class ScheduleWatcher extends Thread {
       timer.schedule(addReleaseToTagQue, 0, min);
    }
    
-   private void addReleaseToTagQue() {
-      Document releaseToAdd = MONGO_CONTROL.scheduleCollection
+   private void postRelease() {
+      Document releaseToPost = MONGO_CONTROL.scheduleCollection
         .find(lt("scheduleTimeMillis", new Date().getTime())).first();
-      if (releaseToAdd != null) {
-         String releaseName = releaseToAdd.get("releaseName").toString();
-         String path = releaseToAdd.get("path").toString();
-         Log.write("Adding Release to Tag Que: " + releaseName,
+      if (releaseToPost != null) {
+         String releaseName = releaseToPost.get("releaseName").toString();
+         Log.write("Adding Release to Post Que: " + releaseName,
            "SCHEDULER");
-         FUtils.writeFile(tagsDir, releaseName + ".json", path);
-         MONGO_CONTROL.scheduleCollection.deleteOne(releaseToAdd);
+         FUtils.writeFile(postDir, releaseName, "");
+         MONGO_CONTROL.scheduleCollection.deleteOne(releaseToPost);
       }
    }
 }

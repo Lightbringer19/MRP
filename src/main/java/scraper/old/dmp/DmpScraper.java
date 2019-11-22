@@ -15,10 +15,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import utils.CheckDate;
-import utils.CustomExecutor;
-import utils.Log;
-import utils.Logger;
+import utils.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,9 +25,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
-import static scheduler.ScheduleWatcher.addToScheduleDB;
 import static scraper.old.dmp.DmpApiService.getDownloadUrl;
 import static scraper.old.dmp.DmpDriver.cookieForAPI;
+import static utils.Constants.tagsDir;
 
 class DmpScraper {
    
@@ -103,7 +100,7 @@ class DmpScraper {
       String releaseName = "Digital Music Pool " + dateForReleaseName;
       new Logger("DMP Scraper").log("Downloading release: " + releaseName);
       String releaseFolderPath =
-        "Z://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
+        "E://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
           "/RECORDPOOL/" + releaseName + "/";
       new File(releaseFolderPath).mkdirs();
       CustomExecutor downloadMaster = new CustomExecutor(15);
@@ -113,7 +110,8 @@ class DmpScraper {
         .forEach(downloadMaster::submit);
       downloadMaster.WaitUntilTheEnd();
       new Logger("DMP Scraper").log("Release Downloaded: " + releaseName);
-      addToScheduleDB(new File(releaseFolderPath));
+      FUtils.writeFile(tagsDir.replace("\\Scrapers", ""),
+        releaseName + ".json", releaseFolderPath);
       new Logger("DMP Scraper").log("Release Scheduled: " + releaseName);
    }
    

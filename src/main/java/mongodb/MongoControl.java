@@ -42,6 +42,7 @@ public class MongoControl {
       
       //mainDB
       mrpDB = mongoClient.getDatabase("MRP");
+   
       releasesCollection = mrpDB.getCollection("releases");
       tasksCollection = mrpDB.getCollection("tasks");
       categoriesCollection = mrpDB.getCollection("categories");

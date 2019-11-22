@@ -14,26 +14,26 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import utils.CheckDate;
 import utils.Log;
+import wordpress.PosterInterface;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
-import static wordpress.WP_API.postAndGetResponse;
 
-public class Reposter extends Thread {
+public class Reposter extends Thread implements PosterInterface {
    
    private static String AUTHORIZATION_HEADER;
    private static String mainCategory;
    private static MongoControl mongoControl;
    
-   public static void main(String[] args) {
-      repostMain();
-   }
+   // public static void main(String[] args) {
+   //    repostMain();
+   // }
    
    @SneakyThrows
-   private static void repostMain() {
+   private void repostMain() {
       Thread.sleep(1000);
       Log.write(CheckDate.getNowTime() + " Reposter Start", "Reposter");
       YamlConfig yamlConfig = new YamlConfig();
@@ -119,8 +119,8 @@ public class Reposter extends Thread {
       }
    }
    
-   private static void setCategoriesLists(Release release, List<String> categoriesForBlog,
-                                          List<Integer> categoriesIDList) throws ParseException {
+   private void setCategoriesLists(Release release, List<String> categoriesForBlog,
+                                   List<Integer> categoriesIDList) throws ParseException {
       categoriesForBlog.add(mainCategory);
       categoriesIDList.add(getOrCreateCategory(mainCategory));
       if (mainCategory.contains("SCENE")) {
@@ -143,7 +143,7 @@ public class Reposter extends Thread {
    }
    
    @SneakyThrows
-   private static Integer getOrCreateCategory(String categoryToFind) {
+   private Integer getOrCreateCategory(String categoryToFind) {
       String apiURI = "https://recordpoolmusic.com/wp-json/wp/v2/categories";
       if (mainCategory.contains("SCENE")) {
          apiURI = apiURI.replace("recordpoolmusic", "scenedownload");

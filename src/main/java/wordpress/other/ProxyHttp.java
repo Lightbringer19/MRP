@@ -1,7 +1,6 @@
-package wordpress;
+package wordpress.other;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -92,28 +91,6 @@ public class ProxyHttp {
       String HTMLResponse = EntityUtils.toString(response.getEntity());
       
       return HTMLResponse;
-   }
-   
-   @SneakyThrows
-   public static String getClean(String url, String cookie) {
-      @Cleanup CloseableHttpClient client = HttpClients.createDefault();
-      HttpGet get = new HttpGet(url);
-      get.setHeader("cookie", cookie);
-      @Cleanup CloseableHttpResponse response = client.execute(get);
-      return EntityUtils.toString(response.getEntity());
-   }
-   
-   public static String postClean(String url, String cookie, String body) throws IOException {
-      @Cleanup CloseableHttpClient client = HttpClients.createDefault();
-      
-      HttpPost get = new HttpPost(url);
-      get.setHeader("cookie", cookie);
-      
-      get.addHeader("Content-Type", " application/x-www-form-urlencoded; charset=UTF-8");
-      get.setEntity(new StringEntity(body, ContentType.APPLICATION_FORM_URLENCODED));
-      @Cleanup CloseableHttpResponse response = client.execute(get);
-      
-      return EntityUtils.toString(response.getEntity());
    }
    
 }
