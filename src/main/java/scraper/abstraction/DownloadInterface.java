@@ -6,8 +6,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import utils.CheckDate;
-import utils.CustomExecutor;
 import utils.FUtils;
 import utils.Logger;
 
@@ -29,12 +31,14 @@ public interface DownloadInterface {
         "E://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
           "/RECORDPOOL/" + releaseName + "/";
       new File(releaseFolderPath).mkdirs();
-      CustomExecutor downloadMaster = new CustomExecutor(15);
-      scrapedLinks.stream()
-        .map(downloadUrl -> new Thread(() ->
-          downloadFile(downloadUrl, releaseFolderPath)))
-        .forEach(downloadMaster::submit);
-      downloadMaster.WaitUntilTheEnd();
+      Scheduler scheduler = Schedulers.newParallel("Download", 15);
+      Flux.fromIterable(scrapedLinks)
+        .parallel()
+        .runOn(scheduler)
+        .doOnNext(downloadUrl -> downloadFile(downloadUrl, releaseFolderPath))
+        .sequential()
+        .blockLast();
+      scheduler.dispose();
       getLogger().log("Release Downloaded: " + releaseName);
       FUtils.writeFile(tagsDir.replace("\\Scrapers", ""), releaseName + ".json",
         releaseFolderPath);

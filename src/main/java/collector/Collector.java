@@ -77,7 +77,7 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
                               sleep(5000);
                            }
                         }
-                        FileUtils.deleteDirectory(releaseFolder);
+                        deleteRelease(releaseFolder);
                         collectJsonFile.delete();
                      } else {
                         logger.log("Not SRC or gFViD group: " + collectJsonFile.getName()
@@ -89,7 +89,7 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
                   } else {
                      logger.log("Deleted(no audio): " + collectJsonFile.getName()
                        + "| In: " + category);
-                     FileUtils.deleteDirectory(releaseFolder);
+                     deleteRelease(releaseFolder);
                      collectJsonFile.delete();
                   }
                }
@@ -98,14 +98,28 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
             Sleep();
          } catch (Exception e) {
             logger.log(CheckDate.getNowTime() + " EXCEPTION " + e);
+            logger.log(e);
             Sleep();
          }
       }
       
    }
    
+   private void deleteRelease(File releaseFolder) {
+      logger.log("Deleting directory: " + releaseFolder.getName());
+      while (true) {
+         try {
+            FileUtils.deleteDirectory(releaseFolder);
+            logger.log("Deleted: " + releaseFolder.getName());
+            break;
+         } catch (IOException e) {
+            logger.log(e);
+            Sleep();
+         }
+      }
+   }
+   
    public InfoForPost collect(File infoJsonFile) {
-      
       String readFile = FUtils.readFile(infoJsonFile);
       Gson gson = new Gson();
       InfoFromBoxCom infoFromBoxCom = gson.fromJson(readFile, InfoFromBoxCom.class);

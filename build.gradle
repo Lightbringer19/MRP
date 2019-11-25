@@ -139,9 +139,6 @@ task Tagger {
 task Collector {
     dependsOn newRelease('monitors.', 'Collector_Monitor', '1.0.')
 }
-task NasAcrhiver {
-    dependsOn newRelease('monitors.', 'NasArchiver_Monitor', '1.0.')
-}
 task SceneFTP {
     dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '2.0.')
 }
@@ -247,6 +244,5 @@ task BuildAll {
     dependsOn BeatportFtp
     dependsOn DJCFtp
     dependsOn ScheduleWatcher
-    dependsOn NasAcrhiver
 
 }

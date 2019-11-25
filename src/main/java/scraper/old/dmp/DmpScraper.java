@@ -15,7 +15,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import utils.*;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
+import utils.CheckDate;
+import utils.FUtils;
+import utils.Log;
+import utils.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -103,12 +109,14 @@ class DmpScraper {
         "E://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
           "/RECORDPOOL/" + releaseName + "/";
       new File(releaseFolderPath).mkdirs();
-      CustomExecutor downloadMaster = new CustomExecutor(15);
-      downloadURLS.stream()
-        .map(downloadUrl -> new Thread(() ->
-          downloadFile(downloadUrl, releaseFolderPath)))
-        .forEach(downloadMaster::submit);
-      downloadMaster.WaitUntilTheEnd();
+      Scheduler scheduler = Schedulers.newParallel("Download", 15);
+      Flux.fromIterable(downloadURLS)
+        .parallel()
+        .runOn(scheduler)
+        .doOnNext(downloadUrl -> downloadFile(downloadUrl, releaseFolderPath))
+        .sequential()
+        .blockLast();
+      scheduler.dispose();
       new Logger("DMP Scraper").log("Release Downloaded: " + releaseName);
       FUtils.writeFile(tagsDir.replace("\\Scrapers", ""),
         releaseName + ".json", releaseFolderPath);
