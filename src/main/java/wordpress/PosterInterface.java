@@ -40,7 +40,7 @@ public interface PosterInterface {
    default void post(String releaseName) {
       Document releaseDoc = MONGO_CONTROL.releasesCollection
         .find(eq("releaseName", releaseName)).first();
-      releaseDoc.remove("_id");
+      ObjectId id = releaseDoc.getObjectId("_id");
       Release release = new Gson().fromJson(releaseDoc.toJson(), Release.class);
       String htmlBodyForPost = buildHTML(release);
       WPPost post = new WPPost(release.getReleaseName(), "publish",
@@ -50,7 +50,6 @@ public interface PosterInterface {
         MRP_AUTHORIZATION);
       //update release in DB with Link
       releaseDoc.put("mrpPostLink", linkToPost);
-      ObjectId id = releaseDoc.getObjectId("_id");
       MONGO_CONTROL.releasesCollection.replaceOne((eq("_id", id)), releaseDoc);
       // add REPOST TASK to que
       Task task = new Task("repost", id.toString());

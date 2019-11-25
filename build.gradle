@@ -39,8 +39,9 @@ dependencies {
 
     compile group: 'com.github.goxr3plus', name: 'jaudiotagger', version: 'V2.2.6'
     compile group: 'com.mpatric', name: 'mp3agic', version: '0.9.1'
-    compile group: 'org.jcodec', name: 'jcodec', version: '0.2.3'
+    compile group: 'org.jcodec', name: 'jcodec', version: '0.2.5'
     compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+
     compile group: 'xuggle', name: 'xuggle-xuggler', version: '5.4'
 
     compile 'com.intellij:forms_rt:7.0.3'
@@ -97,7 +98,7 @@ def newRelease(String packagePath, String name, String ver) {
         baseName = name
         String storedVer = getVersion(name)
         version = ver + storedVer
-        if (name != "Poster_Monitor") {
+        if (name != "Collector_Monitor") {
             dependencies {
                 exclude(dependency(group: 'xuggle', name: 'xuggle-xuggler', version: '5.4'))
             }

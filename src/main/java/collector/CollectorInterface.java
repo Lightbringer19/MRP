@@ -124,14 +124,14 @@ public interface CollectorInterface extends NfoExtractionInterface {
                int key = 0;
                for (File video_file : audioFiles) {
                   Log.write("File Collecting: " + video_file.getName(),
-                    "Poster");
+                    "Collector");
                   size += video_file.length();
                   Map<Integer, MetaValue> itunesMeta = null;
                   try {
                      MetadataEditor mediaMeta = MetadataEditor.createFrom(video_file);
                      itunesMeta = mediaMeta.getItunesMeta();
                   } catch (AssertionError | IllegalArgumentException | NullPointerException e1) {
-                     Log.write("Exception in Collector: " + e1, "Poster");
+                     Log.write("Exception in Collector: " + e1, "Collector");
                   }
                   String title;
                   try {
@@ -162,11 +162,11 @@ public interface CollectorInterface extends NfoExtractionInterface {
                      playtime = getPlaytime(playtime, TrackList,
                        key, title, artist, trackLength);
                   } catch (Exception e) {
-                     Log.write(e.toString(), "Poster");
+                     Log.write(e, "Collector");
                   }
                   key++;
                   Log.write("Info About File Collected: " + video_file.getName(),
-                    "Poster");
+                    "Collector");
                }
             }
             // ==============MUSIC==============
@@ -211,14 +211,14 @@ public interface CollectorInterface extends NfoExtractionInterface {
                // set track_list
                int key = 0;
                for (File audio_file : audioFiles) {
-                  Log.write("Collecting Info About File: " + audio_file.getName(),
-                    "Poster");
+                  Log.write("Collecting Info About Music File: " + audio_file.getName(),
+                    "Collector");
                   size += audio_file.length();
                   AudioFile track = null;
                   try {
                      track = AudioFileIO.read(audio_file);
                   } catch (CannotReadException e) {
-                     Log.write("Exception: " + e, "Poster");
+                     Log.write("Exception: " + e, "Collector");
                   }
                   try {
                      Tag track_tag = track.getTag();
@@ -232,9 +232,9 @@ public interface CollectorInterface extends NfoExtractionInterface {
                      }
                      key++;
                      Log.write("Info About File Collected: " + audio_file.getName(),
-                       "Poster");
+                       "Collector");
                   } catch (NullPointerException e) {
-                     Log.write("Exception: " + e, "Poster");
+                     Log.write("Exception: " + e, "Collector");
                   }
                }
             }
@@ -257,8 +257,8 @@ public interface CollectorInterface extends NfoExtractionInterface {
            Format, Bitrate, Sample_Rate, Size, TrackList);
       } catch (CannotReadException | IOException | TagException | ReadOnlyFileException
         | InvalidAudioFrameException e) {
-         Log.write("EXCEPTION IN COLLECTOR " + e, "Poster");
-         e.printStackTrace();
+         Log.write("EXCEPTION IN COLLECTOR " + e, "Collector");
+         Log.write(e, "Collector");
       }
       return info;
    }

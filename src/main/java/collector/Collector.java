@@ -1,8 +1,10 @@
 package collector;
 
 import com.google.gson.Gson;
+import configuration.YamlConfig;
 import json.InfoForPost;
 import json.InfoFromBoxCom;
+import json.ResponseInfo;
 import json.db.InfoAboutRelease;
 import json.db.Release;
 import mongodb.MongoControl;
@@ -15,6 +17,7 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 import utils.*;
+import wordpress.PosterInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +29,11 @@ import static collector.ImageCompressor.compress;
 import static collector.ImageUploader.uploadImage;
 import static com.mongodb.client.model.Filters.eq;
 import static scheduler.ScheduleWatcher.DATE_FORMAT;
-import static utils.Constants.*;
+import static utils.Constants.filesDir;
+import static utils.Constants.postDir;
+import static wordpress.Poster.MRP_AUTHORIZATION;
 
-public class Collector extends Thread implements CollectorInterface {
+public class Collector extends Thread implements CollectorInterface, PosterInterface {
    
    private MongoControl MONGO_CONTROL;
    
@@ -37,6 +42,9 @@ public class Collector extends Thread implements CollectorInterface {
    @Override
    public void run() {
       MONGO_CONTROL = new MongoControl();
+      YamlConfig yamlConfig = new YamlConfig();
+      String mrp_pc_api = yamlConfig.config.getMrp_pc_api();
+      MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
       logger.log(CheckDate.getNowTime() + " Collector Start");
       new File(Constants.collectorDir).mkdirs();
       while (true) {
@@ -59,8 +67,17 @@ public class Collector extends Thread implements CollectorInterface {
                            FUtils.writeFile(postDir + category,
                              collectedInfo.getReleaseName(), "");
                         }
-                        FUtils.writeFile(archiveDir, releaseFolder.getName() + ".json",
-                          releaseFolder.getAbsolutePath());
+                        ResponseInfo responseInfo =
+                          postAndGetResponse(new Document("boxComLink", collectedInfo.getLink())
+                              .append("releaseName", collectedInfo.getReleaseName()).toJson(),
+                            mrp_pc_api, "");
+                        if (responseInfo.getCode() != 200) {
+                           while (true) {
+                              System.out.println("NOT ADDED TO ARCHIVE");
+                              sleep(5000);
+                           }
+                        }
+                        FileUtils.deleteDirectory(releaseFolder);
                         collectJsonFile.delete();
                      } else {
                         logger.log("Not SRC or gFViD group: " + collectJsonFile.getName()
@@ -70,11 +87,10 @@ public class Collector extends Thread implements CollectorInterface {
                      }
                      Thread.sleep(2000);
                   } else {
-                     FUtils.writeFile(archiveDir, releaseFolder.getName() + ".json",
-                       releaseFolder.getAbsolutePath());
-                     collectJsonFile.delete();
                      logger.log("Deleted(no audio): " + collectJsonFile.getName()
                        + "| In: " + category);
+                     FileUtils.deleteDirectory(releaseFolder);
+                     collectJsonFile.delete();
                   }
                }
             }

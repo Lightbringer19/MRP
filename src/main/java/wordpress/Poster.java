@@ -39,6 +39,7 @@ public class Poster extends Thread implements PosterInterface {
             Sleep();
          } catch (Exception e) {
             Log.write(CheckDate.getNowTime() + " EXCEPTION " + e, "Poster");
+            Log.write(e, "Poster");
             Sleep();
          }
       }

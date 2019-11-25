@@ -25,10 +25,10 @@ public class YamlConfig {
    
    @Data
    public static class Config {
-      
+      private String mrp_user;
       private String box_user_id;
       private String mrp_authorization;
-      private String mrp_user;
+      private String mrp_pc_api;
       private String mrp_password;
       private String scene_host;
       private String scene_username;
