@@ -70,7 +70,9 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
                            }
                            ResponseInfo responseInfo =
                              postAndGetResponse(new Document("boxComLink", collectedInfo.getLink())
-                                 .append("releaseName", collectedInfo.getReleaseName()).toJson(),
+                                 .append("releaseName", collectedInfo.getReleaseName())
+                                 .append("category", collectedInfo.getPostCategory())
+                                 .toJson(),
                                mrp_pc_api, "");
                            if (responseInfo.getCode() != 200) {
                               while (true) {
