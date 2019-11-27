@@ -63,13 +63,13 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    
    @Override
    public String scrapeFirstDate(String html) {
-      return Jsoup.parse(html).select("div[class=col-created_at]").first().text();
+      return Jsoup.parse(html).select("div[class=col-created_at link]").first().text();
    }
    
    @Override
    public String previousDateOnThisPage(String html, String firstDate) {
       return Jsoup.parse(html)
-        .select("div[class=col-created_at]")
+        .select("div[class=col-created_at link]")
         .stream()
         .map(Element::text)
         .filter(date -> !date.equals(firstDate))
@@ -82,7 +82,7 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
       Elements trackInfos = Jsoup.parse(html).select(
         "div[class=row-item row-item-album audio ]");
       for (Element trackInfo : trackInfos) {
-         String trackDate = trackInfo.select("div[class=col-created_at]").first()
+         String trackDate = trackInfo.select("div[class=col-created_at link]").first()
            .text();
          if (trackDate.equals(downloadDate)) {
             String title = trackInfo.select("div[class=row-track]").text();
@@ -106,7 +106,8 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    @Override
    @SneakyThrows
    public void nextPage() {
-      List<WebElement> nextButtons = driver.findElements(By.tagName("li"));
+      WebElement element = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[5]/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[3]/ul"));
+      List<WebElement> nextButtons = element.findElements(By.tagName("li"));
       nextButtons.get(nextButtons.size() - 2).click();
       Thread.sleep(10_000);
    }
