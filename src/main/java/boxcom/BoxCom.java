@@ -7,8 +7,6 @@ import configuration.YamlConfig;
 import json.InfoFromBoxCom;
 import lombok.SneakyThrows;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 import utils.Constants;
 import utils.FUtils;
 import utils.Log;
@@ -17,9 +15,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 
+import static boxcom.Uploader.FILE_UPLOAD_SCHEDULER;
 import static com.box.sdk.BoxSharedLink.Access.OPEN;
+import static java.lang.Thread.sleep;
+import static utils.Constants.uploadingDir;
 
-class BoxCom extends Thread {
+class BoxCom {
    private static final String CONFIG = Constants.filesDir + "config.json";
    
    private static final String ID_2019 = "62866040452";
@@ -29,7 +30,6 @@ class BoxCom extends Thread {
    private static BoxFolder TEST_FOLDER;
    
    private static BoxSharedLink.Permissions permissions;
-   private static final Scheduler SCHEDULER = Schedulers.newParallel("Upload", 10);
    
    //add security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider
    //to java.security in lib/security
@@ -84,7 +84,7 @@ class BoxCom extends Thread {
       } while (true);
    }
    
-   void UploadAndGetLink(File folderToUpload) {
+   void UploadAndGetLink(File folderToUpload, File infoJsonFile) {
       try {
          BoxFolder dayFolder = searchForFolder(FOLDER_2019,
            folderToUpload.getParentFile().getParentFile().getName());
@@ -95,11 +95,14 @@ class BoxCom extends Thread {
          BoxFolder newFolder = searchForFolder(categoryFolder, folderToUpload.getName());
          Flux.just(folderToUpload.listFiles())
            .parallel()
-           .runOn(SCHEDULER)
+           .runOn(FILE_UPLOAD_SCHEDULER)
            .doOnNext(file -> UploadFile(newFolder, file))
            .sequential()
-           .blockLast();
-         getLinkAndName(newFolder, folderToUpload);
+           .doOnComplete(() -> {
+              getLinkAndName(newFolder, folderToUpload);
+              new File(uploadingDir + infoJsonFile.getName()).delete();
+           })
+           .subscribe();
       } catch (Exception e) {
          Log.write("Exception in UploadAndGetLink: " + e, "Uploader");
          Log.write(e, "Uploader");
@@ -116,6 +119,9 @@ class BoxCom extends Thread {
             break;
          } catch (Exception e) {
             Log.write(e, "Uploader");
+            if (e.getMessage().contains("Item with the same name already exists")) {
+               break;
+            }
             sleep(2000);
          }
       }
@@ -136,5 +142,6 @@ class BoxCom extends Thread {
       Log.write("Info for Post: " + (folderName + " | " + link), "Uploader");
       FUtils.writeFile(Constants.collectorDir + folderInfo.getParent().getName(),
         folderName + ".json", new Gson().toJson(infoFromBoxCom));
+      
    }
 }

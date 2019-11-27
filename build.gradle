@@ -125,7 +125,7 @@ task MongoDB {
 }
 // AUTOMATION
 task Uploader {
-    dependsOn newRelease('monitors.', 'Uploader_Monitor', '4.0.')
+    dependsOn newRelease('monitors.', 'Uploader_Monitor', '4.1.')
 }
 task Poster {
     dependsOn newRelease('monitors.', 'Poster_Monitor', '4.0.')

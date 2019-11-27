@@ -12,5 +12,6 @@ public class Constants {
    public static final String repostDir = filesDir + "REPOST\\";
    public static final String scheduleDir = filesDir + "SCHEDULE\\";
    public static final String archiveDir = filesDir + "ARCHIVE\\";
+   public static final String uploadingDir = filesDir + "UPLOADING\\";
    
 }
