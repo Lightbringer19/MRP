@@ -5,7 +5,6 @@ import mongodb.MongoControl;
 import utils.CheckDate;
 import utils.Constants;
 import utils.Log;
-import wordpress.utils.DownloadPoster;
 
 import java.io.File;
 
@@ -13,13 +12,13 @@ public class Poster extends Thread implements PosterInterface {
    public static MongoControl MONGO_CONTROL;
    
    public static String MRP_AUTHORIZATION;
-   public static DownloadPoster DOWNLOAD_POSTER;
+   // public static DownloadPoster DOWNLOAD_POSTER;
    
    @Override
    public void run() {
       Log.write(CheckDate.getNowTime() + " Poster Start", "Poster");
       MONGO_CONTROL = new MongoControl();
-      DOWNLOAD_POSTER = new DownloadPoster();
+      // DOWNLOAD_POSTER = new DownloadPoster();
       new File(Constants.postDir).mkdirs();
       YamlConfig yamlConfig = new YamlConfig();
       MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();

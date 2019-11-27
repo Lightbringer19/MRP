@@ -27,13 +27,13 @@ import utils.Log;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
-import static wordpress.Poster.*;
+import static wordpress.Poster.MONGO_CONTROL;
+import static wordpress.Poster.MRP_AUTHORIZATION;
 
 public interface PosterInterface {
    
@@ -110,15 +110,15 @@ public interface PosterInterface {
       html_base = html_base.replace("xsampleratex", infoAboutRelease.getSampleRate());
       html_base = html_base.replace("xsizex", infoAboutRelease.getSize());
       
-      if (info.getCategory().contains("RECORDPOOL")) {
-         String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(),
-           info.getBoxComDownloadLink());
-         String template = "https://myrecordpool.com/?smd_process_download=1&download_id={0}";
-         String link = MessageFormat.format(template, downloadID);
-         html_base = html_base.replace("xlinkx", link);
-      } else {
-         html_base = html_base.replace("xlinkx", info.getBoxComDownloadLink());
-      }
+      // if (info.getCategory().contains("RECORDPOOL")) {
+      //    String downloadID = DOWNLOAD_POSTER.addDownload(info.getReleaseName(),
+      //      info.getBoxComDownloadLink());
+      //    String template = "https://myrecordpool.com/?smd_process_download=1&download_id={0}";
+      //    String link = MessageFormat.format(template, downloadID);
+      //    html_base = html_base.replace("xlinkx", link);
+      // } else {
+      html_base = html_base.replace("xlinkx", info.getBoxComDownloadLink());
+      // }
       
       List<Track> TrackList = infoAboutRelease.getTrackList();
       StringBuilder trackList = new StringBuilder();

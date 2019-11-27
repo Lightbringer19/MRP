@@ -60,25 +60,31 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
                      logger.log("Preparing to collect: " + collectJsonFile.getName()
                        + "| In: " + category);
                      if (groupCheck(collectJsonFile)) {
-                        InfoForPost collectedInfo = collect(collectJsonFile);
-                        if (category.contains("RECORDPOOL")) {
-                           scheduleRelease(collectedInfo);
-                        } else {
-                           FUtils.writeFile(postDir + category,
-                             collectedInfo.getReleaseName(), "");
-                        }
-                        ResponseInfo responseInfo =
-                          postAndGetResponse(new Document("boxComLink", collectedInfo.getLink())
-                              .append("releaseName", collectedInfo.getReleaseName()).toJson(),
-                            mrp_pc_api, "");
-                        if (responseInfo.getCode() != 200) {
-                           while (true) {
-                              System.out.println("NOT ADDED TO ARCHIVE");
-                              sleep(5000);
+                        try {
+                           InfoForPost collectedInfo = collect(collectJsonFile);
+                           if (category.contains("RECORDPOOL")) {
+                              scheduleRelease(collectedInfo);
+                           } else {
+                              FUtils.writeFile(postDir + category,
+                                collectedInfo.getReleaseName(), "");
                            }
+                           ResponseInfo responseInfo =
+                             postAndGetResponse(new Document("boxComLink", collectedInfo.getLink())
+                                 .append("releaseName", collectedInfo.getReleaseName()).toJson(),
+                               mrp_pc_api, "");
+                           if (responseInfo.getCode() != 200) {
+                              while (true) {
+                                 System.out.println("NOT ADDED TO ARCHIVE");
+                                 sleep(5000);
+                              }
+                           }
+                           deleteRelease(releaseFolder);
+                           collectJsonFile.delete();
+                        } catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
+                           logger.log(e);
+                           FileUtils.moveFileToDirectory(collectJsonFile,
+                             new File(filesDir + "NOT-POSTED\\"), true);
                         }
-                        deleteRelease(releaseFolder);
-                        collectJsonFile.delete();
                      } else {
                         logger.log("Not SRC or gFViD group: " + collectJsonFile.getName()
                           + " | In: " + category);
