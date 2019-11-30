@@ -20,24 +20,26 @@ import java.util.HashMap;
 class TEST implements PosterInterface {
    @SneakyThrows
    public static void main(String[] args) {
-      String nfoFilePath = "GDS_SERVER/orelsan_(feat_damso)-reves_bizarres-fr-720p-x264-2018-iuf.nfo";
+      String nfoFilePath = "GDS_SERVER/clara_luciani-la_grenade_(2019_nrj_music_awards)-fr-720p-x264-2019-pmv.nfo";
       HashMap<Integer, TrackInfo> TrackList = new HashMap<>();
       String nfoSt = FileUtils.readFileToString(new File(nfoFilePath), "UTF-8")
         .replaceAll("\\P{Print}", "")
         .trim();
       
-      String Artist = getFromNfoDot(nfoSt, "Artist", "Title");
-      String title = getFromNfoDot(nfoSt, "Title", "Genre");
-      //
-      String Genre = getFromNfoDot(nfoSt, "Genre", "Video Year");
-      String Released = getFromNfoDot(nfoSt, "Rel.Date", "Encoding Info");
-      String Size = getFromNfoDot(nfoSt, "Size", "octets");
+      String Artist = getFromNfo(nfoSt, "ARTiST", "TiTLE");
+      String title = getFromNfo(nfoSt, "TiTLE", "REL.DATE")
+        .replaceAll("~", "").trim();
+      String Genre = getFromNfo(nfoSt, "GENRE", "FORMAT")
+        .replaceAll("~", "").trim();
+      String Released = getFromNfo(nfoSt, "REL.DATE", "AIR DATE");
+      String Size = getFromNfo(nfoSt, "SIZE", "Bytes");
       long fileSizeInKB = Long.parseLong(Size) / 1024;
       long fileSizeInMB = fileSizeInKB / 1024;
       Size = fileSizeInMB + " MB";
-      String Playtime = getFromNfoDot(nfoSt, "Length", "Size");
-      String Format = getFromNfoDot(nfoSt, "Format", "Resolution");
-      String Bitrate = getFromNfoDot(nfoSt, "Bitrate", "Deinterlace");
+      String Playtime = getFromNfo(nfoSt, "LENGTH", "DAR/SAR");
+      String Format = getFromNfo(nfoSt, "VIDEO CODEC", "AUDIO CODEC");
+      String Bitrate = getFromNfo(nfoSt, "AVERAGE BITRATE:", "CONTAINER");
+      
       // String Sample_Rate = getFromNfoDot(nfoSt, "INFOS", "FASHION");
       //
       // String trackList = getFromNfoSpace(nfoSt, "TRACKLIST", "NOTES");
