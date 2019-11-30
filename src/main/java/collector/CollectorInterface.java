@@ -7,6 +7,7 @@ import com.xuggle.xuggler.IContainer;
 import json.InfoForPost;
 import json.TrackInfo;
 import json.db.InfoAboutRelease;
+import lombok.Cleanup;
 import org.apache.commons.io.FileUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -49,11 +50,13 @@ public interface CollectorInterface extends NfoExtractionInterface {
          if (postCategory.equals("SCENE-MVID")) {
             String[] folderElements = folderToCollect.getName().split("-");
             Group = folderElements[folderElements.length - 1];
-            File[] nfo = folderToCollect.listFiles((dir, name) ->
-              name.endsWith(".nfo"));
-            if (nfo != null && nfo[0] != null) {
+            File nfo = Arrays.stream(folderToCollect.listFiles())
+              .filter(file -> file.getName().endsWith(".nfo"))
+              .findFirst()
+              .orElse(null);
+            if (nfo != null) {
                if (Group.toLowerCase().contains("srp")) {
-                  String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
+                  String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
                     .replaceAll("\\P{Print}", "")
                     .trim();
                   Tracks = "1";
@@ -75,7 +78,7 @@ public interface CollectorInterface extends NfoExtractionInterface {
                     .orElse("???kbps");
                   TrackList.put(0, new TrackInfo(title, Artist, Playtime));
                } else if (Group.toLowerCase().contains("gfvid")) {
-                  String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
+                  String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
                     .trim();
                   String title = getFromNfo(nfoSt, "TITLE:", "TV DATE:");
                   Artist = title.split(" - ")[0];
@@ -101,7 +104,7 @@ public interface CollectorInterface extends NfoExtractionInterface {
                   }
                   Tracks = String.valueOf(TrackList.size());
                } else if (Group.toLowerCase().contains("iuf")) {
-                  String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
+                  String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
                     .replaceAll("\\P{Print}", "")
                     .trim();
                   Tracks = "1";
@@ -118,7 +121,7 @@ public interface CollectorInterface extends NfoExtractionInterface {
                   Bitrate = getFromNfoDot(nfoSt, "Bitrate", "Deinterlace");
                   TrackList.put(0, new TrackInfo(title, Artist, Playtime));
                } else if (Group.toLowerCase().contains("pmv")) {
-                  String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
+                  String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
                     .replaceAll("\\P{Print}", "")
                     .trim();
                   Artist = getFromNfo(nfoSt, "ARTiST", "TiTLE");
@@ -185,12 +188,11 @@ public interface CollectorInterface extends NfoExtractionInterface {
                      //						artist = "No Info";
                   }
                   // Length
-                  int trackLength;
                   try {
-                     IContainer container = IContainer.make();
+                     @Cleanup IContainer container = IContainer.make();
                      int result = container.open(video_file.getAbsolutePath(),
                        READ, null);
-                     trackLength = (int) container.getDuration() / 1000000;
+                     int trackLength = (int) container.getDuration() / 1000000;
                      playtime = getPlaytime(playtime, TrackList,
                        key, title, artist, trackLength);
                   } catch (Exception e) {
