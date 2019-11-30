@@ -216,7 +216,8 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
          String[] folderElements = folderToCollect.getName().split("-");
          String Group = folderElements[folderElements.length - 1];
          return Group.toLowerCase().contains("srp")
-           || Group.toLowerCase().contains("gfvid");
+           || Group.toLowerCase().contains("gfvid")
+           || Group.toLowerCase().contains("iuf");
       }
       return true;
    }

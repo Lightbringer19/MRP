@@ -20,22 +20,25 @@ import java.util.HashMap;
 class TEST implements PosterInterface {
    @SneakyThrows
    public static void main(String[] args) {
-      String nfoFilePath = "gfvid-geim6-480p.nfo";
+      String nfoFilePath = "GDS_SERVER/orelsan_(feat_damso)-reves_bizarres-fr-720p-x264-2018-iuf.nfo";
       HashMap<Integer, TrackInfo> TrackList = new HashMap<>();
       String nfoSt = FileUtils.readFileToString(new File(nfoFilePath), "UTF-8")
-        // .replaceAll("\\P{Print}", "")
+        .replaceAll("\\P{Print}", "")
         .trim();
       
-      // String title = getFromNfo(nfoSt, "TITLE:", "TV DATE:");
+      String Artist = getFromNfoDot(nfoSt, "Artist", "Title");
+      String title = getFromNfoDot(nfoSt, "Title", "Genre");
       //
-      // String Artist = title.split(" - ")[0];
-      // String Genre = getFromNfo(nfoSt, "GENRE", "SUBGENRE");
-      // String Released = getFromNfo(nfoSt, "SHOW DATE", "RUNTIME");
-      // String Size = getFromNfo(nfoSt, "SIZE", "ARCHIVES");
-      // String Playtime = getFromNfo(nfoSt, "RUNTIME", "GENRE");
-      // String Format = getFromNfo(nfoSt, "CODEC", "BITRATE");
-      // String Bitrate = getFromNfo(nfoSt, "AUDIO", "INFOS");
-      // String Sample_Rate = getFromNfo(nfoSt, "INFOS", "FASHION");
+      String Genre = getFromNfoDot(nfoSt, "Genre", "Video Year");
+      String Released = getFromNfoDot(nfoSt, "Rel.Date", "Encoding Info");
+      String Size = getFromNfoDot(nfoSt, "Size", "octets");
+      long fileSizeInKB = Long.parseLong(Size) / 1024;
+      long fileSizeInMB = fileSizeInKB / 1024;
+      Size = fileSizeInMB + " MB";
+      String Playtime = getFromNfoDot(nfoSt, "Length", "Size");
+      String Format = getFromNfoDot(nfoSt, "Format", "Resolution");
+      String Bitrate = getFromNfoDot(nfoSt, "Bitrate", "Deinterlace");
+      // String Sample_Rate = getFromNfoDot(nfoSt, "INFOS", "FASHION");
       //
       // String trackList = getFromNfoSpace(nfoSt, "TRACKLIST", "NOTES");
       // if (trackList.replaceAll("\n", "").replaceAll(" ", "").equals("")) {
@@ -50,17 +53,21 @@ class TEST implements PosterInterface {
       // }
       // String Tracks = String.valueOf(TrackList.size());
       //
-      // System.out.println(Artist);
-      // System.out.println(Genre);
-      // System.out.println(Released);
-      // System.out.println(Size);
-      // System.out.println(Playtime);
-      // System.out.println(Format);
-      // System.out.println(Bitrate);
+      
+      TrackList.put(0, new TrackInfo(title, Artist, Playtime));
+      
+      System.out.println(title);
+      System.out.println(Artist);
+      System.out.println(Genre);
+      System.out.println(Released);
+      System.out.println(Size);
+      System.out.println(Playtime);
+      System.out.println(Format);
+      System.out.println(Bitrate);
       // System.out.println(Sample_Rate);
       // System.out.println(Tracks);
-      // System.out.println(TrackList);
-      // System.out.println(nfo);
+      System.out.println(TrackList);
+      // System.out.println(nfoSt);
    }
    
    @NotNull
@@ -71,6 +78,12 @@ class TEST implements PosterInterface {
    
    public static String getFromNfoSpace(String nfo, String extract, String extractEnd) {
       return nfo.substring(nfo.indexOf("\n", nfo.indexOf(extract)),
+        nfo.indexOf(extractEnd)).trim();
+   }
+   
+   @NotNull
+   public static String getFromNfoDot(String nfo, String extract, String extractEnd) {
+      return nfo.substring(nfo.indexOf(" ", nfo.indexOf(".", nfo.indexOf(extract)) + 1),
         nfo.indexOf(extractEnd)).trim();
    }
    

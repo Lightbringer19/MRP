@@ -11,4 +11,10 @@ public interface NfoExtractionInterface {
       return nfo.substring(nfo.indexOf("\n", nfo.indexOf(extract)),
         nfo.indexOf(extractEnd)).trim();
    }
+   
+   default String getFromNfoDot(String nfo, String extract, String extractEnd) {
+      return nfo.substring(nfo.indexOf(" ", nfo.indexOf(".", nfo.indexOf(extract)) + 1),
+        nfo.indexOf(extractEnd)).trim();
+   }
+   
 }

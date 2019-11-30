@@ -50,7 +50,8 @@ public interface CollectorInterface extends NfoExtractionInterface {
             String[] folderElements = folderToCollect.getName().split("-");
             Group = folderElements[folderElements.length - 1];
             if (Group.toLowerCase().contains("srp")
-              || Group.toLowerCase().contains("gfvid")) {
+              || Group.toLowerCase().contains("gfvid")
+              || Group.toLowerCase().contains("iuf")) {
                File[] nfo = folderToCollect.listFiles((dir, name) ->
                  name.endsWith(".nfo"));
                if (nfo != null && nfo[0] != null) {
@@ -76,7 +77,7 @@ public interface CollectorInterface extends NfoExtractionInterface {
                        .findFirst()
                        .orElse("???kbps");
                      TrackList.put(0, new TrackInfo(title, Artist, Playtime));
-                  } else {
+                  } else if (Group.toLowerCase().contains("gfvid")) {
                      String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
                        .trim();
                      String title = getFromNfo(nfoSt, "TITLE:", "TV DATE:");
@@ -102,6 +103,23 @@ public interface CollectorInterface extends NfoExtractionInterface {
                         }
                      }
                      Tracks = String.valueOf(TrackList.size());
+                  } else if (Group.toLowerCase().contains("iuf")) {
+                     String nfoSt = FileUtils.readFileToString(nfo[0], "UTF-8")
+                       .replaceAll("\\P{Print}", "")
+                       .trim();
+                     Tracks = "1";
+                     Artist = getFromNfoDot(nfoSt, "Artist", "Title");
+                     String title = getFromNfoDot(nfoSt, "Title", "Genre");
+                     Genre = getFromNfoDot(nfoSt, "Genre", "Video Year");
+                     Released = getFromNfoDot(nfoSt, "Rel.Date", "Encoding Info");
+                     Size = getFromNfoDot(nfoSt, "Size", "octets");
+                     long fileSizeInKB = Long.parseLong(Size) / 1024;
+                     long fileSizeInMB = fileSizeInKB / 1024;
+                     Size = fileSizeInMB + " MB";
+                     Playtime = getFromNfoDot(nfoSt, "Length", "Size");
+                     Format = getFromNfoDot(nfoSt, "Format", "Resolution");
+                     Bitrate = getFromNfoDot(nfoSt, "Bitrate", "Deinterlace");
+                     TrackList.put(0, new TrackInfo(title, Artist, Playtime));
                   }
                }
             }

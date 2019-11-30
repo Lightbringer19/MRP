@@ -137,7 +137,7 @@ task Tagger {
     dependsOn newRelease('monitors.', 'Tagger_Monitor', '4.0.')
 }
 task Collector {
-    dependsOn newRelease('monitors.', 'Collector_Monitor', '1.0.')
+    dependsOn newRelease('monitors.', 'Collector_Monitor', '1.1.')
 }
 task SceneFTP {
     dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '2.0.')
