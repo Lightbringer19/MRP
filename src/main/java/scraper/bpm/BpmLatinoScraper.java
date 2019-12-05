@@ -14,6 +14,8 @@ import static java.text.MessageFormat.format;
 
 public class BpmLatinoScraper extends Scraper implements BpmApiService {
    
+   private boolean audioRelease;
+   
    public BpmLatinoScraper() {
       USERNAME = yamlConfig.getBpm_latino_username();
       PASS = yamlConfig.getBpm_latino_password();
@@ -25,6 +27,8 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
       dateFormat = "yyyy-MM-dd";
       downloaded = mongoControl.bpmLatinoDownloaded;
       releaseName = "Bpm Supreme Latino";
+   
+      audioRelease = true;
    }
    
    public static void main(String[] args) {
@@ -51,12 +55,14 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    @SneakyThrows
    protected void mainOperation(String firstDate, String downloadDate) {
       logger.log("Downloading Music Release");
+      audioRelease = true;
       scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
       // SCRAPE VIDEOS AND DOWNLOAD
       urlToGet = "https://app.bpmlatino.com/new-releases/classic/video";
       driver.get(urlToGet);
       Thread.sleep(10_000);
       logger.log("Looking for Video Release");
+      audioRelease = false;
       scrapeAndDownloadRelease(firstDate, downloadDate,
         releaseName + " Videos");
    }
@@ -79,8 +85,12 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    
    @Override
    public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate, List<String> scrapedLinks) {
+      String cssQuery = "div[class=row-item row-item-album audio ]";
+      if (!audioRelease) {
+         cssQuery = "div[class=row-item  row-item-album video ]";
+      }
       Elements trackInfos = Jsoup.parse(html).select(
-        "div[class=row-item row-item-album audio ]");
+        cssQuery);
       for (Element trackInfo : trackInfos) {
          String trackDate = trackInfo.select("div[class=col-created_at link]").first()
            .text();

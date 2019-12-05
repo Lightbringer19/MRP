@@ -12,7 +12,7 @@ import java.text.ParseException;
 public class ScraperTest {
    
    public static void main(String[] args) throws ParseException {
-      String html = FUtils.readFile(new File("source.html"));
+      String html = FUtils.readFile(new File("GDS_SERVER/source.html"));
       Document document = Jsoup.parse(html);
       
       String firstDate = document.select("div[class=col-created_at link]").first()
@@ -31,7 +31,7 @@ public class ScraperTest {
       System.out.println(downloadDate);
       
       Elements trackInfos = document.select(
-        "div[class=row-item row-item-album audio ]");
+        "div[class=row-item  row-item-album video ]");
       for (Element trackInfo : trackInfos) {
          String trackDate = trackInfo.select("div[class=col-created_at link]").first()
            .text();
