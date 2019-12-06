@@ -123,6 +123,10 @@ task DataVisual {
 task MongoDB {
     dependsOn newRelease('mongodb.', 'mongo', '0.0.')
 }
+//UTILS
+task ManualScheduler {
+    dependsOn newRelease('monitors.', 'Manual_Scheduler_Monitor', '2.0.')
+}
 // AUTOMATION
 task Uploader {
     dependsOn newRelease('monitors.', 'Uploader_Monitor', '4.1.')

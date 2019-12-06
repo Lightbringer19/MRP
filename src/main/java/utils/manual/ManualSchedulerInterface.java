@@ -3,10 +3,12 @@ package utils.manual;
 import com.mongodb.client.MongoCollection;
 import mongodb.MongoControl;
 import org.bson.Document;
+import utils.FUtils;
 
 import java.io.File;
 
 import static com.mongodb.client.model.Filters.eq;
+import static utils.Constants.tagsDir;
 
 public interface ManualSchedulerInterface {
    
@@ -18,7 +20,9 @@ public interface ManualSchedulerInterface {
       String releaseName = release.getName();
       if (releaseNotInDB(RELEASES_COLLECTION, releaseName)) {
          if (releaseNotInDB(SCHEDULE_COLLECTION, releaseName)) {
-            // addToScheduleDB(release);
+            FUtils.writeFile(tagsDir.replace("\\Utils", ""),
+              releaseName + ".json", release.getAbsolutePath());
+            System.out.println("Release added to tag Queue: " + releaseName);
          } else {
             System.out.println("Release in Schedule Queue: " + releaseName);
          }
