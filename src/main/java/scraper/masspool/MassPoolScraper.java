@@ -74,7 +74,8 @@ public class MassPoolScraper extends Scraper {
    
    @Override
    public String scrapeFirstDate(String html) {
-      return Jsoup.parse(html).select("table[id=dl_table]>tbody>tr").first()
+      return Jsoup.parse(html)
+        .select("table[id=dl_table]>tbody>tr").first()
         .select("td").get(2)
         .text();
    }
@@ -100,9 +101,9 @@ public class MassPoolScraper extends Scraper {
             String downloadPartLink = trackInfo.select("td").get(1)
               .select("a").attr("href");
             String downloadUrl = MessageFormat.format(
-              "http://www.masspoolmp3.com" +
+              "https://www.masspoolmp3.com" +
                 "{0}", downloadPartLink);
-            String downloadLink = getLocation(getLocation(getLocation(downloadUrl)));
+            String downloadLink = getLocation(getLocation(downloadUrl));
             System.out.println(trackName + " | " + downloadLink);
             if (downloadLink != null) {
                scrapedLinks.add(downloadLink);

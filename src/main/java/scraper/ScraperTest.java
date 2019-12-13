@@ -7,6 +7,7 @@ import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.text.ParseException;
 
 public class ScraperTest {
@@ -15,35 +16,35 @@ public class ScraperTest {
       String html = FUtils.readFile(new File("GDS_SERVER/source.html"));
       Document document = Jsoup.parse(html);
       
-      String firstDate = document.select("div[class=col-created_at link]").first()
+      String firstDate = document
+        .select("table[id=dl_table]>tbody>tr").first()
+        .select("td").get(2)
         .text();
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("div[class=col-created_at link]")
+        .select("table[id=dl_table]>tbody>tr")
         .stream()
-        .map(Element::text)
+        .map(element -> element.select("td").get(2).text())
         .filter(date -> !date.equals(firstDate))
         .findFirst()
         .orElse(null);
       
       System.out.println(downloadDate);
       
-      Elements trackInfos = document.select(
-        "div[class=row-item  row-item-album video ]");
+      Elements trackInfos = Jsoup.parse(html).select("table[id=dl_table]>tbody>tr");
       for (Element trackInfo : trackInfos) {
-         String trackDate = trackInfo.select("div[class=col-created_at link]").first()
-           .text();
+         String trackDate = trackInfo.select("td").get(2).text();
          if (trackDate.equals(downloadDate)) {
-            String title = trackInfo.select("div[class=row-track]").text();
-            Elements tags = trackInfo.select("div[class=row-tags]>span");
-            for (Element tag : tags) {
-               String id = tag.attr("id").replace("New Releases_media_tag_", "");
-               String trackType = tag.text();
-               System.out.println(title + " (" + trackType + ") | "
-                 + id);
-            }
+            String trackName = trackInfo.select("td").get(1).text();
+            String downloadPartLink = trackInfo.select("td").get(1)
+              .select("a").attr("href");
+            String downloadUrl = MessageFormat.format(
+              "http://www.masspoolmp3.com" +
+                "{0}", downloadPartLink);
+            String downloadLink = (downloadUrl);
+            System.out.println(trackName + " | " + downloadLink);
          }
       }
    }

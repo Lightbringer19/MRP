@@ -9,6 +9,7 @@ import json.db.Release;
 import json.db.Task;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -56,6 +57,15 @@ public interface PosterInterface {
       MONGO_CONTROL.tasksCollection.insertOne(task.toDoc());
       Log.write("Posted: " + release.getReleaseName() + "| In: " + release.getCategory(),
         "Poster");
+      //for back up
+      try {
+         FileUtils.writeStringToFile(
+           new File(release.getPathToLocalFolder().replace("E:", "C:")
+             + "\\myrecordpool.com.txt"),
+           release.getBoxComDownloadLink(), "UTF-8");
+      } catch (IOException e) {
+         Log.write(e, "Poster");
+      }
    }
    
    default String createPostGetLinkToPost(String JSON_BODY, String releaseName,
