@@ -84,7 +84,8 @@ class TagEditor {
                byte[] artData = art.getBinaryData();
                if (Arrays.equals(imageExtractor.getMyrec(), artData) ||
                  Arrays.equals(imageExtractor.getElectroFresh(), artData) ||
-                 Arrays.equals(imageExtractor.getHeyDj(), artData)) {
+                 Arrays.equals(imageExtractor.getHeyDj(), artData) ||
+                 Arrays.equals(imageExtractor.getHeyDj2(), artData)) {
                   // if promotion image is present
                   Artwork logoArt = ArtworkFactory
                     .createArtworkFromFile(
@@ -159,31 +160,29 @@ class TagEditor {
    static void EditMP3TagsInFolder(File folder) {
       File[] Mp3Folder = folder.listFiles();
       // extract artwork from file
-      getArtwork(Mp3Folder);
       for (File file : Mp3Folder) {
          // Edit every mp3 file
          if (file.getName().toLowerCase().endsWith(".mp3")) {
             editMP3(file);
          }
       }
-      
+      getArtwork(Mp3Folder);
    }
    
    private static void getArtwork(File[] folder) {
       try {
          for (File file : folder) {
             if (file.getName().toLowerCase().endsWith(".mp3")) {
-               ImageExtractor imageExtractor = new ImageExtractor().invoke();
-               byte[] myrec = imageExtractor.getMyrec();
-               byte[] electroFresh = imageExtractor.getElectroFresh();
                AudioFile audioFile = AudioFileIO.read(file);
                Tag tag = audioFile.getTag();
                if (tag != null) {
                   Artwork art = tag.getFirstArtwork();
                   if (art != null) {
+                     InputStream logo =
+                       new FileInputStream(Constants.filesDir + "logo.jpg");
+                     byte[] logoData = IOUtils.toByteArray(logo);
                      byte[] artData = art.getBinaryData();
-                     if (!Arrays.equals(myrec, artData) &&
-                       !Arrays.equals(electroFresh, artData)) {
+                     if (!Arrays.equals(logoData, artData)) {
                         OutputStream os = new FileOutputStream(changeFileName(file));
                         os.write(artData);
                         os.close();
@@ -224,6 +223,7 @@ class TagEditor {
       private byte[] myrec;
       private byte[] electroFresh;
       private byte[] heyDj;
+      private byte[] heyDj2;
       
       ImageExtractor invoke() throws IOException {
          InputStream myrecImage =
@@ -237,7 +237,10 @@ class TagEditor {
          InputStream heyDjImage =
            new FileInputStream(Constants.filesDir + "heydj.jpg");
          heyDj = IOUtils.toByteArray(heyDjImage);
-         heyDjImage.close();
+         InputStream heyDj2Image =
+           new FileInputStream(Constants.filesDir + "heydj2.jpg");
+         heyDj2 = IOUtils.toByteArray(heyDj2Image);
+         heyDj2Image.close();
          return this;
       }
    }
