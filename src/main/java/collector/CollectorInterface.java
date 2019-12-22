@@ -3,11 +3,10 @@ package collector;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
-import com.xuggle.xuggler.IContainer;
 import json.InfoForPost;
 import json.TrackInfo;
 import json.db.InfoAboutRelease;
-import lombok.Cleanup;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -24,9 +23,9 @@ import utils.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.*;
-
-import static com.xuggle.xuggler.IContainer.Type.READ;
 
 public interface CollectorInterface extends NfoExtractionInterface {
    default InfoForPost collect(File[] audioFiles, String releaseName, String link,
@@ -143,7 +142,7 @@ public interface CollectorInterface extends NfoExtractionInterface {
          } else {
             int playtime = 0;
             long size = 0;
-            // video
+            // ==============VIDEO==============
             if (postCategory.equals("RECORDPOOL VIDEOS")) {
                // set info_table
                Artist = "Mixed";
@@ -189,10 +188,7 @@ public interface CollectorInterface extends NfoExtractionInterface {
                   }
                   // Length
                   try {
-                     @Cleanup IContainer container = IContainer.make();
-                     int result = container.open(video_file.getAbsolutePath(),
-                       READ, null);
-                     int trackLength = (int) container.getDuration() / 1000000;
+                     int trackLength = getTrackLength(video_file.getAbsolutePath());
                      playtime = getPlaytime(playtime, TrackList,
                        key, title, artist, trackLength);
                   } catch (Exception e) {
@@ -295,6 +291,35 @@ public interface CollectorInterface extends NfoExtractionInterface {
          Log.write(e, "Collector");
       }
       return info;
+   }
+   
+   @SneakyThrows
+   static int getTrackLength(String path) {
+      ProcessBuilder builder = new ProcessBuilder("Files/MediaInfo_CLI_19.09_Windows_x64/MediaInfo.exe", path);
+      builder.redirectErrorStream(true);
+      Process process = builder.start();
+      
+      StringBuilder buffer = new StringBuilder();
+      try (Reader reader = new InputStreamReader(process.getInputStream())) {
+         for (int i; (i = reader.read()) != -1; ) {
+            buffer.append((char) i);
+         }
+      }
+      
+      int status = process.waitFor();
+      String collectedMediaInfo = "";
+      if (status == 0) {
+         collectedMediaInfo = buffer.toString();
+      }
+      int dIn = collectedMediaInfo.indexOf("Duration");
+      String duration = collectedMediaInfo.substring(dIn, collectedMediaInfo.indexOf("\n", dIn))
+        .replace("Duration                                 : ", "")
+        .replace(" min ", ":")
+        .replace(" s", "")
+        .trim();
+      int min = Integer.parseInt(duration.split(":")[0]);
+      int sec = Integer.parseInt(duration.split(":")[1]);
+      return min * 60 + sec;
    }
    
    default int getPlaytime(int playtime, HashMap<Integer, TrackInfo> trackList,
