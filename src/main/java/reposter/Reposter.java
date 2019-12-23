@@ -14,15 +14,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import utils.CheckDate;
 import utils.Log;
-import wordpress.PosterInterface;
+import wordpress.ApiInterface;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class Reposter extends Thread implements PosterInterface {
+public class Reposter extends Thread implements ApiInterface {
    
    private static String AUTHORIZATION_HEADER;
    private static String mainCategory;
@@ -59,9 +58,10 @@ public class Reposter extends Thread implements PosterInterface {
                Log.write("Reposting to WP: " + releaseName, "Reposter");
                //compose the post
                Integer[] categoriesID = categoriesIDList.toArray(new Integer[0]);
-               String contentMessage = release.getTrackList()
-                 + "<p>More Info Here:<br><a href=\"" + release.getMrpPostLink()
-                 + "\">" + release.getMrpPostLink() + "</a></p>";
+               // String contentMessage = release.getTrackList()
+               //   + "<p>More Info Here:<br><a href=\"" + release.getMrpPostLink()
+               //   + "\">" + release.getMrpPostLink() + "</a></p>";
+               String contentMessage = null;
                WPPost post = new WPPost(releaseName, "publish",
                  categoriesID, contentMessage);
                //make post
@@ -99,10 +99,10 @@ public class Reposter extends Thread implements PosterInterface {
                // blogPoster.post(contentMessage, releaseName, categoriesForBlog, mainCategory);
                // Log.write("Reposted to blog: " + releaseName, "Reposter");
                //make repost to Reddit
-               String content = MessageFormat.format("{0}\n\nMore Info Here:\n\n{1}",
-                 release.getRedditTrackList(), release.getMrpPostLink());
-               Log.write("Making Repost to Reddit", "Reposter");
-               redditPoster.post(mainCategory, releaseName, content);
+               // String content = MessageFormat.format("{0}\n\nMore Info Here:\n\n{1}",
+               //   release.getRedditTrackList(), release.getMrpPostLink());
+               // Log.write("Making Repost to Reddit", "Reposter");
+               // redditPoster.post(mainCategory, releaseName, content);
                Log.write("Reposted to Reddit: " + releaseName, "Reposter");
                // delete task from que in the end
                mongoControl.tasksCollection.deleteOne(taskDoc);

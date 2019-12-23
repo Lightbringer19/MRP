@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.Document;
 
-import java.util.stream.Collectors;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,11 +26,11 @@ public class Release {
       return new Document(Document.parse(toJson()));
    }
    
-   public String getTrackList() {
-      return getInfoAboutRelease().getTrackList().stream().map(InfoAboutRelease.Track::toLine).collect(Collectors.joining("<br>"));
-   }
-   
-   public String getRedditTrackList() {
-      return getInfoAboutRelease().getTrackList().stream().map(InfoAboutRelease.Track::toLine).collect(Collectors.joining("\n\n"));
-   }
+   // public String getTrackList() {
+   //    return getInfoAboutRelease().getTrackList().stream().map(InfoAboutRelease.Track::toLine).collect(Collectors.joining("<br>"));
+   // }
+   //
+   // public String getRedditTrackList() {
+   //    return getInfoAboutRelease().getTrackList().stream().map(InfoAboutRelease.Track::toLine).collect(Collectors.joining("\n\n"));
+   // }
 }

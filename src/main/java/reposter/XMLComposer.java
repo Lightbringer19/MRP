@@ -41,13 +41,13 @@ public class XMLComposer {
             foundDoc.remove("_id");
             Release release = new Gson().fromJson(foundDoc.toJson(), Release.class);
             String title = release.getReleaseName();
-            String content = release.getTrackList() + "<p>Download here:<br><a href=\"" + release.getMrpPostLink() + "\">" + release.getMrpPostLink() + "</a></p>";
+            // String content = release.getTrackList() + "<p>Download here:<br><a href=\"" + release.getMrpPostLink() + "\">" + release.getMrpPostLink() + "</a></p>";
             // String artist = release.getInfoAboutRelease().getArtist();
             // String releaseGroup = release.getInfoAboutRelease().getGroup();
             String genre = release.getInfoAboutRelease().getGenre().replaceAll("[^a-zA-Z]", "");
             List<String> categories = Arrays.asList(release.getCategory(), genre);
             //blog
-            blog(cal, title, content, categories);
+            // blog(cal, title, content, categories);
             //WP
             // WP(cal, title, content, categories);
          }

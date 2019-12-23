@@ -42,8 +42,6 @@ dependencies {
     compile group: 'org.jcodec', name: 'jcodec', version: '0.2.5'
     compile group: 'javax.activation', name: 'activation', version: '1.1.1'
 
-//    compile group: 'xuggle', name: 'xuggle-xuggler', version: '5.4'
-
     compile 'com.intellij:forms_rt:7.0.3'
 
     compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.10.2'
@@ -98,11 +96,6 @@ def newRelease(String packagePath, String name, String ver) {
         baseName = name
         String storedVer = getVersion(name)
         version = ver + storedVer
-//        if (name != "Collector_Monitor") {
-//            dependencies {
-//                exclude(dependency(group: 'xuggle', name: 'xuggle-xuggler', version: '5.4'))
-//            }
-//        }
         doLast {
             updateVersion(storedVer, name)
         }
@@ -132,7 +125,7 @@ task Uploader {
     dependsOn newRelease('monitors.', 'Uploader_Monitor', '4.1.')
 }
 task Poster {
-    dependsOn newRelease('monitors.', 'Poster_Monitor', '4.0.')
+    dependsOn newRelease('monitors.', 'Poster_Monitor', '5.0.')
 }
 task Reposter {
     dependsOn newRelease('monitors.', 'Reposter_Monitor', '3.3.')
@@ -141,7 +134,7 @@ task Tagger {
     dependsOn newRelease('monitors.', 'Tagger_Monitor', '4.0.')
 }
 task Collector {
-    dependsOn newRelease('monitors.', 'Collector_Monitor', '1.2.')
+    dependsOn newRelease('monitors.', 'Collector_Monitor', '2.0.')
 }
 task SceneFTP {
     dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '2.0.')

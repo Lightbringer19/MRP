@@ -6,6 +6,7 @@ import com.mpatric.mp3agic.UnsupportedTagException;
 import json.InfoForPost;
 import json.TrackInfo;
 import json.db.InfoAboutRelease;
+import json.db.ReleaseNew;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.jaudiotagger.audio.AudioFile;
@@ -348,9 +349,9 @@ public interface CollectorInterface extends NfoExtractionInterface {
       infoAboutRelease.setSampleRate(info.getSample_Rate());
       infoAboutRelease.setSize(info.getSize());
       HashMap<Integer, TrackInfo> trackList = info.getTrackList();
-      List<InfoAboutRelease.Track> listOfTracks = new ArrayList<>();
+      List<ReleaseNew.Track> listOfTracks = new ArrayList<>();
       for (TrackInfo value : trackList.values()) {
-         InfoAboutRelease.Track track = new InfoAboutRelease.Track(value.getTitle(), value.getArtist(), value.getTime());
+         ReleaseNew.Track track = new ReleaseNew.Track(value.getTitle(), value.getArtist(), value.getTime());
          listOfTracks.add(track);
       }
       infoAboutRelease.setTrackList(listOfTracks);

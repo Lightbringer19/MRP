@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.text.MessageFormat;
 
 import static scraper.old.dmp.DmpApiService.Extractor.*;
-import static wordpress.PosterInterface.getClean;
-import static wordpress.PosterInterface.postClean;
+import static wordpress.ApiInterface.getClean;
+import static wordpress.ApiInterface.postClean;
 
 class DmpApiService {
    

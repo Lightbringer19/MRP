@@ -7,6 +7,7 @@ import json.InfoFromBoxCom;
 import json.ResponseInfo;
 import json.db.InfoAboutRelease;
 import json.db.Release;
+import lombok.SneakyThrows;
 import mongodb.MongoControl;
 import org.apache.commons.io.FileUtils;
 import org.bson.Document;
@@ -17,7 +18,7 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 import utils.*;
-import wordpress.PosterInterface;
+import wordpress.ApiInterface;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,14 +27,12 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static collector.ImageCompressor.compress;
-import static collector.ImageUploader.uploadImage;
 import static com.mongodb.client.model.Filters.eq;
 import static scheduler.ScheduleWatcher.DATE_FORMAT;
 import static utils.Constants.filesDir;
 import static utils.Constants.postDir;
-import static wordpress.Poster.MRP_AUTHORIZATION;
 
-public class Collector extends Thread implements CollectorInterface, PosterInterface {
+public class Collector extends Thread implements CollectorInterface, ApiInterface {
    
    private MongoControl MONGO_CONTROL;
    
@@ -44,7 +43,6 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
       MONGO_CONTROL = new MongoControl();
       YamlConfig yamlConfig = new YamlConfig();
       String mrp_pc_api = yamlConfig.config.getMrp_pc_api();
-      MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
       logger.log(CheckDate.getNowTime() + " Collector Start");
       new File(Constants.collectorDir).mkdirs();
       while (true) {
@@ -175,12 +173,13 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
       return info;
    }
    
+   @SneakyThrows
    private String getArt(InfoFromBoxCom infoFromBoxCom, File folderToCollect, String postCategory) {
       // get art
       File[] art = folderToCollect.listFiles((dir, name) ->
         name.toLowerCase().endsWith(".jpg"));
       // upload art
-      String artLink = "https://myrecordpool.com/wp-content/images/logo.jpg";
+      String artLink = "images/logo.jpg";
       if (postCategory.contains("RECORDPOOL")) {
          @SuppressWarnings("unchecked")
          Map<String, String> imageMap = (Map<String, String>) MONGO_CONTROL
@@ -201,8 +200,10 @@ public class Collector extends Thread implements CollectorInterface, PosterInter
             theArt.delete();
          } else {
             logger.log("Uploading Art");
-            // upload compressed art
-            artLink = uploadImage(compressedImage);
+            // save compressed art
+            File imagesFolder = new File("C:/images");
+            FileUtils.moveFileToDirectory(compressedImage, imagesFolder, true);
+            artLink = "images/" + compressedImage.getName();
             compressedImage.delete();
          }
       }

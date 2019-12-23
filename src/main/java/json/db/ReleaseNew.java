@@ -6,13 +6,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.Document;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InfoAboutRelease {
+public class ReleaseNew {
+   
+   String releaseName;
+   
+   Date date;
+   String category;
+   
+   String pathToLocalFolder;
+   String boxComDownloadLink;
    String linkToArt;
+   
    String artist;
    String album;
    String genre;
@@ -24,26 +34,21 @@ public class InfoAboutRelease {
    String bitrate;
    String sampleRate;
    String size;
-   List<ReleaseNew.Track> trackList;
+   List<Track> trackList;
+   
+   @Data
+   @AllArgsConstructor
+   public static class Track {
+      String title;
+      String artist;
+      String trackDuration;
+   }
    
    private String toJson() {
-      return new GsonBuilder().serializeNulls().create().toJson(this);
+      return new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create().toJson(this);
    }
    
    public Document toDoc() {
       return new Document(Document.parse(toJson()));
    }
-   
-   // @Data
-   // @AllArgsConstructor
-   // public static class Track {
-   //    String title;
-   //    String artist;
-   //    String trackDuration;
-   //
-   //    String toLine() {
-   //       String line = artist + " - " + title + " (" + trackDuration + ")";
-   //       return line;
-   //    }
-   // }
 }

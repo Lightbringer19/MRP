@@ -22,8 +22,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static wordpress.Poster.MRP_AUTHORIZATION;
-
 @Slf4j
 public class CategoryDeleter {
    
@@ -33,10 +31,10 @@ public class CategoryDeleter {
    private final CloseableHttpClient client;
    private static List<Integer> importantIDs;
    private Scheduler scheduler;
+   private String MRP_AUTHORIZATION;
    
    public CategoryDeleter() {
       YamlConfig yamlConfig = new YamlConfig();
-      MRP_AUTHORIZATION = yamlConfig.config.getMrp_authorization();
       client = HttpClients.createDefault();
       scheduler = Schedulers.newParallel("Scheduler", 16);
       importantIDs = new ArrayList<>();

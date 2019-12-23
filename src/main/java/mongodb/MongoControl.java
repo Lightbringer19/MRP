@@ -11,6 +11,7 @@ public class MongoControl {
    private final MongoDatabase ftpDB;
    public final MongoDatabase poolsDB;
    public final MongoCollection<Document> releasesCollection;
+   public final MongoCollection<Document> releasesNewCollection;
    public final MongoCollection<Document> categoriesCollection;
    public final MongoCollection<Document> tasksCollection;
    public final MongoCollection<Document> scheduleCollection;
@@ -44,6 +45,8 @@ public class MongoControl {
       mrpDB = mongoClient.getDatabase("MRP");
    
       releasesCollection = mrpDB.getCollection("releases");
+      releasesNewCollection = mrpDB.getCollection("releasesNew");
+   
       tasksCollection = mrpDB.getCollection("tasks");
       categoriesCollection = mrpDB.getCollection("categories");
       staticImageLinksCollection = mrpDB.getCollection("staticImageLinks");

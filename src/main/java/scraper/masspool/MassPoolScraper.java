@@ -13,6 +13,7 @@ import scraper.abstraction.Scraper;
 import java.text.MessageFormat;
 import java.util.List;
 
+// FIXME: 23.12.2019 MASS POOL GIVES ERRORS ON DOWNLOAD - INVESTIGATE
 public class MassPoolScraper extends Scraper {
    public MassPoolScraper() {
       USERNAME = yamlConfig.getMasspool_username();
