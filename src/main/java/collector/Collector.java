@@ -60,23 +60,12 @@ public class Collector extends Thread implements CollectorInterface, ApiInterfac
                      if (groupCheck(collectJsonFile)) {
                         try {
                            InfoForPost collectedInfo = collect(collectJsonFile);
+                           archive(mrp_pc_api, collectedInfo);
                            if (category.contains("RECORDPOOL")) {
                               scheduleRelease(collectedInfo);
                            } else {
                               FUtils.writeFile(postDir + category,
                                 collectedInfo.getReleaseName(), "");
-                           }
-                           ResponseInfo responseInfo =
-                             postAndGetResponse(new Document("boxComLink", collectedInfo.getLink())
-                                 .append("releaseName", collectedInfo.getReleaseName())
-                                 .append("category", collectedInfo.getPostCategory())
-                                 .toJson(),
-                               mrp_pc_api, "");
-                           if (responseInfo.getCode() != 200) {
-                              while (true) {
-                                 System.out.println("NOT ADDED TO ARCHIVE");
-                                 sleep(5000);
-                              }
                            }
                            deleteRelease(releaseFolder);
                            collectJsonFile.delete();
@@ -109,6 +98,21 @@ public class Collector extends Thread implements CollectorInterface, ApiInterfac
          }
       }
       
+   }
+   
+   public void archive(String mrp_pc_api, InfoForPost collectedInfo) throws InterruptedException {
+      ResponseInfo responseInfo =
+        postAndGetResponse(new Document("boxComLink", collectedInfo.getLink())
+            .append("releaseName", collectedInfo.getReleaseName())
+            .append("category", collectedInfo.getPostCategory())
+            .toJson(),
+          mrp_pc_api, "");
+      if (responseInfo.getCode() != 200) {
+         while (true) {
+            System.out.println("NOT ADDED TO ARCHIVE");
+            sleep(5000);
+         }
+      }
    }
    
    private void deleteRelease(File releaseFolder) {

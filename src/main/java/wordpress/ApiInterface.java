@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,6 +14,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+
+import static java.lang.Thread.sleep;
 
 public interface ApiInterface {
    @SneakyThrows
@@ -45,8 +48,18 @@ public interface ApiInterface {
       httpPost.addHeader("Authorization", authorizationHeader);
       httpPost.addHeader("Content-Type", "application/json");
       httpPost.setEntity(new StringEntity(JSON_BODY, ContentType.APPLICATION_JSON));
-      @Cleanup CloseableHttpResponse postResponse = client.execute(httpPost);
+      CloseableHttpResponse postResponse;
+      while (true) {
+         try {
+            postResponse = client.execute(httpPost);
+            break;
+         } catch (HttpHostConnectException e) {
+            System.out.println("ERROR ON REQUEST " + apiURI);
+            sleep(5000);
+         }
+      }
       String jsonResponse = EntityUtils.toString(postResponse.getEntity());
+      postResponse.close();
       return new ResponseInfo(postResponse.getStatusLine().getStatusCode(), jsonResponse);
    }
 }
