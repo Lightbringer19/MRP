@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,10 +72,12 @@ public class HlScraper extends Scraper {
          htmlWithTracks = containerHtml.substring(indexOfFirstDate);
       }
       
-      Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]").stream()
-        .map(trackInfo ->
-          trackInfo.select("div[class*=download-stars]>a").attr("href"))
-        .forEach(scrapedLinks::add);
+      String template = "https://headlinermusicclub.com/?get_file={0}";
+      Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]")
+        .forEach(trackInfo ->
+          trackInfo.select("a:contains(download)").stream()
+            .map(element -> MessageFormat.format(template, element.attr("data-file")))
+            .forEach(scrapedLinks::add));
    }
    
    @Override
