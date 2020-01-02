@@ -13,7 +13,6 @@ import scraper.abstraction.Scraper;
 import java.text.MessageFormat;
 import java.util.List;
 
-// FIXME: 23.12.2019 MASS POOL GIVES ERRORS ON DOWNLOAD - INVESTIGATE
 public class MassPoolScraper extends Scraper {
    public MassPoolScraper() {
       USERNAME = yamlConfig.getMasspool_username();
@@ -60,8 +59,9 @@ public class MassPoolScraper extends Scraper {
       downloadCategory("Trance-Tech");
       driver.get("http://www.masspoolmp3.com/members/downloads/Electro-House");
       downloadCategory("Electro-House");
-      driver.get("http://www.masspoolmp3.com/members/downloads/Latin");
-      downloadCategory("Latin-International");
+      // TODO: 02.01.2020 ACTIVATE LATIN LATER
+      // driver.get("http://www.masspoolmp3.com/members/downloads/Latin");
+      // downloadCategory("Latin-International");
    }
    
    private void downloadCategory(String category) {

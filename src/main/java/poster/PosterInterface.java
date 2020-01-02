@@ -7,6 +7,7 @@ import json.db.ReleaseNew;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import utils.Log;
 
 import java.io.File;
@@ -18,9 +19,9 @@ import static poster.Poster.MONGO_CONTROL;
 
 public interface PosterInterface {
    
-   default void post(String releaseName) {
+   default void post(String releaseId) {
       Document releaseDoc = MONGO_CONTROL.releasesCollection
-        .find(eq("releaseName", releaseName)).first();
+        .find(eq("_id", new ObjectId(releaseId))).first();
       Release release = new Gson().fromJson(releaseDoc.toJson(), Release.class);
       // CONVERT RELEASE AND INSERT TO NEW DB
       ReleaseNew releaseNew = convertRelease(release);

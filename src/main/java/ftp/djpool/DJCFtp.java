@@ -10,9 +10,13 @@ import utils.Logger;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
+import static utils.CheckDate.getCurrentYear;
 import static utils.Constants.tagsDir;
 
 public class DJCFtp extends FtpManager {
@@ -39,15 +43,17 @@ public class DJCFtp extends FtpManager {
       SimpleDateFormat formatter = new SimpleDateFormat("MM-MMM", Locale.US);
       String month = formatter
         .format(new Date()).toUpperCase();
-      monthFolder = "/AUDIO/DATES/2019/" + month + "/";
+      monthFolder = "/AUDIO/DATES/" + getCurrentYear() + "/" + month + "/";
       checkFtp();
-      // past month check
-      Calendar cal = Calendar.getInstance();
-      cal.add(Calendar.MONTH, -1);
-      String previousMonth = formatter
-        .format(cal.getTime()).toUpperCase();
-      monthFolder = "/AUDIO/DATES/2019/" + previousMonth + "/";
-      checkFtp();
+      // TODO: 02.01.2020 activate in FEBRUARY
+      //  past month check
+      // Calendar cal = Calendar.getInstance();
+      // cal.add(Calendar.MONTH, -1);
+      // String previousMonth = formatter
+      //   .format(cal.getTime()).toUpperCase();
+      // String year = new SimpleDateFormat("yyyy").format(cal.getTime());
+      // monthFolder = "/AUDIO/DATES/" + year + "/" + previousMonth + "/";
+      // checkFtp();
    }
    
    @Override
@@ -74,7 +80,7 @@ public class DJCFtp extends FtpManager {
          logger.log("New Releases to Download: " + releaseNameCleaned);
          // create local release folder
          String releaseLocalPath =
-           "E:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
+           "E:/TEMP FOR LATER/" + getCurrentYear() + "/" + CheckDate.getTodayDate()
              + "/" + CATEGORY_NAME + "/" + releaseNameCleaned;
          FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);
          boolean noSubFolders = true;
@@ -93,8 +99,9 @@ public class DJCFtp extends FtpManager {
          }
          // ADD TO QUEUE
          logger.log("Release Downloaded: " + releaseNameCleaned);
-         mongoControl.ftpDownloadedCollection
-           .insertOne(new Document("releaseName", releaseNameCleaned));
+         mongoControl.djcDownloadedCollection
+           .insertOne(new Document("releaseName", releaseNameCleaned)
+             .append("date", new Date()));
          // ADD TO SCHEDULE
          if (noSubFolders) {
             FUtils.writeFile(tagsDir, releaseName + ".json", releaseLocalPath);
@@ -130,7 +137,7 @@ public class DJCFtp extends FtpManager {
                return false;
             }
          }
-         return mongoControl.ftpDownloadedCollection
+         return mongoControl.djcDownloadedCollection
            .find(eq("releaseName", releaseNameCleaned))
            .first() == null;
       }

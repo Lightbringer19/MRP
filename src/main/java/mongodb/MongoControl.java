@@ -37,6 +37,7 @@ public class MongoControl {
    public final MongoCollection<Document> vjStreetDownloaded;
    public final MongoCollection<Document> proVideo4DJsDownloaded;
    public final MongoCollection<Document> clubDjVideosDownloaded;
+   public final MongoCollection<Document> djcDownloadedCollection;
    
    public MongoControl() {
       mongoClient = new MongoClient("localhost", 27017);
@@ -55,6 +56,8 @@ public class MongoControl {
       //FTP
       ftpDB = mongoClient.getDatabase("FTP");
       timeStampsCollection = ftpDB.getCollection("timeStamps");
+      djcDownloadedCollection = ftpDB.getCollection("djc_downloaded");
+   
       ftpDownloadedCollection = ftpDB.getCollection("ftp_downloaded");
       djc_skipCollection = ftpDB.getCollection("djc_skip");
       

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static collector.ImageCompressor.compress;
-import static com.mongodb.client.model.Filters.eq;
 import static scheduler.ScheduleWatcher.DATE_FORMAT;
 import static utils.Constants.filesDir;
 import static utils.Constants.postDir;
@@ -59,13 +58,14 @@ public class Collector extends Thread implements CollectorInterface, ApiInterfac
                        + "| In: " + category);
                      if (groupCheck(collectJsonFile)) {
                         try {
-                           InfoForPost collectedInfo = collect(collectJsonFile);
-                           archive(mrp_pc_api, collectedInfo);
+                           InfoForPost info = collect(collectJsonFile);
+                           String objectId = insertReleaseToDB(releaseFolder, info);
+                           archive(mrp_pc_api, info);
                            if (category.contains("RECORDPOOL")) {
-                              scheduleRelease(collectedInfo);
+                              scheduleRelease(info, objectId);
                            } else {
                               FUtils.writeFile(postDir + category,
-                                collectedInfo.getReleaseName(), "");
+                                objectId, "");
                            }
                            deleteRelease(releaseFolder);
                            collectJsonFile.delete();
@@ -98,6 +98,20 @@ public class Collector extends Thread implements CollectorInterface, ApiInterfac
          }
       }
       
+   }
+   
+   public String insertReleaseToDB(File releaseFolder, InfoForPost info) {
+      // insert info to DB
+      InfoAboutRelease infoAboutRelease = convertInfo(info);
+      Release release = new Release();
+      release.setReleaseName(info.getReleaseName());
+      release.setCategory(info.getPostCategory());
+      release.setBoxComDownloadLink(info.getLink());
+      release.setPathToLocalFolder(releaseFolder.getAbsolutePath());
+      release.setInfoAboutRelease(infoAboutRelease);
+      Document releaseDoc = release.toDoc();
+      MONGO_CONTROL.releasesCollection.insertOne(releaseDoc);
+      return releaseDoc.getObjectId("_id").toString();
    }
    
    public void archive(String mrp_pc_api, InfoForPost collectedInfo) throws InterruptedException {
@@ -154,26 +168,6 @@ public class Collector extends Thread implements CollectorInterface, ApiInterfac
       logger.log("Collecting Info About Files");
       InfoForPost info = collect(audioFiles, infoFromBoxCom.getReleaseName(),
         infoFromBoxCom.getDownloadLinkBoxCom(), artLink, folderToCollect, postCategory);
-      // insert info to DB
-      Document foundRelease = MONGO_CONTROL.releasesCollection
-        .find(eq("releaseName", info.getReleaseName())).first();
-      if (foundRelease == null) {
-         InfoAboutRelease infoAboutRelease = convertInfo(info);
-         Release release = new Release();
-         release.setReleaseName(info.getReleaseName());
-         release.setCategory(info.getPostCategory());
-         release.setBoxComDownloadLink(info.getLink());
-         release.setPathToLocalFolder(folderToCollect.getAbsolutePath());
-         release.setInfoAboutRelease(infoAboutRelease);
-         MONGO_CONTROL.releasesCollection.insertOne(release.toDoc());
-      } else {
-         InfoAboutRelease infoAboutRelease = convertInfo(info);
-         foundRelease.put("category", info.getPostCategory());
-         foundRelease.put("boxComDownloadLink", info.getLink());
-         foundRelease.put("infoAboutRelease", infoAboutRelease.toDoc());
-         MONGO_CONTROL.releasesCollection.replaceOne((eq("_id",
-           foundRelease.getObjectId("_id"))), foundRelease);
-      }
       return info;
    }
    
@@ -295,12 +289,13 @@ public class Collector extends Thread implements CollectorInterface, ApiInterfac
       return audioFiles;
    }
    
-   private void scheduleRelease(InfoForPost collectedInfo) {
+   private void scheduleRelease(InfoForPost collectedInfo, String id) {
       Calendar cal = Calendar.getInstance();
       cal.add(Calendar.MINUTE, ThreadLocalRandom.current().nextInt(480, 720));
       String scheduleTime = DATE_FORMAT.format(cal.getTime());
       Document scheduleTask = new Document()
         .append("releaseName", collectedInfo.getReleaseName())
+        .append("id", id)
         .append("scheduleTime", scheduleTime)
         .append("scheduleTimeMillis", cal.getTime().getTime());
       Log.write("Scheduling the Release: " + collectedInfo.getReleaseName()

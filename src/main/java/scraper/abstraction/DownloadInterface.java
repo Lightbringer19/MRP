@@ -9,7 +9,6 @@ import org.apache.http.impl.client.HttpClients;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
-import utils.CheckDate;
 import utils.FUtils;
 import utils.Logger;
 
@@ -20,6 +19,8 @@ import java.util.List;
 
 import static java.net.URLDecoder.decode;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static utils.CheckDate.getCurrentYear;
+import static utils.CheckDate.getTodayDate;
 import static utils.Constants.tagsDir;
 
 @SuppressWarnings("ALL")
@@ -28,7 +29,7 @@ public interface DownloadInterface {
    default void downloadLinks(List<String> scrapedLinks, String releaseName) {
       getLogger().log("Downloading release: " + releaseName);
       String releaseFolderPath =
-        "E://TEMP FOR LATER/2019/" + CheckDate.getTodayDate() +
+        "E://TEMP FOR LATER/" + getCurrentYear() + "/" + getTodayDate() +
           "/RECORDPOOL/" + releaseName + "/";
       new File(releaseFolderPath).mkdirs();
       Scheduler scheduler = Schedulers.newParallel("Download", 15);

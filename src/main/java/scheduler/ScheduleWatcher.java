@@ -47,9 +47,10 @@ public class ScheduleWatcher extends Thread {
         .find(lt("scheduleTimeMillis", new Date().getTime())).first();
       if (releaseToPost != null) {
          String releaseName = releaseToPost.get("releaseName").toString();
+         String id = (String) releaseToPost.get("id");
          Log.write("Adding Release to Post Que: " + releaseName,
            "SCHEDULER");
-         FUtils.writeFile(postDir + "RECORDPOOL", releaseName, "");
+         FUtils.writeFile(postDir + "RECORDPOOL", id, "");
          MONGO_CONTROL.scheduleCollection.deleteOne(releaseToPost);
       }
    }

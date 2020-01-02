@@ -20,6 +20,7 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.mongodb.client.model.Filters.eq;
+import static utils.CheckDate.getCurrentYear;
 
 public class SceneFTPManager extends Thread {
    private static final int PORT_SCENE = 35695;
@@ -64,9 +65,9 @@ public class SceneFTPManager extends Thread {
       };
       long sec = 1000;
       long min = sec * 60;
-      // timer.schedule(ftpCheckMp3, 0, min);
-      // timer.schedule(ftpCheckFlac, 0, min);
-      timer.schedule(ftpCheckMvid, 0, min);
+      timer.schedule(ftpCheckMp3, 0, min);
+      timer.schedule(ftpCheckFlac, 0, min);
+      // timer.schedule(ftpCheckMvid, 0, min);
    }
    
    private void checkFtp(String categoryToDownload) {
@@ -148,7 +149,7 @@ public class SceneFTPManager extends Thread {
            "SCENE_FTP");
          // create local release folder
          String releaseLocalPath =
-           "E:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
+           "E:/TEMP FOR LATER/" + getCurrentYear() + "/" + CheckDate.getTodayDate()
              + "/" + category + "/" + releaseName;
          new File(releaseLocalPath).mkdirs();
          //download files

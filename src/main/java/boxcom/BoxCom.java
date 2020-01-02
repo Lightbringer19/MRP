@@ -23,10 +23,12 @@ import static utils.Constants.uploadingDir;
 class BoxCom {
    private static final String CONFIG = Constants.filesDir + "config.json";
    
-   private static final String ID_2019 = "62866040452";
+   // private static final String ID_2019 = "62866040452";
+   private static final String ID_2020 = "98456879842";
+   
    private static final String TEST_FOLDER_ID = "77312192064";
    private static String USER_ID;
-   private static BoxFolder FOLDER_2019;
+   private static BoxFolder FOLDER_TO_DOWNLOAD;
    private static BoxFolder TEST_FOLDER;
    
    private static BoxSharedLink.Permissions permissions;
@@ -40,7 +42,7 @@ class BoxCom {
       permissions = new BoxSharedLink.Permissions();
       YamlConfig yamlConfig = new YamlConfig();
       USER_ID = yamlConfig.config.getBox_user_id();
-      FOLDER_2019 = new BoxFolder(GetClient(), ID_2019);
+      FOLDER_TO_DOWNLOAD = new BoxFolder(GetClient(), ID_2020);
       permissions.setCanDownload(true);
       permissions.setCanPreview(true);
    }
@@ -86,7 +88,7 @@ class BoxCom {
    
    void UploadAndGetLink(File folderToUpload, File infoJsonFile) {
       try {
-         BoxFolder dayFolder = searchForFolder(FOLDER_2019,
+         BoxFolder dayFolder = searchForFolder(FOLDER_TO_DOWNLOAD,
            folderToUpload.getParentFile().getParentFile().getName());
          BoxFolder categoryFolder =
            searchForFolder(dayFolder, folderToUpload.getParentFile().getName());

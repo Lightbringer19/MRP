@@ -134,7 +134,7 @@ task Tagger {
     dependsOn newRelease('monitors.', 'Tagger_Monitor', '4.0.')
 }
 task Collector {
-    dependsOn newRelease('monitors.', 'Collector_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'Collector_Monitor', '3.0.')
 }
 task SceneFTP {
     dependsOn newRelease('monitors.', 'Scene_FTP_Monitor', '2.0.')
@@ -204,23 +204,24 @@ task ClubDJScraper {
     dependsOn newRelease('monitors.', 'ClubDJ_Scraper_Monitor', '1.0.')
 }
 task BuildScrapers {
-    dependsOn BpmSupremeScraper
-    dependsOn BpmLatinoScraper
+    
     dependsOn AvDistrictScraper
-    dependsOn SmashVisionScraper
-    dependsOn EwScraper
-    dependsOn MaletaDvjScraper
+    dependsOn BpmLatinoScraper
+    dependsOn BpmSupremeScraper
     dependsOn ClubDJScraper
+    dependsOn EwScraper
+    dependsOn HeadlineScraper
+    dependsOn HeavyHitsScraper
+    dependsOn MaletaDvjScraper
+    dependsOn MassPoolScraper
+    dependsOn Mp3PoolScraper
+    dependsOn SmashVisionScraper
 
 //    dependsOn DMPScraper
-    dependsOn HeadlineScraper
-    dependsOn CrateConnectScraper
-    dependsOn HeavyHitsScraper
-    dependsOn Mp3PoolScraper
+//    dependsOn CrateConnectScraper
 
 //    dependsOn BeatJunkiesScraper
 //    dependsOn DaleMBScraper
-//    dependsOn MassPoolScraper
 //    dependsOn VjStreetScraper
 }
 
@@ -231,15 +232,18 @@ task BuildPosters {
 
 task BuildAll {
 
-    dependsOn BuildScrapers
+//    dependsOn BuildScrapers
 
+//    dependsOn Tagger
     dependsOn Uploader
+    dependsOn Collector
     dependsOn Poster
     dependsOn Reposter
-    dependsOn Tagger
+    dependsOn ScheduleWatcher
+
+    //ftp
     dependsOn SceneFTP
     dependsOn BeatportFtp
     dependsOn DJCFtp
-    dependsOn ScheduleWatcher
 
 }

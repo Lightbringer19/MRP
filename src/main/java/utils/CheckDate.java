@@ -40,6 +40,10 @@ public class CheckDate {
       return new SimpleDateFormat("MM-dd-yy HH:mm:ss ").format(new Date());
    }
    
+   public static String getCurrentYear() {
+      return new SimpleDateFormat("yyyy").format(new Date());
+   }
+   
    public static String getTodayDate() {
       return new SimpleDateFormat("MM-dd-yy").format(new Date());
    }
@@ -62,9 +66,6 @@ public class CheckDate {
    
    private static boolean isBetween(LocalTime candidate, LocalTime start, LocalTime end) {
       return !candidate.isBefore(start) && !candidate.isAfter(end); // Inclusive.
-   }
-   
-   public static void main(String[] args) {
    }
    
 }

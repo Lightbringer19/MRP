@@ -3,7 +3,6 @@ package ftp.beatport;
 import ftp.abstraction.FtpManager;
 import org.apache.commons.net.ftp.FTPFile;
 import org.bson.Document;
-import utils.CheckDate;
 import utils.Constants;
 import utils.FUtils;
 import utils.Logger;
@@ -11,6 +10,8 @@ import utils.Logger;
 import java.io.*;
 
 import static com.mongodb.client.model.Filters.eq;
+import static utils.CheckDate.getCurrentYear;
+import static utils.CheckDate.getTodayDate;
 
 public class BeatportFtp extends FtpManager {
    
@@ -35,7 +36,7 @@ public class BeatportFtp extends FtpManager {
          logger.log("New Releases to Download: " + releaseName);
          // create local release folder
          String releaseLocalPath =
-           "E:/TEMP FOR LATER/2019/" + CheckDate.getTodayDate()
+           "E:/TEMP FOR LATER/" + getCurrentYear() + "/" + getTodayDate()
              + "/" + CATEGORY_NAME + "/" + releaseName;
          new File(releaseLocalPath).mkdirs();
          FTPFile[] releaseFiles = ftpClient.listFiles(releaseRemotePath);
