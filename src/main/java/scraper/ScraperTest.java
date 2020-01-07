@@ -2,15 +2,12 @@ package scraper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class ScraperTest {
    
@@ -19,48 +16,44 @@ public class ScraperTest {
       Document document = Jsoup.parse(html);
       
       String firstDate = document
-        .select("div[class=tracks_homepage]>div>div")
-        .first().text()
-        .replace("Added on ", "");
+        .select("div[class=col-created_at link]").first().text();
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("div[class=date-added]")
+        .select("div[class=col-created_at link]")
         .stream()
-        .map(nextDate -> nextDate.text().replace("Added on ", ""))
-        .filter(dateFormatted -> !dateFormatted.equals(firstDate))
-        .findFirst().get();
+        .map(Element::text)
+        .filter(date -> !date.equals(firstDate))
+        .findFirst()
+        .orElse(null);
       
       System.out.println(downloadDate);
       
-      Elements dates = document.select("div[class=date-added]");
-      String containerHtml = document.select("div[class=tracks_homepage]").html();
-      int indexOfFirstDate = containerHtml.indexOf(downloadDate);
-      
-      Optional<String> dateAfterDownloadDate = dates.stream()
-        .map(date -> date.text().replace("Added on ", ""))
-        .filter(dateFormatted ->
-          !dateFormatted.equals(downloadDate) && !dateFormatted.equals(firstDate))
-        .findFirst();
-      String htmlWithTracks;
-      if (dateAfterDownloadDate.isPresent()) {
-         int indexOfSecondDate = containerHtml.indexOf(dateAfterDownloadDate.get());
-         htmlWithTracks = containerHtml.substring(indexOfFirstDate, indexOfSecondDate);
-      } else {
-         htmlWithTracks = containerHtml.substring(indexOfFirstDate);
+      String cssQuery = "div[class=row-item row-item-album audio ]";
+      // if (!audioRelease) {
+      //    cssQuery = "div[class=row-item  row-item-album video ]";
+      // }
+      Elements trackInfos = Jsoup.parse(html).select(
+        cssQuery);
+      for (Element trackInfo : trackInfos) {
+         String trackDate = trackInfo.select("div[class=col-created_at link]").first()
+           .text();
+         if (trackDate.equals(downloadDate)) {
+            String title = trackInfo.select("div[class=row-track]").text();
+            Elements tags = trackInfo.select("div[class=row-tags]>span");
+            for (Element tag : tags) {
+               String trackId = tag.attr("id").replace("New Releases_media_tag_", "");
+               // String linkForApi = format(
+               //   "https://api.bpmlatino.com/v1/media/{0}/download?crate=false", trackId);
+               // List<String> info = getDownloadInfo(linkForApi, "latino");
+               // String downloadUrl = info.get(0);
+               String trackType = tag.text();
+               System.out.println(title + " (" + trackType + ") | "
+                 + trackId);
+            }
+         }
       }
-      
-      List<String> scrapedLinks = new ArrayList<>();
-      String template = "https://headlinermusicclub.com/?get_file={0}";
-      Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]")
-        .forEach(trackInfo ->
-          trackInfo.select("a:contains(download)").stream()
-            .map(element -> MessageFormat.format(template, element.attr("data-file")))
-            .forEach(scrapedLinks::add));
-      
-      System.out.println(scrapedLinks.size());
-      scrapedLinks.forEach(System.out::println);
       
    }
 }

@@ -1,11 +1,130 @@
 package collector;
 
-public class TEST {
+import json.TrackInfo;
+import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+
+public class TEST implements NfoExtractionInterface {
    public static void main(String[] args) {
-      // String st = "{\"_id\":{\"$oid\":\"5d07c56aa34a3b1e75ffc20b\"},\"imageMap\":{\"Latino Music Pool\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Latino-Music-Pool.jpg\",\"Remix Planet\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Remix-Planet.jpg\",\"Heavy Hits\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Heavy-Hits.jpg\",\"Ultimix\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Ultimix.jpg\",\"BeatJunkies\":\"https://myrecordpool.com/wp-content/uploads/2019/06/BeatJunkies.jpg\",\"Crack 4 Djs\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Crack-4-Djs.jpg\",\"Crate Connect\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Crate-Connect.jpg\",\"TrakkAddixx\":\"https://myrecordpool.com/wp-content/uploads/2019/06/TrakkAddixx.jpg\",\"Digital Music Pool\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Digital-Music-Pool.png\",\"Doing The Damage\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Doing-Damage.jpg\",\"Headliner Music Club\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Headliner-Music-Club.jpg\",\"Bpm Supreme\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Bpm-Supreme.png\",\"DJ City\":\"https://myrecordpool.com/wp-content/uploads/2019/06/DJ-City.png\",\"8th Wonder\":\"https://myrecordpool.com/wp-content/uploads/2019/06/8th-Wonder.png\",\"Direct Music Service\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Direct-Music-Service.jpg\",\"MyMp3Pool\":\"https://myrecordpool.com/wp-content/uploads/2019/06/MyMp3Pool.jpg\",\"Beezo Beehive\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Beezo-Beehive.png\",\"Club Killers\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Club-Killers.png\",\"Beatfreakz\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Beatfreakz.jpg\",\"Crooklyn Clan\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Crooklyn-Clan.jpg\",\"Cicana\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Cicana.jpg\",\"Select Mix\":\"https://myrecordpool.com/wp-content/uploads/2019/06/Select-Mix.jpg\",\"SmashVision\":\"https://myrecordpool.com/wp-content/uploads/2019/08/SmashVision.jpg\",\"BarBangerz\":\"https://myrecordpool.com/wp-content/uploads/2019/08/BarBangerz.png\",\"RemixMP4\":\"https://myrecordpool.com/wp-content/uploads/2019/08/RemixMP4.png\",\"MixShow Tools\":\"https://myrecordpool.com/wp-content/uploads/2019/08/MixShowTools.jpg\",\"Megatraxx\":\"https://myrecordpool.com/wp-content/uploads/2019/08/Megatraxx-Remixes.jpg\",\"Mastermix\":\"https://myrecordpool.com/wp-content/uploads/2019/08/MasterMix.jpg\",\"Mass Pool\":\"https://myrecordpool.com/wp-content/uploads/2019/08/MassPool.jpg\",\"masspooldjs\":\"https://myrecordpool.com/wp-content/uploads/2019/08/MassPool.jpg\",\"Late Night Record Pool\":\"https://myrecordpool.com/wp-content/uploads/2019/08/Late-Night-Record-Pool.jpg\",\"Intensa Music\":\"https://myrecordpool.com/wp-content/uploads/2019/08/IntensaMusic.jpg\",\"Crate Gang\":\"https://myrecordpool.com/wp-content/uploads/2019/08/Crate-Gang-1.jpg\",\"DaleMasBajo\":\"https://myrecordpool.com/wp-content/uploads/2019/08/DaleMasBajo.jpg\"}}";
-      // String replaceAll = st.replaceAll("https://myrecordpool.com/wp-content/uploads/2019/06", "images")
-      //   .replaceAll("https://myrecordpool.com/wp-content/uploads/2019/08", "images");
-      // System.out.println(replaceAll);
       
+      TEST test = new TEST();
+      
+      File file = new File("GDS_SERVER/srp");
+      test.extract(file);
+   }
+   
+   @SneakyThrows
+   void extract(File folderToCollect) {
+      String Artist = "No Info";
+      String Album = "No Info";
+      String Genre = "No Info";
+      String Released = "No Info";
+      String Tracks = "No Info";
+      String Playtime = "No Info";
+      String Group = "No Info";
+      String Format = "No Info";
+      String Bitrate = "No Info";
+      String Sample_Rate = "No Info";
+      String Size = "No Info";
+      HashMap<Integer, TrackInfo> TrackList = new HashMap<>();
+      String[] folderElements = folderToCollect.getName().split("-");
+      Group = folderElements[folderElements.length - 1];
+      File nfo = Arrays.stream(folderToCollect.listFiles())
+        .filter(file -> file.getName().endsWith(".nfo"))
+        .findFirst()
+        .orElse(null);
+      if (nfo != null) {
+         if (Group.toLowerCase().contains("srp")) {
+            String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
+              .replaceAll("\\P{Print}", "")
+              .trim();
+            System.out.println(nfoSt);
+            Tracks = "1";
+            Artist = getFromNfo(nfoSt, "Artist", "Track Title");
+            String title = getFromNfo(nfoSt, "Title", "Genre");
+            Genre = getFromNfo(nfoSt, "Genre", "Year");
+            Released = getFromNfo(nfoSt, "Year.", "Rip date");
+            System.out.println(Released);
+            Size = getFromNfo(nfoSt, "Size", "Resolution");
+            Playtime = getFromNfo(nfoSt, "Length", "Size");
+            Format = getFromNfo(nfoSt, "Format", "Audio");
+            String audio = getFromNfo(nfoSt, "Audio", "Deinterlace");
+            Sample_Rate = Arrays.stream(audio.split(" "))
+              .filter(s -> s.contains("Hz"))
+              .findFirst()
+              .orElse("???Hz");
+            Bitrate = Arrays.stream(audio.split(" "))
+              .filter(s -> s.contains("kbps"))
+              .findFirst()
+              .orElse("???kbps");
+            TrackList.put(0, new TrackInfo(title, Artist, Playtime));
+         } else if (Group.toLowerCase().contains("gfvid")) {
+            String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
+              .trim();
+            String title = getFromNfo(nfoSt, "TITLE:", "TV DATE:");
+            Artist = title.split(" - ")[0];
+            Genre = getFromNfo(nfoSt, "GENRE", "SUBGENRE");
+            Released = getFromNfo(nfoSt, "SHOW DATE", "RUNTIME");
+            Size = getFromNfo(nfoSt, "SIZE", "ARCHIVES");
+            Playtime = getFromNfo(nfoSt, "RUNTIME", "GENRE");
+            Format = getFromNfo(nfoSt, "CODEC", "BITRATE");
+            Bitrate = getFromNfo(nfoSt, "AUDIO", "INFOS");
+            Sample_Rate = getFromNfo(nfoSt, "INFOS", "FASHION");
+            String trackList = getFromNfoSpace(nfoSt, "TRACKLIST", "NOTES");
+            if (trackList.replaceAll("\n", "")
+              .replaceAll(" ", "").equals("")) {
+               TrackList.put(0, new TrackInfo(title.split(" - ")[1],
+                 Artist, Playtime));
+            } else {
+               String[] tracks = trackList.split("\n");
+               for (int i = 0; i < tracks.length; i++) {
+                  String[] trackSplit = tracks[i].split(" {2}");
+                  TrackList.put(i, new TrackInfo(trackSplit[0], Artist,
+                    trackSplit[trackSplit.length - 1]));
+               }
+            }
+            Tracks = String.valueOf(TrackList.size());
+         } else if (Group.toLowerCase().contains("iuf")) {
+            String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
+              .replaceAll("\\P{Print}", "")
+              .trim();
+            Tracks = "1";
+            Artist = getFromNfoDot(nfoSt, "Artist", "Title");
+            String title = getFromNfoDot(nfoSt, "Title", "Genre");
+            Genre = getFromNfoDot(nfoSt, "Genre", "Video Year");
+            Released = getFromNfoDot(nfoSt, "Rel.Date", "Encoding Info");
+            Size = getFromNfoDot(nfoSt, "Size", "octets");
+            long fileSizeInKB = Long.parseLong(Size) / 1024;
+            long fileSizeInMB = fileSizeInKB / 1024;
+            Size = fileSizeInMB + " MB";
+            Playtime = getFromNfoDot(nfoSt, "Length", "Size");
+            Format = getFromNfoDot(nfoSt, "Format", "Resolution");
+            Bitrate = getFromNfoDot(nfoSt, "Bitrate", "Deinterlace");
+            TrackList.put(0, new TrackInfo(title, Artist, Playtime));
+         } else if (Group.toLowerCase().contains("pmv")) {
+            String nfoSt = FileUtils.readFileToString(nfo, "UTF-8")
+              .replaceAll("\\P{Print}", "")
+              .trim();
+            Artist = getFromNfo(nfoSt, "ARTiST", "TiTLE");
+            String title = getFromNfo(nfoSt, "TiTLE", "REL.DATE")
+              .replaceAll("~", "").trim();
+            Genre = getFromNfo(nfoSt, "GENRE", "FORMAT")
+              .replaceAll("~", "").trim();
+            Released = getFromNfo(nfoSt, "REL.DATE", "AIR DATE");
+            Size = getFromNfo(nfoSt, "SIZE", "Bytes");
+            long fileSizeInKB = Long.parseLong(Size) / 1024;
+            long fileSizeInMB = fileSizeInKB / 1024;
+            Size = fileSizeInMB + " MB";
+            Playtime = getFromNfo(nfoSt, "LENGTH", "DAR/SAR");
+            Format = getFromNfo(nfoSt, "VIDEO CODEC", "AUDIO CODEC");
+            Bitrate = getFromNfo(nfoSt, "AVERAGE BITRATE:", "CONTAINER");
+            TrackList.put(0, new TrackInfo(title, Artist, Playtime));
+         }
+         
+      }
    }
 }

@@ -63,7 +63,7 @@ public interface CollectorInterface extends NfoExtractionInterface {
                   Artist = getFromNfo(nfoSt, "Artist", "Track Title");
                   String title = getFromNfo(nfoSt, "Title", "Genre");
                   Genre = getFromNfo(nfoSt, "Genre", "Year");
-                  Released = getFromNfo(nfoSt, "Year", "Rip date");
+                  Released = getFromNfo(nfoSt, "Year.", "Rip date");
                   Size = getFromNfo(nfoSt, "Size", "Resolution");
                   Playtime = getFromNfo(nfoSt, "Length", "Size");
                   Format = getFromNfo(nfoSt, "Format", "Audio");

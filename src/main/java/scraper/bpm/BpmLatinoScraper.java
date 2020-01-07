@@ -69,7 +69,8 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    
    @Override
    public String scrapeFirstDate(String html) {
-      return Jsoup.parse(html).select("div[class=col-created_at link]").first().text();
+      return Jsoup.parse(html)
+        .select("div[class=col-created_at link]").first().text();
    }
    
    @Override
