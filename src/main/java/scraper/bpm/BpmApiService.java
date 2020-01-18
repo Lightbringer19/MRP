@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 import static org.bson.Document.parse;
 
 public interface BpmApiService {
-   default List<String> getDownloadInfo(String url, String bpmType) {
+   @SuppressWarnings("DuplicatedCode")
+   default List<String> getDownloadInfo(String url) {
       try {
          @Cleanup CloseableHttpClient client = HttpClients.createDefault();
          HttpGet get = new HttpGet(url);
@@ -29,24 +30,24 @@ public interface BpmApiService {
          get.setHeader("Cookie", getCookie());
          get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
          @Cleanup CloseableHttpResponse response = client.execute(get);
-         System.out.println(url + " " + response.getStatusLine().getStatusCode());
-         String cookieForAPI = Arrays.stream(response.getAllHeaders())
-           .filter(header -> header.getName().equals("Set-Cookie"))
-           .map(header -> header.getElements()[0])
-           .map(cookieElem -> cookieElem.getName() + "=" + cookieElem.getValue())
-           .collect(Collectors.joining("; "));
-         String downloadURL;
-         if (bpmType.equals("latino")) {
+         int statusCode = response.getStatusLine().getStatusCode();
+         System.out.println(url + " " + statusCode);
+         List<String> info = null;
+         if (statusCode == 200) {
+            String cookieForAPI = Arrays.stream(response.getAllHeaders())
+              .filter(header -> header.getName().equals("Set-Cookie"))
+              .map(header -> header.getElements()[0])
+              .map(cookieElem -> cookieElem.getName() + "=" + cookieElem.getValue())
+              .collect(Collectors.joining("; "));
+            String downloadURL;
             downloadURL =
               ((Document) (parse(EntityUtils.toString(response.getEntity()))
                 .get("data")))
                 .get("url").toString();
-         } else {
-            downloadURL = response.getFirstHeader("Location").getValue();
+            info = new ArrayList<>();
+            info.add(downloadURL);
+            info.add(cookieForAPI);
          }
-         List<String> info = new ArrayList<>();
-         info.add(downloadURL);
-         info.add(cookieForAPI);
          return info;
       } catch (Exception e) {
          getLogger().log(e);

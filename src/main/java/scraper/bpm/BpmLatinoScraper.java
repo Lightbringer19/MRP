@@ -39,7 +39,7 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    @Override
    @SneakyThrows
    public void beforeLogin() {
-      sleep(1_000);
+      sleep(2_000);
       
    }
    
@@ -102,7 +102,7 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
                String trackId = tag.attr("id").replace("New Releases_media_tag_", "");
                String linkForApi = format(
                  "https://api.bpmlatino.com/v1/media/{0}/download?crate=false", trackId);
-               List<String> info = getDownloadInfo(linkForApi, "latino");
+               List<String> info = getDownloadInfo(linkForApi);
                String downloadUrl = info.get(0);
                cookieForAPI = info.get(1);
                String trackType = tag.text();

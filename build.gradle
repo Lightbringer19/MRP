@@ -165,7 +165,7 @@ task HeadlineScraper {
     dependsOn newRelease('monitors.', 'Headline_Scraper_Monitor', '2.0.')
 }
 task BpmSupremeScraper {
-    dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'BpmSupreme_Scraper_Monitor', '3.0.')
 }
 task BpmLatinoScraper {
     dependsOn newRelease('monitors.', 'BpmLatino_Scraper_Monitor', '2.0.')
@@ -204,7 +204,7 @@ task ClubDJScraper {
     dependsOn newRelease('monitors.', 'ClubDJ_Scraper_Monitor', '1.0.')
 }
 task BuildScrapers {
-    
+
     dependsOn AvDistrictScraper
     dependsOn BpmLatinoScraper
     dependsOn BpmSupremeScraper

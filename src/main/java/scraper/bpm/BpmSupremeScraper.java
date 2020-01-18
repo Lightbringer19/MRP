@@ -5,8 +5,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import scraper.abstraction.Scraper;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +22,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
       passFieldNavigator = By.id("login-form-password");
       submitButtonNavigator = By.tagName("button");
    
-      dateFormat = "MM/dd/yy";
+      dateFormat = "yyyy-MM-dd";
       downloaded = mongoControl.bpmDownloaded;
       releaseName = "Bpm Supreme";
    }
@@ -32,8 +34,14 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
    
    @Override
    @SneakyThrows
+   public void beforeLogin() {
+      sleep(3_000);
+   }
+   
+   @Override
+   @SneakyThrows
    public void afterFirstStage() {
-      urlToGet = "https://www.bpmsupreme.com/store/newreleases/audio/classic/1";
+      urlToGet = "https://app.bpmsupreme.com/new-releases/classic/audio";
       driver.get(urlToGet);
       Thread.sleep(10_000);
    }
@@ -44,7 +52,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
       logger.log("Downloading Music Release");
       scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
       // SCRAPE VIDEOS AND DOWNLOAD
-      urlToGet = "https://www.bpmsupreme.com/store/newreleases/video/classic/1";
+      urlToGet = "https://app.bpmsupreme.com/new-releases/classic/video";
       driver.get(urlToGet);
       Thread.sleep(10_000);
       logger.log("Looking for Video Release");
@@ -54,43 +62,62 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
    
    @Override
    public String scrapeFirstDate(String html) {
-      return Jsoup.parse(html).select("span[class=date ng-binding]").first().text();
+      return Jsoup.parse(html)
+        .select("div[class=col-created_at link]").first().text();
    }
    
    @Override
    public String previousDateOnThisPage(String html, String firstDate) {
       return Jsoup.parse(html)
-        .select("span[class=date ng-binding]")
+        .select("div[class=col-created_at link]")
         .stream()
-        .filter(date -> !date.text().equals(firstDate))
-        .findFirst()
         .map(Element::text)
+        .filter(date -> !date.equals(firstDate))
+        .findFirst()
         .orElse(null);
    }
    
    @Override
+   @SneakyThrows
    public void scrapeAllLinksOnPage(String html, String downloadDate, String firstDate,
                                     List<String> scrapedLinks) {
       Elements trackInfos = Jsoup.parse(html)
-        .select("li[class=even updatedversion ng-scope]");
+        .select("div[class*=row-item-album]");
       for (Element trackInfo : trackInfos) {
-         String date = trackInfo.select("span[class=date ng-binding]").text();
+         String date = trackInfo.select("div[class=col-created_at link]").text();
          if (date.equals(downloadDate)) {
-            String title = trackInfo.select("div[class=title_box]>h3").first()
-              .attr("title");
-            Element trackTags = trackInfo.select("div[class=tag]").first();
-            Elements trackDownloadInfos = trackTags.select("span");
-            for (Element downloadInfo : trackDownloadInfos) {
-               String trackId = downloadInfo.attr("id")
-                 .replace("icon_download_", "");
-               String linkForApi = "https://www.bpmsupreme.com/store/output_file/" + trackId;
-               List<String> info = getDownloadInfo(linkForApi, "");
-               String downloadUrl = info.get(0);
-               cookieForAPI = info.get(1);
-               String trackType = downloadInfo.text();
-               logger.log(title + " (" + trackType + ") | "
-                 + downloadUrl);
+            String title = trackInfo.select("div[class=row-track-name]").first().text();
+            String artist = trackInfo.select("div[class=row-artist]").first().text();
+            Elements tags = trackInfo.select("div[class=row-tags]").first()
+              .select("span[class=tag-link]");
+            for (Element tag : tags) {
+               // construct download url from artist, title and tag name
+               String pattern = "https://av.bpmsupreme.com/audio/{0} - {1} ({2}).mp3?download";
+               if (urlToGet.contains("video")) {
+                  pattern = pattern.replace("/audio/", "/video/");
+                  pattern = pattern.replace(".mp3", ".mp4");
+               }
+               String downloadUrl = MessageFormat.format(
+                 pattern,
+                 artist, title, tag.text());
+               System.out.println(downloadUrl);
                scrapedLinks.add(downloadUrl);
+               
+              /* String trackId = tag.attr("id")
+                 .replace("New Releases_media_tag_", "");
+               String linkForApi = MessageFormat.format(
+                 "https://api.bpmsupreme.com/v1.2/media/{0}/download?crate=false",
+                 trackId);
+               List<String> info = getDownloadInfo(linkForApi);
+               if (info != null) {
+                  String downloadUrl = info.get(0);
+                  cookieForAPI = info.get(1);
+                  String trackType = tag.text();
+                  logger.log(
+                    MessageFormat.format("{0} - {1} ({2}) | {3}",
+                      artist, title, tag.text(), downloadUrl));
+                  scrapedLinks.add(downloadUrl);
+               }*/
             }
          }
       }
@@ -109,11 +136,9 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
    @Override
    @SneakyThrows
    public void nextPage() {
-      String currentUrl = driver.getCurrentUrl();
-      Integer pageNumber =
-        Integer.valueOf(currentUrl.substring(currentUrl.lastIndexOf("/") + 1));
-      urlToGet = currentUrl.replace(pageNumber.toString(), String.valueOf(pageNumber + 1));
-      driver.get(urlToGet);
+      WebElement element = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[5]/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[3]/ul"));
+      List<WebElement> nextButtons = element.findElements(By.tagName("li"));
+      nextButtons.get(nextButtons.size() - 2).click();
       Thread.sleep(10_000);
    }
 }
