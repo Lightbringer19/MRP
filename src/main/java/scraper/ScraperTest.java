@@ -2,13 +2,12 @@ package scraper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.Optional;
 
 public class ScraperTest {
    
@@ -17,56 +16,50 @@ public class ScraperTest {
       Document document = Jsoup.parse(html);
       
       String firstDate = document
-        .select("div[class=col-created_at link]").first().text();
+        .select("div[class=tracks_homepage]>div>div")
+        .first().text()
+        .replace("Added on ", "");
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("div[class=col-created_at link]")
+        .select("div[class=date-added]")
         .stream()
-        .map(Element::text)
-        .filter(date -> !date.equals(firstDate))
+        .map(nextDate -> nextDate.text().replace("Added on ", ""))
+        .filter(dateFormatted -> !dateFormatted.equals(firstDate))
         .findFirst()
         .orElse(null);
       
       System.out.println(downloadDate);
       
-      Elements trackInfos = document
-        .select("div[class*=row-item-album]");
-      for (Element trackInfo : trackInfos) {
-         String date = trackInfo.select("div[class=col-created_at link]").text();
-         if (date.equals(downloadDate)) {
-            String title = trackInfo.select("div[class=row-track-name]").first().text();
-            String artist = trackInfo.select("div[class=row-artist]").first().text();
-            Elements tags = trackInfo.select("div[class=row-tags]").first()
-              .select("span[class=tag-link]");
-            for (Element tagInfo : tags) {
-               
-               String trackId = tagInfo.attr("id")
-                 .replace("New Releases_media_tag_", "");
-               String linkForApi = MessageFormat.format(
-                 "https://api.bpmsupreme.com/v1.2/media/{0}/download?crate=false",
-                 trackId);
-               
-               //+construct download url from artist title and tag name
-               // String downloadUrl = MessageFormat.format(
-               //   "https://av.bpmsupreme.com/audio/{0} - {1} ({2}).mp3?download",
-               //   artist, title, tagInfo.text());
-               // System.out.println(downloadUrl);
-               //-construct download url from artist title and tag name
-               
-               // List<String> info = getDownloadInfo(linkForApi, "");
-               // String downloadUrl = info.get(0);
-               // cookieForAPI = info.get(1);
-               // String trackType = tagInfo.text();
-               // logger.log(
-               //   MessageFormat.format(
-               //     "{0} - {1} ({2}) | {3}",
-               //     artist, title, tagInfo.text(), downloadUrl);
-               // scrapedLinks.add(downloadUrl);
-            }
-         }
+      Elements dates = document.select("div[class=date-added]");
+      String containerHtml = document.select("div[class=tracks_homepage]").html();
+      int indexOfFirstDate = containerHtml.indexOf(downloadDate);
+      
+      Optional<String> dateAfterDownloadDate = dates.stream()
+        .map(date -> date.text().replace("Added on ", ""))
+        .filter(dateFormatted ->
+          !dateFormatted.equals(downloadDate) && !dateFormatted.equals(firstDate))
+        .findFirst();
+      String htmlWithTracks;
+      if (dateAfterDownloadDate.isPresent()) {
+         int indexOfSecondDate = containerHtml.indexOf(dateAfterDownloadDate.get());
+         htmlWithTracks = containerHtml.substring(indexOfFirstDate, indexOfSecondDate);
+      } else {
+         htmlWithTracks = containerHtml.substring(indexOfFirstDate);
       }
+      
+      Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]").stream()
+        .map(trackInfo ->
+          trackInfo.select("div[class*=download-stars]>a").attr("href"))
+        .forEach(System.out::println);
+      
+      // String template = "https://headlinermusicclub.com/?get_file={0}";
+      // Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]")
+      //   .forEach(trackInfo ->
+      //     trackInfo.select("a:contains(download)").stream()
+      //       .map(element -> MessageFormat.format(template, element.attr("data-file")))
+      //       .forEach(System.out::println));
       
    }
 }

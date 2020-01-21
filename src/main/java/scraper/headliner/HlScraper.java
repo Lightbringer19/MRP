@@ -6,7 +6,6 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +35,8 @@ public class HlScraper extends Scraper {
    
    @Override
    public String scrapeFirstDate(String html) {
-      return Jsoup.parse(html).select("div[class=tracks_homepage]>div>div")
+      return Jsoup.parse(html)
+        .select("div[class=tracks_homepage]>div>div")
         .first().text()
         .replace("Added on ", "");
    }
@@ -71,13 +71,17 @@ public class HlScraper extends Scraper {
       } else {
          htmlWithTracks = containerHtml.substring(indexOfFirstDate);
       }
-      
-      String template = "https://headlinermusicclub.com/?get_file={0}";
+      //api download
+     /* String template = "https://headlinermusicclub.com/?get_file={0}";
       Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]")
         .forEach(trackInfo ->
           trackInfo.select("a:contains(download)").stream()
             .map(element -> MessageFormat.format(template, element.attr("data-file")))
-            .forEach(scrapedLinks::add));
+            .forEach(scrapedLinks::add));*/
+      Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]").stream()
+        .map(trackInfo ->
+          trackInfo.select("div[class*=download-stars]>a").attr("href"))
+        .forEach(scrapedLinks::add);
    }
    
    @Override
