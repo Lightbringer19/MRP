@@ -21,7 +21,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -62,6 +61,8 @@ public abstract class Scraper extends Thread
       yamlConfig = new YamlConfig().config;
       mongoControl = new MongoControl();
       System.setProperty("webdriver.gecko.driver", Constants.filesDir + "geckodriver.exe");
+      System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true");
+      System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
       FirefoxProfile ini = new ProfilesIni().getProfile("selenium");
       firefoxOptions = new FirefoxOptions().setProfile(ini);
    }
@@ -94,8 +95,7 @@ public abstract class Scraper extends Thread
    
    @SneakyThrows
    protected void login() {
-      FirefoxOptions options = new FirefoxOptions().setLogLevel(Level.OFF);
-      driver = new FirefoxDriver(options);
+      driver = new FirefoxDriver();
       logger.log("Login");
       driver.get(loginUrl);
       driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
