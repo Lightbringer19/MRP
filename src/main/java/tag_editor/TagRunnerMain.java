@@ -4,17 +4,17 @@ import lombok.SneakyThrows;
 import utils.CheckDate;
 import utils.Constants;
 import utils.FUtils;
-import utils.Log;
 
 import java.io.File;
 
 import static tag_editor.TagEditor.editMP3;
 import static utils.Constants.tagsDir;
+import static utils.Log.write;
 
 public class TagRunnerMain extends Thread {
    @SneakyThrows
    private static void DO() {
-      Log.write("Tagger Started", "Tagger");
+      write("Tagger Started", "Tagger");
       while (true) {
          try {
             // get info files
@@ -28,49 +28,50 @@ public class TagRunnerMain extends Thread {
                   editRecordPool(infoFile, folderToEdit, category);
                }
             }
-            Log.write(CheckDate.getNowTime() + " Tagger Sleeping", "Tagger");
-            Thread.sleep(10000);
+            write(CheckDate.getNowTime() + " Tagger Sleeping", "Tagger");
+            sleep(10000);
          } catch (Exception e) {
-            Log.write(CheckDate.getNowTime() +
+            write(CheckDate.getNowTime() +
               " Tagger Sleeping With Exception " + e, "Tagger");
-            Log.write(e, "Tagger");
-            Thread.sleep(5000);
+            write(e, "Tagger");
+            sleep(5000);
          }
       }
    }
    
    private static void editRecordPool(File infoFile, File folderToEdit, String category) {
       // Edit tags in folder
-      Log.write("Editing Folder: " + folderToEdit.getName(), "Tagger");
+      write("Editing Folder: " + folderToEdit.getName(), "Tagger");
       File[] RecordPoolFolder = folderToEdit.listFiles();
-      for (File RPfile : RecordPoolFolder) {
-         if (RPfile.getName().toLowerCase().endsWith(".mp3")) {
-            category = "RECORDPOOL MUSIC";
-            break;
-         }
-         if (RPfile.getName().toLowerCase().endsWith(".mp4")) {
-            category = "RECORDPOOL VIDEOS";
-            break;
-         }
-      }
-      if (category.equals("RECORDPOOL MUSIC")) {
-         for (File file : folderToEdit.listFiles()) {
-            if (file.getName().toLowerCase().endsWith(".mp3")) {
-               editMP3(file);
+      if (RecordPoolFolder != null) {
+         for (File RPfile : RecordPoolFolder) {
+            if (RPfile.getName().toLowerCase().endsWith(".mp3")) {
+               category = "RECORDPOOL MUSIC";
+               break;
+            }
+            if (RPfile.getName().toLowerCase().endsWith(".mp4")) {
+               category = "RECORDPOOL VIDEOS";
+               break;
             }
          }
-      } else {
-         for (File file : folderToEdit.listFiles()) {
-            if (file.getName().toLowerCase().endsWith(".mp4")) {
-               TagEditor.EditMP4(file);
+         if (category.equals("RECORDPOOL MUSIC")) {
+            for (File file : folderToEdit.listFiles()) {
+               if (file.getName().toLowerCase().endsWith(".mp3")) {
+                  editMP3(file);
+               }
+            }
+         } else {
+            for (File file : folderToEdit.listFiles()) {
+               if (file.getName().toLowerCase().endsWith(".mp4")) {
+                  TagEditor.EditMP4(file);
+               }
             }
          }
+         write("Folder Edited: " + folderToEdit.getName(), "Tagger");
+         FUtils.writeFile(Constants.uploadDir, folderToEdit.getName() + ".json",
+           folderToEdit.getAbsolutePath());
       }
       infoFile.delete();
-      Log.write("Folder Edited: " + folderToEdit.getName(), "Tagger");
-      // send info of edited folder to Uploader
-      FUtils.writeFile(Constants.uploadDir, folderToEdit.getName() + ".json",
-        folderToEdit.getAbsolutePath());
    }
    
    @SneakyThrows
@@ -93,8 +94,8 @@ public class TagRunnerMain extends Thread {
          FUtils.writeFile(Constants.uploadDir,
            folderToTag.getName() + ".json", folderToTag.getAbsolutePath());
       } catch (Exception e) {
-         Log.write("Exception TagEdit " + e, "Tagger");
-         Thread.sleep(5000);
+         write("Exception TagEdit " + e, "Tagger");
+         sleep(5000);
       }
    }
    
@@ -114,7 +115,7 @@ public class TagRunnerMain extends Thread {
    public void run() {
       new File(tagsDir).mkdirs();
       try {
-         Thread.sleep(500);
+         sleep(500);
          DO();
       } catch (InterruptedException e) {
          e.printStackTrace();
