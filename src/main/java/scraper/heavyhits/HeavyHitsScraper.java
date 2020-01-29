@@ -14,7 +14,7 @@ public class HeavyHitsScraper extends Scraper {
       USERNAME = yamlConfig.getHeavyhits_username();
       PASS = yamlConfig.getHeavyhits_password();
       dateFormat = "MM.dd.yyyy";
-      loginUrl = "https://www.heavyhits.com/members/login";
+      loginUrl = "https://heavyhits.com/members/login";
       nameFieldNavigator = By.id("amember-login");
       passFieldNavigator = By.id("amember-pass");
       submitButtonNavigator = By.cssSelector("div.am-row:nth-child(5) >" +
@@ -31,7 +31,7 @@ public class HeavyHitsScraper extends Scraper {
    @Override
    @SneakyThrows
    public void afterFirstStage() {
-      urlToGet = "https://www.heavyhits.com/browse/#/new-releases?a";
+      urlToGet = "https://heavyhits.com/browse/#/new-releases?a";
       driver.get(urlToGet);
       Thread.sleep(10_000);
    }
@@ -68,7 +68,7 @@ public class HeavyHitsScraper extends Scraper {
          for (Element downloadButton : downloadButtons) {
             String downloadID = downloadButton.attr("data-id");
             String trackName = downloadButton.attr("data-f");
-            String urlForApi = "https://www.heavyhits.com/hh18/library/download.php?id=" + downloadID;
+            String urlForApi = "https://heavyhits.com/hh18/library/download.php?id=" + downloadID;
             String downloadUrl = getLocation(urlForApi);
             scrapedLinks.add(downloadUrl);
             System.out.println(trackName + " | " + downloadUrl);
@@ -80,13 +80,13 @@ public class HeavyHitsScraper extends Scraper {
    @SneakyThrows
    public void nextPage() {
       String currentUrl = driver.getCurrentUrl();
-      if (!currentUrl.equals("https://www.heavyhits.com/browse/#/new-releases?a")) {
+      if (!currentUrl.equals("https://heavyhits.com/browse/#/new-releases?a")) {
          String pageNumber = currentUrl.substring(currentUrl.lastIndexOf("/") + 1);
-         urlToGet = "https://www.heavyhits.com/browse/#/new-releases/" +
+         urlToGet = "https://heavyhits.com/browse/#/new-releases/" +
            (Integer.parseInt(pageNumber) + 1);
          driver.get(urlToGet);
       } else {
-         urlToGet = "https://www.heavyhits.com/browse/#/new-releases/2";
+         urlToGet = "https://heavyhits.com/browse/#/new-releases/2";
          driver.get(urlToGet);
       }
       Thread.sleep(10_000);
