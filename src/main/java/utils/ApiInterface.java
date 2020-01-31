@@ -1,4 +1,4 @@
-package wordpress;
+package utils;
 
 import json.ResponseInfo;
 import lombok.Cleanup;
@@ -18,13 +18,16 @@ import java.io.IOException;
 import static java.lang.Thread.sleep;
 
 public interface ApiInterface {
-   @SneakyThrows
    static String getClean(String url, String cookie) {
-      @Cleanup CloseableHttpClient client = HttpClients.createDefault();
-      HttpGet get = new HttpGet(url);
-      get.setHeader("cookie", cookie);
-      @Cleanup CloseableHttpResponse response = client.execute(get);
-      return EntityUtils.toString(response.getEntity());
+      try {
+         @Cleanup CloseableHttpClient client = HttpClients.createDefault();
+         HttpGet get = new HttpGet(url);
+         get.setHeader("cookie", cookie);
+         @Cleanup CloseableHttpResponse response = client.execute(get);
+         return EntityUtils.toString(response.getEntity());
+      } catch (Exception e) {
+         return null;
+      }
    }
    
    static String postClean(String url, String cookie, String body) throws IOException {

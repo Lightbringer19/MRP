@@ -13,7 +13,7 @@ import static utils.Constants.tagsDir;
 public interface ManualSchedulerInterface {
    
    MongoControl MONGO_CONTROL = new MongoControl();
-   MongoCollection<Document> RELEASES_COLLECTION = MONGO_CONTROL.releasesCollection;
+   MongoCollection<Document> RELEASES_COLLECTION = MONGO_CONTROL.releasesNewCollection;
    MongoCollection<Document> SCHEDULE_COLLECTION = MONGO_CONTROL.scheduleCollection;
    
    default void checkRelease(File release) {

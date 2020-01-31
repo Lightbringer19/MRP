@@ -1,4 +1,4 @@
-package wordpress.other;
+package utils.other;
 
 import lombok.Cleanup;
 import org.apache.http.HttpHost;

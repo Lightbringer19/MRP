@@ -260,6 +260,14 @@ public abstract class Scraper extends Thread
         .collect(Collectors.joining("; "));
    }
    
+   @SneakyThrows
+   void testNextPage() {
+      for (int i = 0; i < 10; i++) {
+         nextPage();
+      }
+      sleep(666666666);
+   }
+   
    @Override
    public String getCookie() {
       return cookieForAPI;

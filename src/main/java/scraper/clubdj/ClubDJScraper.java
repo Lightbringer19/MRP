@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static wordpress.ApiInterface.getClean;
+import static utils.ApiInterface.getClean;
 
 public class ClubDJScraper extends Scraper {
    
@@ -79,12 +79,14 @@ public class ClubDJScraper extends Scraper {
             String requestUrl =
               "http://www.clubdjvideos.com/download-info?videoId=" + video.getId();
             String purchaseInfo = getClean(requestUrl, cookieForAPI);
-            String downloadLink = (String) Document.parse(purchaseInfo).get("downloadLink");
-            String trackName = video.getTitle();
-            logger.log(downloadLink + " " + trackName);
-            logger.log("CREDITS LEFT: " + ((Document) Document.parse(purchaseInfo)
-              .get("user")).get("downloadCredit").toString());
-            scrapedLinks.add(downloadLink);
+            if (purchaseInfo != null) {
+               String downloadLink = (String) Document.parse(purchaseInfo).get("downloadLink");
+               String trackName = video.getTitle();
+               logger.log(downloadLink + " " + trackName);
+               logger.log("CREDITS LEFT: " + ((Document) Document.parse(purchaseInfo)
+                 .get("user")).get("downloadCredit").toString());
+               scrapedLinks.add(downloadLink);
+            }
          }
       }
       return scrapedLinks;
