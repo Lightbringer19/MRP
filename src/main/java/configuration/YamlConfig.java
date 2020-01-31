@@ -5,6 +5,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.InputStream;
+import java.util.Map;
 
 public class YamlConfig {
    
@@ -20,7 +21,6 @@ public class YamlConfig {
    
    public static void main(String[] args) {
       YamlConfig yamlConfig = new YamlConfig();
-      System.out.println(yamlConfig.config.toString());
    }
    
    @Data
@@ -82,5 +82,6 @@ public class YamlConfig {
       private String provideos4djs_password;
       private String clubdj_username;
       private String clubdj_password;
+      private Map<String, String> headlinerPlaylistMap;
    }
 }

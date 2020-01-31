@@ -45,7 +45,7 @@ public class ClubDJScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       sleep(2500);
       setCookieForAPI();
       String response = getClean("http://www.clubdjvideos.com/videos/set/first?ascending=false&totalSize=1000&index=1&sortField=dateAdded&viewableSize=300",

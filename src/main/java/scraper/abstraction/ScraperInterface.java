@@ -7,7 +7,7 @@ public interface ScraperInterface {
    default void beforeCheck() {
    }
    
-   default void firstStageCheck() {
+   default void loginStage() {
    }
    
    default void beforeLogin() {
@@ -16,13 +16,13 @@ public interface ScraperInterface {
    default void afterLogin() {
    }
    
-   default void afterFirstStage() {
+   default void afterLoginStage() {
    }
    
    default void betweenStages() {
    }
    
-   default void secondStageCheck() {
+   default void scrapingStage() {
    }
    
    default void operationWithLinksAfterScrape(List<String> scrapedLinks) {

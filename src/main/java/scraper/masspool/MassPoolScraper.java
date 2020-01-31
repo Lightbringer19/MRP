@@ -34,7 +34,7 @@ public class MassPoolScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       driver.get("http://www.masspoolmp3.com/members/downloads/Dance");
       Actions action = new Actions(driver);
       WebElement choiceMenu = driver.findElement(
@@ -48,7 +48,7 @@ public class MassPoolScraper extends Scraper {
    
    @Override
    // @SneakyThrows
-   public void secondStageCheck() {
+   public void scrapingStage() {
       downloadCategory("Dance");
       driver.get("http://www.masspoolmp3.com/members/downloads/HipHop");
       downloadCategory("Hip-Hop");

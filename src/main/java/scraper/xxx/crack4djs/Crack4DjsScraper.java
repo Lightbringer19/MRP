@@ -31,7 +31,7 @@ public class Crack4DjsScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       Thread.sleep(5_000);
       Actions action = new Actions(driver);
       action.sendKeys(driver.findElement(By.cssSelector(".maingo")), Keys.DOWN).build().perform();

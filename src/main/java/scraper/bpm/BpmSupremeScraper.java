@@ -40,7 +40,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       urlToGet = "https://app.bpmsupreme.com/new-releases/classic/audio";
       driver.get(urlToGet);
       Thread.sleep(10_000);

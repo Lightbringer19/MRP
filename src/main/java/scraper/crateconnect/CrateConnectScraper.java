@@ -22,7 +22,7 @@ public class CrateConnectScraper extends Scraper {
       nameFieldNavigator = By.id("username");
       passFieldNavigator = By.id("password");
       submitButtonNavigator = By.cssSelector(".button");
-      
+   
       dateFormat = "MM/dd/yyyy";
       downloaded = mongoControl.crateConnectDownloaded;
       releaseName = "Crate Connect";
@@ -51,7 +51,7 @@ public class CrateConnectScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       driver.get("https://crateconnect.net/record-pool");
       Thread.sleep(10_000);
       //sort by DATE

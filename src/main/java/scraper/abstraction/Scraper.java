@@ -131,7 +131,7 @@ public abstract class Scraper extends Thread
             // MAIN OPERATION EXECUTION
             mainOperation(firstDate, downloadDate);
          }
-         // Schedule release and add to DB
+         // add to DB
          downloaded.insertOne(
            new Document("releaseDate", firstDate));
       } else if (releaseIsOld && !oldReleaseWasDownloaded) {
@@ -144,18 +144,18 @@ public abstract class Scraper extends Thread
    }
    
    @Override
-   public void secondStageCheck() {
+   public void scrapingStage() {
       fullScrape();
    }
    
    @Override
-   public void firstStageCheck() {
+   public void loginStage() {
       if (loginAtFirstStage) {
          login();
       } else {
-         getDriverPage();
+         getProfileDriver();
       }
-      afterFirstStage();
+      afterLoginStage();
    }
    
    @SneakyThrows
@@ -171,7 +171,7 @@ public abstract class Scraper extends Thread
    }
    
    @SneakyThrows
-   private void getDriverPage() {
+   private void getProfileDriver() {
       driver = new FirefoxDriver(firefoxOptions);
       driver.get(urlForFirstStage);
       driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -221,7 +221,7 @@ public abstract class Scraper extends Thread
       }
    }
    
-   private void writeLinksToDB(List<String> scrapedLinks, String releaseName) {
+   protected void writeLinksToDB(List<String> scrapedLinks, String releaseName) {
       boolean noScrapedReleaseInDB = mongoControl.scrapedReleases
         .find(eq("releaseName", releaseName)).first() == null;
       if (noScrapedReleaseInDB) {
@@ -232,7 +232,7 @@ public abstract class Scraper extends Thread
    }
    
    @SneakyThrows
-   private String formatDownloadDate(String date) {
+   protected String formatDownloadDate(String date) {
       Calendar cal = Calendar.getInstance();
       cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
       cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -281,9 +281,9 @@ public abstract class Scraper extends Thread
    private class Driver {
       private void check() {
          try {
-            firstStageCheck();
+            loginStage();
             betweenStages();
-            secondStageCheck();
+            scrapingStage();
          } catch (Exception e) {
             logger.log(e);
          } finally {

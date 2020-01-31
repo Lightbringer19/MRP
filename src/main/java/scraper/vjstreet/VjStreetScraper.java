@@ -39,7 +39,7 @@ public class VjStreetScraper extends Scraper implements VjStreetApiService {
    
    @SneakyThrows
    @Override
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       driver.get("https://www.vjstreet.com/en/catalog");
       sleep(2000);
    }

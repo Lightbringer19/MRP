@@ -31,7 +31,7 @@ public class SmashVisionScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       Thread.sleep(5000);
       driver.findElement(By.id("btnRowCollapseMsg")).click();
       Thread.sleep(2000);

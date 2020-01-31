@@ -39,6 +39,8 @@ public class MongoControl {
    public final MongoCollection<Document> clubDjVideosDownloaded;
    public final MongoCollection<Document> djcDownloadedCollection;
    
+   public final MongoCollection<Document> tempTestCollection;
+   
    public MongoControl() {
       mongoClient = new MongoClient("localhost", 27017);
       
@@ -83,6 +85,8 @@ public class MongoControl {
       vjStreetDownloaded = poolsDB.getCollection("vjStreet");
       proVideo4DJsDownloaded = poolsDB.getCollection("proVideo4DJs");
       clubDjVideosDownloaded = poolsDB.getCollection("clubDjVideos");
+   
+      tempTestCollection = poolsDB.getCollection("tempTestCollection");
    }
    
 }

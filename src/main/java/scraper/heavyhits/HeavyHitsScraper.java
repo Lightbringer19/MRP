@@ -30,7 +30,7 @@ public class HeavyHitsScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       urlToGet = "https://heavyhits.com/browse/#/new-releases?a";
       driver.get(urlToGet);
       Thread.sleep(10_000);

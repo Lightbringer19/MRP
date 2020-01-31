@@ -1,16 +1,16 @@
 Curated sets/Playlists:
     Headliner - https://headlinermusicclub.com/playlists
-        Hip-Hop Hits - https://headlinermusicclub.com/playlist/hip-hop-hits/
-        New For The Streets - https://headlinermusicclub.com/playlist/new-for-the-streets/
-        Big Room EDM - https://headlinermusicclub.com/playlist/big-room-edm/
-        Festival Trap - https://headlinermusicclub.com/playlist/festival-trap/
-        Dance - https://headlinermusicclub.com/playlist/dance/
-        Pop Hits - https://headlinermusicclub.com/playlist/pop-hits/
-        Latin Hits - https://headlinermusicclub.com/playlist/latin-hits/
-        Electronica - https://headlinermusicclub.com/playlist/electronica/
-        Moombahton - https://headlinermusicclub.com/playlist/moombahton/
-        Deep House - https://headlinermusicclub.com/playlist/deep-house/
-        Exclusives - https://headlinermusicclub.com/playlist/exclusives/
+        Hip-Hop Hits: https://headlinermusicclub.com/playlist/hip-hop-hits/
+        New For The Streets: https://headlinermusicclub.com/playlist/new-for-the-streets/
+        Big Room EDM: https://headlinermusicclub.com/playlist/big-room-edm/
+        Festival Trap: https://headlinermusicclub.com/playlist/festival-trap/
+        Dance: https://headlinermusicclub.com/playlist/dance/
+        Pop Hits: https://headlinermusicclub.com/playlist/pop-hits/
+        Latin Hits: https://headlinermusicclub.com/playlist/latin-hits/
+        Electronica: https://headlinermusicclub.com/playlist/electronica/
+        Moombahton: https://headlinermusicclub.com/playlist/moombahton/
+        Deep House: https://headlinermusicclub.com/playlist/deep-house/
+        Exclusives: https://headlinermusicclub.com/playlist/exclusives/
     MyMp3Pool - https://mp3poolonline.com/viewtop50mainstream#
         TOP 50 MAINSTREAM MONTHLY - https://mp3poolonline.com/viewtop50mainstream
         ...

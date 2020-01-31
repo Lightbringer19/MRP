@@ -41,7 +41,7 @@ public class MaletaDvjScraper extends Scraper {
    }
    
    @Override
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       driver.get("https://maletadvj.com/audios");
    }
    

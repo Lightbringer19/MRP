@@ -7,9 +7,15 @@ import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class HlScraper extends Scraper {
+   
+   private Map<String, String> headlinerPlaylistMap;
    
    public HlScraper() {
       USERNAME = yamlConfig.getHl_username();
@@ -21,6 +27,7 @@ public class HlScraper extends Scraper {
       submitButtonNavigator = By.id("wp-submit1");
       downloaded = mongoControl.headlinerDownloaded;
       releaseName = "Headliner Music Club";
+      headlinerPlaylistMap = yamlConfig.getHeadlinerPlaylistMap();
    }
    
    public static void main(String[] args) {
@@ -31,6 +38,63 @@ public class HlScraper extends Scraper {
    @Override
    public void afterLogin() {
       driver.get("https://headlinermusicclub.com/welcome/");
+   }
+   
+   @Override
+   public void scrapingStage() {
+      //Scrape main page with tracks
+      fullScrape();
+      // Scrape all playlists
+      playlistsScrape();
+   }
+   
+   private void playlistsScrape() {
+      //check if playlists updated
+      String playlistUpdatedDate = scrapePlaylistDate();
+      boolean newReleasePlaylist = downloaded
+        .find(eq("playlistUpdatedDate", playlistUpdatedDate)).first() == null;
+      if (newReleasePlaylist) {
+         // -> start scraping
+         setCookieForAPI();
+         //scrape and download each playlist
+         headlinerPlaylistMap
+           .forEach((playlistName, playlistUrl) ->
+             scrapeAndDownloadPlaylist(playlistUpdatedDate, playlistName, playlistUrl));
+         downloaded.insertOne(
+           new org.bson.Document("playlistUpdatedDate", playlistUpdatedDate));
+      }
+   }
+   
+   private String scrapePlaylistDate() {
+      driver.get("https://headlinermusicclub.com/playlists");
+      String pageSource = getPageSource();
+      return Jsoup.parse(pageSource)
+        .select("span[id=updated_date]")
+        .first().text()
+        .replace("updated ", "");
+   }
+   
+   private void scrapeAndDownloadPlaylist(String downloadDate, String playlistName,
+                                          String playListUrl) {
+      List<String> scrapedLinks = scrapePlaylist(playListUrl);
+      operationWithLinksAfterScrape(scrapedLinks);
+      String playlistReleaseName =
+        releaseName + " " + playlistName + " Playlist " + formatDownloadDate(downloadDate);
+      boolean noScrapedReleaseInDB = mongoControl.tempTestCollection
+        .find(eq("releaseName", playlistReleaseName)).first() == null;
+      if (noScrapedReleaseInDB) {
+         mongoControl.tempTestCollection
+           .insertOne(new org.bson.Document("releaseName", playlistReleaseName)
+             .append("scrapedLinks", scrapedLinks));
+      }
+      // TODO: 31.01.2020 ACTIVATE AFTER TESTING
+      // writeLinksToDB(downloadLinks, playlistReleaseName);
+      // downloadLinks(downloadLinks, playlistReleaseName);
+   }
+   
+   private List<String> scrapePlaylist(String playListUrl) {
+      driver.get(playListUrl);
+      return scrapeLinksFromPage(getPageSource());
    }
    
    @Override
@@ -78,10 +142,14 @@ public class HlScraper extends Scraper {
           trackInfo.select("a:contains(download)").stream()
             .map(element -> MessageFormat.format(template, element.attr("data-file")))
             .forEach(scrapedLinks::add));*/
-      Jsoup.parse(htmlWithTracks).select("li[class*=post-view load-tracks]").stream()
+      scrapedLinks.addAll(scrapeLinksFromPage(htmlWithTracks));
+   }
+   
+   private List<String> scrapeLinksFromPage(String html) {
+      return Jsoup.parse(html).select("li[class*=post-view load-tracks]").stream()
         .map(trackInfo ->
           trackInfo.select("div[class*=download-stars]>a").attr("href"))
-        .forEach(scrapedLinks::add);
+        .collect(Collectors.toList());
    }
    
    @Override

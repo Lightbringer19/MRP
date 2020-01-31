@@ -45,7 +45,7 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    
    @Override
    @SneakyThrows
-   public void afterFirstStage() {
+   public void afterLoginStage() {
       urlToGet = "https://app.bpmlatino.com/new-releases/classic/audio";
       driver.get(urlToGet);
       Thread.sleep(10_000);
