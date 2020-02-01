@@ -1,4 +1,4 @@
-package scraper.crateconnect;
+package scraper.stoped.crateconnect;
 
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;

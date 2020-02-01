@@ -1,6 +1,6 @@
 package monitors;
 
-import scraper.dalemasbajo.DaleMasBajoScraper;
+import scraper.stoped.dalemasbajo.DaleMasBajoScraper;
 
 public class DaleMB_Scraper_Monitor extends Monitor {
    

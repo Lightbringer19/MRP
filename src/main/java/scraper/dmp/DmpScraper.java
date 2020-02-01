@@ -1,4 +1,4 @@
-package scraper.old.dmp;
+package scraper.dmp;
 
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
@@ -31,8 +31,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
-import static scraper.old.dmp.DmpApiService.getDownloadUrl;
-import static scraper.old.dmp.DmpDriver.cookieForAPI;
+import static scraper.dmp.DmpApiService.getDownloadUrl;
+import static scraper.dmp.DmpDriver.cookieForAPI;
 import static utils.Constants.tagsDir;
 
 class DmpScraper {

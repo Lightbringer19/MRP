@@ -1,4 +1,4 @@
-package scraper.old.dmp;
+package scraper.dmp;
 
 import configuration.YamlConfig;
 import org.openqa.selenium.By;

@@ -1,4 +1,4 @@
-package scraper.dalemasbajo;
+package scraper.stoped.dalemasbajo;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;

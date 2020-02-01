@@ -1,6 +1,6 @@
 package monitors;
 
-import scraper.crateconnect.CrateConnectScraper;
+import scraper.stoped.crateconnect.CrateConnectScraper;
 
 public class CrateConnect_Scraper_Monitor extends Monitor {
    

@@ -208,6 +208,7 @@ task BuildScrapers {
     dependsOn BpmLatinoScraper
     dependsOn BpmSupremeScraper
     dependsOn ClubDJScraper
+//    dependsOn DMPScraper
     dependsOn EwScraper
     dependsOn HeadlineScraper
     dependsOn HeavyHitsScraper
@@ -215,13 +216,6 @@ task BuildScrapers {
     dependsOn MassPoolScraper
     dependsOn Mp3PoolScraper
     dependsOn SmashVisionScraper
-
-//    dependsOn DMPScraper
-//    dependsOn CrateConnectScraper
-
-//    dependsOn BeatJunkiesScraper
-//    dependsOn DaleMBScraper
-//    dependsOn VjStreetScraper
 }
 
 task BuildPosters {

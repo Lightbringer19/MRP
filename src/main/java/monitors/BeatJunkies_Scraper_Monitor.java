@@ -1,6 +1,6 @@
 package monitors;
 
-import scraper.beatjunkies.BjScraper;
+import scraper.stoped.beatjunkies.BjScraper;
 
 public class BeatJunkies_Scraper_Monitor extends Monitor {
    

@@ -1,6 +1,6 @@
 package monitors;
 
-import scraper.old.dmp.DmpSchedulerMain;
+import scraper.dmp.DmpSchedulerMain;
 
 public class DMP_Scraper_Monitor extends Monitor {
    

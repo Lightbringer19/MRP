@@ -1,6 +1,6 @@
 package monitors;
 
-import scraper.vjstreet.VjStreetScraper;
+import scraper.stoped.vjstreet.VjStreetScraper;
 
 public class VjStreet_Scraper_Monitor extends Monitor {
    

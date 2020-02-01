@@ -1,4 +1,4 @@
-package scraper.beatjunkies;
+package scraper.stoped.beatjunkies;
 
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;

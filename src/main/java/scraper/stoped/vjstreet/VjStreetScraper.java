@@ -1,4 +1,4 @@
-package scraper.vjstreet;
+package scraper.stoped.vjstreet;
 
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;

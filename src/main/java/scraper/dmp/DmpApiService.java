@@ -1,4 +1,4 @@
-package scraper.old.dmp;
+package scraper.dmp;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import utils.Log;
 import java.io.IOException;
 import java.text.MessageFormat;
 
-import static scraper.old.dmp.DmpApiService.Extractor.*;
+import static scraper.dmp.DmpApiService.Extractor.*;
 import static utils.ApiInterface.getClean;
 import static utils.ApiInterface.postClean;
 

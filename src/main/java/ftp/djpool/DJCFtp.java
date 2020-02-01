@@ -10,10 +10,7 @@ import utils.Logger;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static utils.CheckDate.getCurrentYear;
@@ -45,15 +42,13 @@ public class DJCFtp extends FtpManager {
         .format(new Date()).toUpperCase();
       monthFolder = "/AUDIO/DATES/" + getCurrentYear() + "/" + month + "/";
       checkFtp();
-      // TODO: 02.01.2020 activate in FEBRUARY
-      //  past month check
-      // Calendar cal = Calendar.getInstance();
-      // cal.add(Calendar.MONTH, -1);
-      // String previousMonth = formatter
-      //   .format(cal.getTime()).toUpperCase();
-      // String year = new SimpleDateFormat("yyyy").format(cal.getTime());
-      // monthFolder = "/AUDIO/DATES/" + year + "/" + previousMonth + "/";
-      // checkFtp();
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.MONTH, -1);
+      String previousMonth = formatter
+        .format(cal.getTime()).toUpperCase();
+      String year = new SimpleDateFormat("yyyy").format(cal.getTime());
+      monthFolder = "/AUDIO/DATES/" + year + "/" + previousMonth + "/";
+      checkFtp();
    }
    
    @Override
