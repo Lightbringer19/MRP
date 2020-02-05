@@ -82,6 +82,8 @@ public class YamlConfig {
       private String provideos4djs_password;
       private String clubdj_username;
       private String clubdj_password;
+      private String latinvideoremix_username;
+      private String latinvideoremix_password;
       private Map<String, String> headlinerPlaylistMap;
    }
 }

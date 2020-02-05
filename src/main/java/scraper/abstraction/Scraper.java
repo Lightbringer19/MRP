@@ -261,7 +261,7 @@ public abstract class Scraper extends Thread
    }
    
    @SneakyThrows
-   void testNextPage() {
+   protected void testNextPage() {
       for (int i = 0; i < 10; i++) {
          nextPage();
       }

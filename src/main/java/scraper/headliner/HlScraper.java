@@ -80,16 +80,15 @@ public class HlScraper extends Scraper {
       operationWithLinksAfterScrape(scrapedLinks);
       String playlistReleaseName =
         releaseName + " " + playlistName + " Playlist " + formatDownloadDate(downloadDate);
-      boolean noScrapedReleaseInDB = mongoControl.tempTestCollection
-        .find(eq("releaseName", playlistReleaseName)).first() == null;
-      if (noScrapedReleaseInDB) {
-         mongoControl.tempTestCollection
-           .insertOne(new org.bson.Document("releaseName", playlistReleaseName)
-             .append("scrapedLinks", scrapedLinks));
-      }
-      // TODO: 31.01.2020 ACTIVATE AFTER TESTING
-      // writeLinksToDB(downloadLinks, playlistReleaseName);
-      // downloadLinks(downloadLinks, playlistReleaseName);
+      // boolean noScrapedReleaseInDB = mongoControl.tempTestCollection
+      //   .find(eq("releaseName", playlistReleaseName)).first() == null;
+      // if (noScrapedReleaseInDB) {
+      //    mongoControl.tempTestCollection
+      //      .insertOne(new org.bson.Document("releaseName", playlistReleaseName)
+      //        .append("scrapedLinks", scrapedLinks));
+      // }
+      writeLinksToDB(scrapedLinks, playlistReleaseName);
+      downloadLinks(scrapedLinks, playlistReleaseName);
    }
    
    private List<String> scrapePlaylist(String playListUrl) {
@@ -156,7 +155,10 @@ public class HlScraper extends Scraper {
    public void nextPage() {
       String currentUrl = driver.getCurrentUrl();
       if (currentUrl.contains("page")) {
-         driver.get("https://headlinermusicclub.com/welcome/page/3/");
+         int pageNumber =
+           Integer.parseInt(currentUrl.substring(currentUrl.lastIndexOf("/") - 1)
+             .replace("/", ""));
+         driver.get("https://headlinermusicclub.com/welcome/page/" + (pageNumber + 1) + "/");
       } else {
          driver.get("https://headlinermusicclub.com/welcome/page/2/");
       }

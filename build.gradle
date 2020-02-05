@@ -202,6 +202,9 @@ task ProVideo4DJsScraper {
 task ClubDJScraper {
     dependsOn newRelease('monitors.', 'ClubDJ_Scraper_Monitor', '1.0.')
 }
+task LatinVideoRemixScraper {
+    dependsOn newRelease('monitors.', 'LatinVideoRemix_Scraper_Monitor', '1.0.')
+}
 task BuildScrapers {
 
     dependsOn AvDistrictScraper

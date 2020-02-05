@@ -38,6 +38,7 @@ public class MongoControl {
    public final MongoCollection<Document> proVideo4DJsDownloaded;
    public final MongoCollection<Document> clubDjVideosDownloaded;
    public final MongoCollection<Document> djcDownloadedCollection;
+   public final MongoCollection<Document> latinVideoRemixDownloaded;
    
    public final MongoCollection<Document> tempTestCollection;
    
@@ -85,6 +86,7 @@ public class MongoControl {
       vjStreetDownloaded = poolsDB.getCollection("vjStreet");
       proVideo4DJsDownloaded = poolsDB.getCollection("proVideo4DJs");
       clubDjVideosDownloaded = poolsDB.getCollection("clubDjVideos");
+      latinVideoRemixDownloaded = poolsDB.getCollection("latinVideoRemix");
    
       tempTestCollection = poolsDB.getCollection("tempTestCollection");
    }
