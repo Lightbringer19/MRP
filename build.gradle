@@ -154,8 +154,8 @@ task DMPScraper {
 task EwScraper {
     dependsOn newRelease('monitors.', 'EW_Scraper_Monitor', '3.0.')
 }
-task Mp3PoolScraper {
-    dependsOn newRelease('monitors.', 'Mp3Pool_Scraper_Monitor', '3.0.')
+task MyMp3PoolScraper {
+    dependsOn newRelease('monitors.', 'MyMp3Pool_Scraper_Monitor', '4.0.')
 }
 task BeatJunkiesScraper {
     dependsOn newRelease('monitors.', 'BeatJunkies_Scraper_Monitor', '3.0.')
@@ -217,7 +217,7 @@ task BuildScrapers {
     dependsOn HeavyHitsScraper
     dependsOn MaletaDvjScraper
     dependsOn MassPoolScraper
-    dependsOn Mp3PoolScraper
+    dependsOn MyMp3PoolScraper
     dependsOn SmashVisionScraper
 }
 

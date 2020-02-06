@@ -57,6 +57,8 @@ public abstract class Scraper extends Thread
    
    protected boolean exitAfterCheck = true;
    
+   protected boolean checkOldReleases = true;
+   
    public Scraper() {
       yamlConfig = new YamlConfig().config;
       mongoControl = new MongoControl();
@@ -112,15 +114,20 @@ public abstract class Scraper extends Thread
       afterLogin();
    }
    
+   @Override
    @SneakyThrows
-   public void fullScrape() {
+   public void mainOperation() {
       String firstDate = getFirstDate();
-      boolean releaseIsOld = releaseIsOld(firstDate);
+      boolean releaseIsOld = false;
+      boolean oldReleaseWasDownloaded = false;
+      if (checkOldReleases) {
+         releaseIsOld = releaseIsOld(firstDate);
+         oldReleaseWasDownloaded = downloaded
+           .find(eq("oldReleaseDate", firstDate)).first() != null;
+      }
       // If release found -> scrape all links and date
       boolean newReleaseOnThePool = downloaded
         .find(eq("releaseDate", firstDate)).first() == null;
-      boolean oldReleaseWasDownloaded = downloaded
-        .find(eq("oldReleaseDate", firstDate)).first() != null;
       if (newReleaseOnThePool) {
          logger.log("Downloading New Release");
          setCookieForAPI();
@@ -128,8 +135,7 @@ public abstract class Scraper extends Thread
          String downloadDate = getDownloadDate(firstDate);
          if (downloaded.find(eq("oldReleaseDate", downloadDate))
            .first() == null) {
-            // MAIN OPERATION EXECUTION
-            mainOperation(firstDate, downloadDate);
+            scrapeAndDownloadOperation(firstDate, downloadDate);
          }
          // add to DB
          downloaded.insertOne(
@@ -137,15 +143,10 @@ public abstract class Scraper extends Thread
       } else if (releaseIsOld && !oldReleaseWasDownloaded) {
          logger.log("Downloading Old Release");
          setCookieForAPI();
-         mainOperation(firstDate, firstDate);
+         scrapeAndDownloadOperation(firstDate, firstDate);
          downloaded.insertOne(
            new Document("oldReleaseDate", firstDate));
       }
-   }
-   
-   @Override
-   public void scrapingStage() {
-      fullScrape();
    }
    
    @Override
@@ -181,12 +182,26 @@ public abstract class Scraper extends Thread
       while (true) {
          String html = getPageSource();
          String downloadDate = previousDateOnThisPage(html, firstDate);
-         boolean dateOnThisPage = downloadDate != null;
-         if (dateOnThisPage) {
+         if (downloadDate != null) {
             return downloadDate;
          } else {
             nextPage();
          }
+      }
+   }
+   
+   protected void scrapeAndDownloadOperation(String firstDate, String downloadDate) {
+      scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
+   }
+   
+   protected void scrapeAndDownloadRelease(String firstDate, String downloadDate,
+                                           String releaseName) {
+      List<String> scrapedLinks = scrapeLinks(firstDate, downloadDate);
+      if (scrapedLinks.size() > 0) {
+         writeLinksToDB(scrapedLinks,
+           releaseName + " " + formatDownloadDate(downloadDate));
+         downloadLinks(scrapedLinks,
+           releaseName + " " + formatDownloadDate(downloadDate));
       }
    }
    
@@ -203,21 +218,6 @@ public abstract class Scraper extends Thread
             operationWithLinksAfterScrape(scrapedLinks);
             return scrapedLinks;
          }
-      }
-   }
-   
-   protected void mainOperation(String firstDate, String downloadDate) {
-      scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
-   }
-   
-   protected void scrapeAndDownloadRelease(String firstDate, String downloadDate,
-                                           String releaseName) {
-      List<String> scrapedLinks = scrapeLinks(firstDate, downloadDate);
-      if (scrapedLinks.size() > 0) {
-         writeLinksToDB(scrapedLinks,
-           releaseName + " " + formatDownloadDate(downloadDate));
-         downloadLinks(scrapedLinks,
-           releaseName + " " + formatDownloadDate(downloadDate));
       }
    }
    
@@ -276,6 +276,10 @@ public abstract class Scraper extends Thread
    @Override
    public Logger getLogger() {
       return logger;
+   }
+   
+   public void setDriver(WebDriver driver) {
+      Scraper.driver = driver;
    }
    
    private class Driver {

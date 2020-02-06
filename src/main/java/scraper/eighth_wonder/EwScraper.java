@@ -36,7 +36,7 @@ public class EwScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   protected void mainOperation(String firstDate, String downloadDate) {
+   protected void scrapeAndDownloadOperation(String firstDate, String downloadDate) {
       logger.log("Downloading Music Release");
       scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
       // SCRAPE VIDEOS AND DOWNLOAD

@@ -43,7 +43,7 @@ public class HlScraper extends Scraper {
    @Override
    public void scrapingStage() {
       //Scrape main page with tracks
-      fullScrape();
+      mainOperation();
       // Scrape all playlists
       playlistsScrape();
    }

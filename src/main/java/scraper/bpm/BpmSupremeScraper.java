@@ -48,7 +48,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
    
    @Override
    @SneakyThrows
-   protected void mainOperation(String firstDate, String downloadDate) {
+   protected void scrapeAndDownloadOperation(String firstDate, String downloadDate) {
       logger.log("Downloading Music Release");
       scrapeAndDownloadRelease(firstDate, downloadDate, releaseName);
       // SCRAPE VIDEOS AND DOWNLOAD

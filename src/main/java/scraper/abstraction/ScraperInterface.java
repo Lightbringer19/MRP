@@ -23,9 +23,12 @@ public interface ScraperInterface {
    }
    
    default void scrapingStage() {
+      mainOperation();
    }
    
    default void operationWithLinksAfterScrape(List<String> scrapedLinks) {
    }
    
+   default void mainOperation() {
+   }
 }

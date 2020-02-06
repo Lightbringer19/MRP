@@ -1,4 +1,4 @@
-package scraper.mp3pool;
+package scraper.mymp3pool;
 
 import org.jsoup.Jsoup;
 import org.openqa.selenium.By;
@@ -7,9 +7,9 @@ import scraper.abstraction.Scraper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Mp3PoolScraper extends Scraper {
+public class MyMp3PoolScraper extends Scraper {
    
-   public Mp3PoolScraper() {
+   public MyMp3PoolScraper() {
       System.setProperty("jsse.enableSNIExtension", "false");
       USERNAME = yamlConfig.getMp3_pool_username();
       PASS = yamlConfig.getMp3_pool_password();
@@ -24,13 +24,22 @@ public class Mp3PoolScraper extends Scraper {
    }
    
    public static void main(String[] args) {
-      Mp3PoolScraper mp3PoolScraper = new Mp3PoolScraper();
-      mp3PoolScraper.run();
+      MyMp3PoolScraper myMp3PoolScraper = new MyMp3PoolScraper();
+      myMp3PoolScraper.run();
+   }
+   
+   @Override
+   public void scrapingStage() {
+      mainOperation();
+      
+      driver.get("https://mp3poolonline.com/videoview");
+      MyMp3PoolVideosScraper myMp3PoolVideosScraper = new MyMp3PoolVideosScraper();
+      myMp3PoolVideosScraper.setDriver(driver);
+      myMp3PoolVideosScraper.mainOperation();
    }
    
    @Override
    public void operationWithLinksAfterScrape(List<String> scrapedLinks) {
-      driver.quit();
       List<String> duplicates = scrapedLinks.stream()
         .filter(scrapedLink -> scrapedLink.endsWith("/"))
         .collect(Collectors.toList());

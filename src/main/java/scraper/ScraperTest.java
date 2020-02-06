@@ -5,7 +5,11 @@ import org.jsoup.nodes.Document;
 import utils.FUtils;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ScraperTest {
@@ -15,32 +19,58 @@ public class ScraperTest {
       Document document = Jsoup.parse(html);
       
       String firstDate = document
-        .select("tr[class*=tr_box]>td")
-        .first().text();
+        .select("div[class=month-divider]")
+        .first().text().replace(" Videos", "");
       
       System.out.println(firstDate);
       
       String downloadDate = document
-        .select("tr[class*=tr_box]")
+        .select("div[class=month-divider]")
         .stream()
-        .map(trackInfo -> trackInfo.select("td").first().text())
+        .map(trackInfo -> trackInfo.text().replace(" Videos", ""))
         .filter(date -> !date.equals(firstDate))
         .findFirst()
         .orElse(null);
       
       System.out.println(downloadDate);
       
-      // TODO: 02.02.2020
+      // String downloadDate = "December";
+      // String firstDate = "";
+      List<String> scrapedLinks = new ArrayList<>();
+      String htmlWithTracks;
+      int indexOfDownloadDate = html.indexOf(downloadDate);
       
-      document
-        .select("tr[class*=tr_box]")
+      Optional<String> dateAfterDownloadDate = document
+        .select("div[class=month-divider]")
         .stream()
-        .filter(element -> element.select("td").first().text().equals(downloadDate))
-        .map(element -> "http://www.latinvideoremix.com/" +
-          element.select("a").last().attr("href")
-            .replace("Javascript:frame('", "")
-            .replace("');", ""))
+        .map(trackInfo -> trackInfo.text().replace(" Videos", ""))
+        .filter(date -> !date.equals(downloadDate) && !date.equals(firstDate))
+        .findFirst();
+      
+      if (dateAfterDownloadDate.isPresent()) {
+         int indexOfSecondDate = html.indexOf(dateAfterDownloadDate.get());
+         htmlWithTracks = html.substring(indexOfDownloadDate, indexOfSecondDate);
+      } else {
+         htmlWithTracks = html.substring(indexOfDownloadDate);
+      }
+      
+      Jsoup.parse(htmlWithTracks)
+        .select("li[class*=views-row]")
+        .stream()
+        .map(element -> element.select("a").attr("href")
+          .replace("https://mp3poolonline.com/node/", ""))
+        .forEach(scrapedLinks::add);
+      
+      getStrings(scrapedLinks);
+      System.out.println(scrapedLinks);
+   }
+   
+   public static void getStrings(List<String> scrapedLinks) {
+      String downloadTemplate = "https://mp3poolonline.com/videos2/download/{0}";
+      List<String> distinctList = scrapedLinks.stream().distinct()
+        .map(s -> MessageFormat.format(downloadTemplate, s))
         .collect(Collectors.toList());
-      String downloadLink = "http://www.latinvideoremix.com/download_start.php?file=67049";
+      scrapedLinks.clear();
+      scrapedLinks.addAll(distinctList);
    }
 }

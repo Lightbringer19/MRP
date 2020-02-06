@@ -69,7 +69,7 @@ public class MassPoolScraper extends Scraper {
         "masspool_" + category.replaceAll("-", ""));
       releaseName = "Mass Pool " + category;
       logger.log("Scraping: " + category);
-      fullScrape();
+      mainOperation();
       logger.log("Scraped: " + category);
    }
    

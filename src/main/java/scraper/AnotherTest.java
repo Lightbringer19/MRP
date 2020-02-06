@@ -1,20 +1,24 @@
 package scraper;
 
-import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class AnotherTest {
-   public static void main(String[] args) throws UnsupportedEncodingException {
-      // String content = "attachment; filename=\"ShawnMendes_%26_CamilaCabello_x_SilkCity_DuaLipa_x_DavidGuetta_%26_R3HAB_Senorita_x_Stay_DaveDefenderMashupIntro_Cln_CLUBDJVIDEOS_HD.mp4\"; filename*=UTF-8''ShawnMendes_%26_CamilaCabello_x_SilkCity_DuaLipa_x_DavidGuetta_%26_R3HAB_Senorita_x_Stay_DaveDefenderMashupIntro_Cln_CLUBDJVIDEOS_HD.mp4";
-      // int index = content.indexOf("\"");
-      // String filename = content
-      //   .substring(index + 1, content.indexOf("\"", index + 1));
-      //
-      // String decode = java.net.URLDecoder.decode(filename, StandardCharsets.UTF_8.name());
-      // System.out.println(decode);
-      String currentUrl = "https://headlinermusicclub.com/welcome/page/3/";
-      int pageNumber =
-        Integer.parseInt(currentUrl.substring(currentUrl.lastIndexOf("/") - 1)
-          .replace("/", ""));
-      System.out.println(pageNumber);
+   public static void main(String[] args) throws ParseException {
+      String dateFormat = "MMMM";
+      
+      String scrapedDate = "January Videos".replace(" Videos", "");
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(new Date());
+      cal.set(Calendar.DAY_OF_MONTH, 1);
+      cal.set(Calendar.MONTH, new SimpleDateFormat(dateFormat, Locale.US)
+        .parse(scrapedDate).getMonth());
+      cal.add(Calendar.MONTH, -1);
+      String format = new SimpleDateFormat("MMMM yyyy", Locale.US).format(cal.getTime());
+      System.out.println(format);
+      
    }
 }
