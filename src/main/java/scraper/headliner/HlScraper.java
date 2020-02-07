@@ -27,7 +27,7 @@ public class HlScraper extends Scraper {
       submitButtonNavigator = By.id("wp-submit1");
       downloaded = mongoControl.headlinerDownloaded;
       releaseName = "Headliner Music Club";
-      headlinerPlaylistMap = yamlConfig.getHeadlinerPlaylistMap();
+      headlinerPlaylistMap = yamlConfig.getHeadlinerPlaylistsMap();
    }
    
    public static void main(String[] args) {
@@ -80,13 +80,6 @@ public class HlScraper extends Scraper {
       operationWithLinksAfterScrape(scrapedLinks);
       String playlistReleaseName =
         releaseName + " " + playlistName + " Playlist " + formatDownloadDate(downloadDate);
-      // boolean noScrapedReleaseInDB = mongoControl.tempTestCollection
-      //   .find(eq("releaseName", playlistReleaseName)).first() == null;
-      // if (noScrapedReleaseInDB) {
-      //    mongoControl.tempTestCollection
-      //      .insertOne(new org.bson.Document("releaseName", playlistReleaseName)
-      //        .append("scrapedLinks", scrapedLinks));
-      // }
       writeLinksToDB(scrapedLinks, playlistReleaseName);
       downloadLinks(scrapedLinks, playlistReleaseName);
    }

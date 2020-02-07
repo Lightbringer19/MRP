@@ -21,6 +21,7 @@ public class YamlConfig {
    
    public static void main(String[] args) {
       YamlConfig yamlConfig = new YamlConfig();
+      System.out.println(yamlConfig.config.myMp3PoolPlaylistsMap);
    }
    
    @Data
@@ -84,6 +85,7 @@ public class YamlConfig {
       private String clubdj_password;
       private String latinvideoremix_username;
       private String latinvideoremix_password;
-      private Map<String, String> headlinerPlaylistMap;
+      private Map<String, String> headlinerPlaylistsMap;
+      private Map<String, String> myMp3PoolPlaylistsMap;
    }
 }
