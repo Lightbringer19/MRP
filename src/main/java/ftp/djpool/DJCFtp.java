@@ -67,10 +67,9 @@ public class DJCFtp extends FtpManager {
    @Override
    protected void downloadRelease(String dayReleasesPath, FTPFile releaseFolder) throws IOException {
       String releaseName = releaseFolder.getName();
-      String releaseNameCleaned = cleanReleaseName(releaseName);
-      String releaseRemotePath = dayReleasesPath + "/" + releaseName + "/";
-      boolean download = toDownload(releaseName, releaseNameCleaned);
-      if (download) {
+      if (toDownload(releaseName)) {
+         String releaseNameCleaned = cleanReleaseName(releaseName);
+         String releaseRemotePath = dayReleasesPath + "/" + releaseName + "/";
          // download release
          logger.log("New Releases to Download: " + releaseNameCleaned);
          // create local release folder
@@ -86,7 +85,7 @@ public class DJCFtp extends FtpManager {
                for (FTPFile file : ftpClient.listFiles(subFolder)) {
                   downloadFile(subFolder, subFolderLP, file);
                }
-               FUtils.writeFile(tagsDir, releaseName + ".json", subFolderLP);
+               FUtils.writeFile(tagsDir, releaseNameCleaned + ".json", subFolderLP);
                noSubFolders = false;
             } else {
                downloadFile(releaseRemotePath, releaseLocalPath, releaseFile);
@@ -99,7 +98,7 @@ public class DJCFtp extends FtpManager {
              .append("date", new Date()));
          // ADD TO SCHEDULE
          if (noSubFolders) {
-            FUtils.writeFile(tagsDir, releaseName + ".json", releaseLocalPath);
+            FUtils.writeFile(tagsDir, releaseNameCleaned + ".json", releaseLocalPath);
          }
       }
    }
@@ -123,7 +122,7 @@ public class DJCFtp extends FtpManager {
       return releaseName;
    }
    
-   private boolean toDownload(String releaseName, String releaseNameCleaned) {
+   private boolean toDownload(String releaseName) {
       if (releaseName.equals(".") || releaseName.equals("..")) {
          return false;
       } else {
@@ -133,7 +132,7 @@ public class DJCFtp extends FtpManager {
             }
          }
          return mongoControl.djcDownloadedCollection
-           .find(eq("releaseName", releaseNameCleaned))
+           .find(eq("releaseName", cleanReleaseName(releaseName)))
            .first() == null;
       }
    }
