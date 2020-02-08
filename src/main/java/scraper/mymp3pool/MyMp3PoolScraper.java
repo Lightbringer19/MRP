@@ -127,10 +127,10 @@ public class MyMp3PoolScraper extends Scraper {
           .replace("Added On: ", "").equals(downloadDate))
         .forEach(release -> release.select("div>ul>li")
           .forEach(track -> {
-             if (!track.select("div[class=track-title]").text().equals("")) {
-                logger.log("Adding Track to Download List: "
-                  + track.select("div[class=track-title]").text());
-             }
+             // if (!track.select("div[class=track-title]").text().equals("")) {
+             // logger.log("Adding Track to Download List: "
+             //   + track.select("div[class=track-title]").text());
+             // }
              track.select("div[class=download2 sub-section]>a")
                .stream()
                .map(link -> link.attr("href"))
