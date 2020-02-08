@@ -5,6 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import scraper.abstraction.Scraper;
 
@@ -117,9 +118,11 @@ public class BpmLatinoScraper extends Scraper implements BpmApiService {
    @Override
    @SneakyThrows
    public void nextPage() {
-      WebElement element = driver.findElement(By.xpath("/html/body/div/div[2]/div/div[5]/div/div[2]/div/div/div[1]/div/div[2]/div/div/div[3]/ul"));
-      List<WebElement> nextButtons = element.findElements(By.tagName("li"));
-      nextButtons.get(nextButtons.size() - 2).click();
+      WebElement element = driver.findElement(By.cssSelector("input.page-input"));
+      int value = Integer.parseInt(element.getAttribute("value"));
+      element.sendKeys(Keys.chord(Keys.CONTROL, Keys.BACK_SPACE));
+      element.sendKeys(String.valueOf(value + 1));
+      element.sendKeys(Keys.ENTER);
       Thread.sleep(10_000);
    }
 }

@@ -207,18 +207,18 @@ task LatinVideoRemixScraper {
 }
 task BuildScrapers {
 
-    dependsOn AvDistrictScraper
+//    dependsOn AvDistrictScraper
     dependsOn BpmLatinoScraper
     dependsOn BpmSupremeScraper
-    dependsOn ClubDJScraper
+//    dependsOn ClubDJScraper
 //    dependsOn DMPScraper
-    dependsOn EwScraper
-    dependsOn HeadlineScraper
-    dependsOn HeavyHitsScraper
-    dependsOn MaletaDvjScraper
-    dependsOn MassPoolScraper
-    dependsOn MyMp3PoolScraper
-    dependsOn SmashVisionScraper
+//    dependsOn EwScraper
+//    dependsOn HeadlineScraper
+//    dependsOn HeavyHitsScraper
+//    dependsOn MaletaDvjScraper
+//    dependsOn MassPoolScraper
+//    dependsOn MyMp3PoolScraper
+//    dependsOn SmashVisionScraper
 }
 
 task BuildPosters {
