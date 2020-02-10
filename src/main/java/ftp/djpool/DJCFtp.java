@@ -80,12 +80,15 @@ public class DJCFtp extends FtpManager {
          boolean noSubFolders = true;
          for (FTPFile releaseFile : releaseFiles) {
             if (!releaseFile.isFile()) {
-               String subFolder = releaseRemotePath + releaseFile.getName() + "/";
-               String subFolderLP = releaseLocalPath + " " + releaseFile.getName();
-               for (FTPFile file : ftpClient.listFiles(subFolder)) {
-                  downloadFile(subFolder, subFolderLP, file);
+               String subfolderName = releaseFile.getName();
+               String subfolderReleaseName = releaseNameCleaned + " " + subfolderName;
+               String subfolderFtpPath = releaseRemotePath + subfolderName + "/";
+               String subFolderLP = releaseLocalPath + " " + subfolderName;
+               for (FTPFile file : ftpClient.listFiles(subfolderFtpPath)) {
+                  downloadFile(subfolderFtpPath, subFolderLP, file);
                }
-               FUtils.writeFile(tagsDir, releaseNameCleaned + ".json", subFolderLP);
+               logger.log("Subfolder Downloaded: " + subfolderReleaseName);
+               FUtils.writeFile(tagsDir, subfolderReleaseName + ".json", subFolderLP);
                noSubFolders = false;
             } else {
                downloadFile(releaseRemotePath, releaseLocalPath, releaseFile);
