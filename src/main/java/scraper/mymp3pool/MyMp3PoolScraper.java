@@ -1,18 +1,13 @@
 package scraper.mymp3pool;
 
-import org.bson.Document;
 import org.jsoup.Jsoup;
 import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.mongodb.client.model.Filters.eq;
 
 public class MyMp3PoolScraper extends Scraper {
    
@@ -52,51 +47,13 @@ public class MyMp3PoolScraper extends Scraper {
         .forEach(this::scrapeAndDownloadPlaylist);
    }
    
-   private void scrapeAndDownloadPlaylist(String playlistName, String playListUrl) {
-      logger.log("Scraping: " + playlistName);
-      List<String> scrapedLinks = scrapePlaylist(playListUrl);
-      Document playlistInDb = downloaded.find(eq("playlistName", playlistName)).first();
-      if (playlistInDb != null) {
-         List<String> scrapedLinksInDb = (List<String>) playlistInDb.get("scrapedLinks");
-         int changedPercent = getChangedPercent(scrapedLinks, scrapedLinksInDb);
-         if (changedPercent > 50) {
-            downloadPlaylist(playlistName, scrapedLinks);
-            playlistInDb.put("scrapedLinks", scrapedLinks);
-            downloaded.findOneAndReplace(eq("playlistName", playlistName), playlistInDb);
-         }
-      } else {
-         downloadPlaylist(playlistName, scrapedLinks);
-         downloaded.insertOne(new Document()
-           .append("playlistName", playlistName)
-           .append("scrapedLinks", scrapedLinks));
-      }
-   }
-   
-   private List<String> scrapePlaylist(String playListUrl) {
+   @Override
+   public List<String> scrapePlaylist(String playListUrl) {
       driver.get(playListUrl);
       List<String> scrapedLinks = new ArrayList<>();
       scrapeAllLinksOnPage(getPageSource(), null, null, scrapedLinks);
       operationWithLinksAfterScrape(scrapedLinks);
       return scrapedLinks;
-   }
-   
-   private void downloadPlaylist(String playlistName, List<String> scrapedLinks) {
-      String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-      String playlistReleaseName =
-        releaseName + " " + playlistName + " Playlist " + date;
-      writeLinksToDB(scrapedLinks, playlistReleaseName);
-      setCookieForAPI();
-      downloadLinks(scrapedLinks, playlistReleaseName);
-   }
-   
-   private int getChangedPercent(List<String> scrapedLinks, List<String> oldScrape) {
-      List<String> scrapedLinksTemp = new ArrayList<>(scrapedLinks);
-      List<String> oldScrapeTemp = new ArrayList<>(oldScrape);
-      int originalSize = scrapedLinksTemp.size();
-      scrapedLinksTemp.removeAll(oldScrapeTemp);
-      int changedPercent = (int) (scrapedLinksTemp.size() / ((float) originalSize / 100));
-      logger.log(changedPercent + "% Changed");
-      return changedPercent;
    }
    
    @Override

@@ -15,4 +15,9 @@ public interface ScrapingInterface {
    
    default void nextPage() {
    }
+   
+   default List<String> scrapePlaylist(String playListUrl) {
+      return null;
+      
+   }
 }

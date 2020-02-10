@@ -58,6 +58,7 @@ public abstract class Scraper extends Thread
    protected boolean exitAfterCheck = true;
    
    protected boolean checkOldReleases = true;
+   protected boolean downloadFirstTimeScrapedPlaylist = true;
    
    public Scraper() {
       yamlConfig = new YamlConfig().config;
@@ -237,6 +238,48 @@ public abstract class Scraper extends Thread
       cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
       cal.add(Calendar.DAY_OF_MONTH, 1);
       return new SimpleDateFormat("ddMM").format(cal.getTime());
+   }
+   
+   protected void scrapeAndDownloadPlaylist(String playlistName, String playListUrl) {
+      setCookieForAPI();
+      logger.log("Scraping: " + playlistName);
+      List<String> scrapedLinks = scrapePlaylist(playListUrl);
+      Document playlistInDb = downloaded.find(eq("playlistName", playlistName)).first();
+      if (playlistInDb != null) {
+         List<String> scrapedLinksInDb = (List<String>) playlistInDb.get("scrapedLinks");
+         int changedPercent = getChangedPercent(scrapedLinks, scrapedLinksInDb);
+         if (changedPercent > 70) {
+            downloadPlaylist(playlistName, scrapedLinks);
+            playlistInDb.put("scrapedLinks", scrapedLinks);
+            downloaded.findOneAndReplace(eq("playlistName", playlistName), playlistInDb);
+         }
+      } else {
+         if (downloadFirstTimeScrapedPlaylist) {
+            downloadPlaylist(playlistName, scrapedLinks);
+         }
+         downloaded.insertOne(new Document()
+           .append("playlistName", playlistName)
+           .append("scrapedLinks", scrapedLinks));
+      }
+   }
+   
+   protected void downloadPlaylist(String playlistName, List<String> scrapedLinks) {
+      String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+      String playlistReleaseName =
+        releaseName + " " + playlistName + " Playlist " + date;
+      writeLinksToDB(scrapedLinks, playlistReleaseName);
+      setCookieForAPI();
+      downloadLinks(scrapedLinks, playlistReleaseName);
+   }
+   
+   protected int getChangedPercent(List<String> scrapedLinks, List<String> oldScrape) {
+      List<String> scrapedLinksTemp = new ArrayList<>(scrapedLinks);
+      List<String> oldScrapeTemp = new ArrayList<>(oldScrape);
+      int originalSize = scrapedLinksTemp.size();
+      scrapedLinksTemp.removeAll(oldScrapeTemp);
+      int changedPercent = (int) (scrapedLinksTemp.size() / ((float) originalSize / 100));
+      logger.log(changedPercent + "% Changed");
+      return changedPercent;
    }
    
    private boolean releaseIsOld(String date) throws ParseException {

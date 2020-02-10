@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.mongodb.client.model.Filters.eq;
-
 public class HlScraper extends Scraper {
    
    private Map<String, String> headlinerPlaylistMap;
@@ -28,6 +26,7 @@ public class HlScraper extends Scraper {
       downloaded = mongoControl.headlinerDownloaded;
       releaseName = "Headliner Music Club";
       headlinerPlaylistMap = yamlConfig.getHeadlinerPlaylistsMap();
+      downloadFirstTimeScrapedPlaylist = false;
    }
    
    public static void main(String[] args) {
@@ -50,41 +49,15 @@ public class HlScraper extends Scraper {
    
    private void playlistsScrape() {
       //check if playlists updated
-      String playlistUpdatedDate = scrapePlaylistDate();
-      boolean newReleasePlaylist = downloaded
-        .find(eq("playlistUpdatedDate", playlistUpdatedDate)).first() == null;
-      if (newReleasePlaylist) {
-         // -> start scraping
-         setCookieForAPI();
-         //scrape and download each playlist
-         headlinerPlaylistMap
-           .forEach((playlistName, playlistUrl) ->
-             scrapeAndDownloadPlaylist(playlistUpdatedDate, playlistName, playlistUrl));
-         downloaded.insertOne(
-           new org.bson.Document("playlistUpdatedDate", playlistUpdatedDate));
-      }
+      // -> start scraping
+      setCookieForAPI();
+      //scrape and download each playlist
+      headlinerPlaylistMap
+        .forEach(this::scrapeAndDownloadPlaylist);
    }
    
-   private String scrapePlaylistDate() {
-      driver.get("https://headlinermusicclub.com/playlists");
-      String pageSource = getPageSource();
-      return Jsoup.parse(pageSource)
-        .select("span[id=updated_date]")
-        .first().text()
-        .replace("updated ", "");
-   }
-   
-   private void scrapeAndDownloadPlaylist(String downloadDate, String playlistName,
-                                          String playListUrl) {
-      List<String> scrapedLinks = scrapePlaylist(playListUrl);
-      operationWithLinksAfterScrape(scrapedLinks);
-      String playlistReleaseName =
-        releaseName + " " + playlistName + " Playlist " + formatDownloadDate(downloadDate);
-      writeLinksToDB(scrapedLinks, playlistReleaseName);
-      downloadLinks(scrapedLinks, playlistReleaseName);
-   }
-   
-   private List<String> scrapePlaylist(String playListUrl) {
+   @Override
+   public List<String> scrapePlaylist(String playListUrl) {
       driver.get(playListUrl);
       return scrapeLinksFromPage(getPageSource());
    }
