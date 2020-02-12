@@ -4,14 +4,12 @@ import com.google.gson.Gson;
 import json.db.InfoAboutRelease;
 import json.db.Release;
 import json.db.ReleaseNew;
+import json.db.Task;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import utils.Log;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -33,18 +31,8 @@ public interface PosterInterface {
         "Poster");
       
       // add REPOST TASK to que
-      // Task task = new Task("repost", id.toString());
-      // MONGO_CONTROL.tasksCollection.insertOne(task.toDoc());
-      
-      //for back up
-      try {
-         FileUtils.writeStringToFile(
-           new File(release.getPathToLocalFolder().replace("E:", "C:")
-             + "\\myrecordpool.com.txt"),
-           release.getBoxComDownloadLink(), "UTF-8");
-      } catch (IOException e) {
-         Log.write(e, "Poster");
-      }
+      Task task = new Task("repost", document.getObjectId("_id").toString());
+      MONGO_CONTROL.tasksCollection.insertOne(task.toDoc());
    }
    
    @SneakyThrows

@@ -1,4 +1,4 @@
-package reposter;
+package reposter.xxx;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -41,7 +41,7 @@ public class BlogPoster {
    
    private static Credential getCredentials(NetHttpTransport HTTP_TRANSPORT) throws IOException {
       // Load client secrets.
-      InputStream in = Test.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+      InputStream in = BlogPoster.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
       GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
       //		 Build flow and trigger user authorization request.
       GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,

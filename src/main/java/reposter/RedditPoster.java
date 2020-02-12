@@ -1,6 +1,7 @@
 package reposter;
 
 import configuration.YamlConfig;
+import lombok.SneakyThrows;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.OkHttpNetworkAdapter;
 import net.dean.jraw.http.UserAgent;
@@ -10,7 +11,8 @@ import net.dean.jraw.oauth.OAuthHelper;
 import net.dean.jraw.references.SubredditReference;
 import utils.Log;
 
-import java.util.concurrent.ThreadLocalRandom;
+import static java.lang.Thread.sleep;
+import static java.util.concurrent.ThreadLocalRandom.current;
 
 public class RedditPoster {
    
@@ -30,14 +32,20 @@ public class RedditPoster {
       clientSecret = yamlConfig.config.getReddit_client_secret();
       
       Credentials oauthCreds = Credentials.script(username, password, clientId, clientSecret);
-      UserAgent userAgent = new UserAgent("windows", "reposter.mrp", "1.0.0", username);
+      UserAgent userAgent = new UserAgent("windows", "reposter.mrp", "2.0.0", username);
       RedditClient reddit = OAuthHelper.automatic(new OkHttpNetworkAdapter(userAgent), oauthCreds);
       scenedownload = reddit.subreddit("scenedownload");
       myRecordPool = reddit.subreddit("MyRecordPool");
       beatportmusic = reddit.subreddit("beatportmusic");
    }
    
-   public void post(String category, String title, String content) throws InterruptedException {
+   public static void main(String[] args) {
+      RedditPoster redditPoster = new RedditPoster();
+      redditPoster.post("RECORDPOOL", "TEST", "TEST");
+   }
+   
+   @SneakyThrows
+   public void post(String category, String title, String content) {
       int sleepMultiplier = 1;
       while (true) {
          try {
@@ -55,7 +63,7 @@ public class RedditPoster {
             if (too_long) {
                break;
             }
-            Thread.sleep((1000 * sleepMultiplier) + ThreadLocalRandom.current().nextInt(500, 1000 + 1));
+            sleep((1000 * sleepMultiplier) + current().nextInt(500, 1000 + 1));
             sleepMultiplier *= 2;
          }
       }

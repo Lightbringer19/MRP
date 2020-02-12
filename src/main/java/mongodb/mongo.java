@@ -1,8 +1,11 @@
 package mongodb;
 
+import com.google.gson.Gson;
 import com.mongodb.MongoNamespace;
 import com.mongodb.client.FindIterable;
+import json.db.ReleaseNew;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import reactor.core.publisher.Flux;
 import utils.Logger;
 
@@ -15,11 +18,19 @@ public class mongo extends Thread {
    
    public static void main(String[] args) {
       MONGO_CONTROL = new MongoControl();
-      Document releaseName = MONGO_CONTROL.releasesCollection.find(
-        eq("releaseName", "Armando Quattrone-Calabria-IT-CD-FLAC-2018-NBFLAC"))
-        .first();
       
-      System.out.println(releaseName.toString());
+      // Document first = MONGO_CONTROL.releasesNewCollection.find().first();
+      // Task task = new Task("repost", first.getObjectId("_id").toString());
+      // MONGO_CONTROL.tasksCollection.insertOne(task.toDoc());
+      
+      Document first1 = MONGO_CONTROL.tasksCollection.find().first();
+      ObjectId releaseId = new ObjectId(first1.get("releaseId").toString());
+      Document foundDoc = MONGO_CONTROL.releasesNewCollection
+        .find(eq("_id", releaseId)).first();
+      foundDoc.remove("_id");
+      foundDoc.remove("date");
+      ReleaseNew releaseNew = new Gson().fromJson(foundDoc.toJson(), ReleaseNew.class);
+      System.out.println(releaseNew.toString());
       // from MRP to POOLS
       // String sourceDatabaseName = "MRP";
       // String targetDatabaseName = "POOLS";

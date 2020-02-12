@@ -124,10 +124,10 @@ task Uploader {
     dependsOn newRelease('monitors.', 'Uploader_Monitor', '4.1.')
 }
 task Poster {
-    dependsOn newRelease('monitors.', 'Poster_Monitor', '5.0.')
+    dependsOn newRelease('monitors.', 'Poster_Monitor', '5.1.')
 }
 task Reposter {
-    dependsOn newRelease('monitors.', 'Reposter_Monitor', '3.3.')
+    dependsOn newRelease('monitors.', 'Reposter_Monitor', '4.0.')
 }
 task Tagger {
     dependsOn newRelease('monitors.', 'Tagger_Monitor', '4.0.')

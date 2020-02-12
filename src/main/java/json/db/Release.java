@@ -25,12 +25,4 @@ public class Release {
    public Document toDoc() {
       return new Document(Document.parse(toJson()));
    }
-   
-   // public String getTrackList() {
-   //    return getInfoAboutRelease().getTrackList().stream().map(InfoAboutRelease.Track::toLine).collect(Collectors.joining("<br>"));
-   // }
-   //
-   // public String getRedditTrackList() {
-   //    return getInfoAboutRelease().getTrackList().stream().map(InfoAboutRelease.Track::toLine).collect(Collectors.joining("\n\n"));
-   // }
 }
