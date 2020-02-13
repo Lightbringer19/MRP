@@ -43,7 +43,8 @@ public class Reposter extends Thread {
                  format("{0} - {1} ({2})",
                    track.getArtist(), track.getTitle(), track.getTrackDuration()))
                  .collect(joining("\n" + "\n"));
-               String downloadLink = "https://myrecordpool.com/release/" + releaseName;
+               String downloadLink = "https://myrecordpool.com/release/" + releaseName
+                 .replaceAll(" ", "%20");
                String contentPattern = "{0}\n\nMore Info Here:\n\n{1}";
                String content = format(contentPattern, trackList, downloadLink);
                redditPoster.post(category, releaseName, content);
