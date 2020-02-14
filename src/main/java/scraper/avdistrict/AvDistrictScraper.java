@@ -38,7 +38,7 @@ public class AvDistrictScraper extends Scraper implements AvDistrictApiService {
    
    @SneakyThrows
    @Override
-   public void afterLoginStage() {
+   public void afterDriverCreation() {
       Thread.sleep(5000);
    }
    

@@ -205,6 +205,9 @@ task ClubDJScraper {
 task LatinVideoRemixScraper {
     dependsOn newRelease('monitors.', 'LatinVideoRemix_Scraper_Monitor', '1.0.')
 }
+task LNRPScraper {
+    dependsOn newRelease('monitors.', 'LNRP_Scraper_Monitor', '1.0.')
+}
 task BuildScrapers {
 
 //    dependsOn AvDistrictScraper

@@ -39,6 +39,9 @@ public class MongoControl {
    public final MongoCollection<Document> clubDjVideosDownloaded;
    public final MongoCollection<Document> djcDownloadedCollection;
    public final MongoCollection<Document> latinVideoRemixDownloaded;
+   public final MongoCollection<Document> lateNightRPDownloaded;
+   
+   public final MongoCollection<Document> lateNightRPTracksDownloaded;
    
    public final MongoCollection<Document> tempTestCollection;
    
@@ -87,6 +90,8 @@ public class MongoControl {
       proVideo4DJsDownloaded = poolsDB.getCollection("proVideo4DJs");
       clubDjVideosDownloaded = poolsDB.getCollection("clubDjVideos");
       latinVideoRemixDownloaded = poolsDB.getCollection("latinVideoRemix");
+      lateNightRPDownloaded = poolsDB.getCollection("lateNightRP");
+      lateNightRPTracksDownloaded = poolsDB.getCollection(" lateNightRPTracks");
    
       tempTestCollection = poolsDB.getCollection("tempTestCollection");
    }

@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 import org.bson.Document;
 import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
-import scraper.clubdj.ClubDJScraper.FullInfo.VideosBean;
+import scraper.clubdj.ClubDJScraper.FullInfo.Video;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import static utils.ApiInterface.getClean;
 
 public class ClubDJScraper extends Scraper {
    
-   private List<VideosBean> videos;
+   private List<Video> videos;
    
    public ClubDJScraper() {
    
@@ -45,7 +45,7 @@ public class ClubDJScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterLoginStage() {
+   public void afterDriverCreation() {
       sleep(2500);
       setCookieForAPI();
       String response = getClean("http://www.clubdjvideos.com/videos/set/first?ascending=false&totalSize=1000&index=1&sortField=dateAdded&viewableSize=300",
@@ -72,7 +72,7 @@ public class ClubDJScraper extends Scraper {
    @Override
    protected List<String> scrapeLinks(String firstDate, String downloadDate) {
       List<String> scrapedLinks = new ArrayList<>();
-      for (VideosBean video : videos) {
+      for (Video video : videos) {
          String trackDate = new SimpleDateFormat(dateFormat)
            .format(video.getDateAdded());
          if (trackDate.equals(downloadDate)) {
@@ -95,11 +95,11 @@ public class ClubDJScraper extends Scraper {
    @Data
    public static class FullInfo {
       
-      private ListPositionBean listPosition;
-      private List<VideosBean> videos;
+      private ListPosition listPosition;
+      private List<Video> videos;
       
       @Data
-      public static class ListPositionBean {
+      public static class ListPosition {
          private Object title;
          private Object artist;
          private Object genre;
@@ -118,7 +118,7 @@ public class ClubDJScraper extends Scraper {
       }
       
       @Data
-      public static class VideosBean {
+      public static class Video {
          private int id;
          private String filename;
          private String title;

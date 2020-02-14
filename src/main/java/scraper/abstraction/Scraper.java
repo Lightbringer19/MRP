@@ -151,13 +151,13 @@ public abstract class Scraper extends Thread
    }
    
    @Override
-   public void loginStage() {
+   public void driverCreationStage() {
       if (loginAtFirstStage) {
          login();
       } else {
          getProfileDriver();
       }
-      afterLoginStage();
+      afterDriverCreation();
    }
    
    @SneakyThrows
@@ -199,10 +199,9 @@ public abstract class Scraper extends Thread
                                            String releaseName) {
       List<String> scrapedLinks = scrapeLinks(firstDate, downloadDate);
       if (scrapedLinks.size() > 0) {
-         writeLinksToDB(scrapedLinks,
-           releaseName + " " + formatDownloadDate(downloadDate));
-         downloadLinks(scrapedLinks,
-           releaseName + " " + formatDownloadDate(downloadDate));
+         String formattedDate = formatDownloadDate(downloadDate, dateFormat);
+         writeLinksToDB(scrapedLinks, releaseName + " " + formattedDate);
+         downloadLinks(scrapedLinks, releaseName + " " + formattedDate);
       }
    }
    
@@ -230,14 +229,6 @@ public abstract class Scraper extends Thread
            .insertOne(new Document("releaseName", releaseName)
              .append("scrapedLinks", scrapedLinks));
       }
-   }
-   
-   @SneakyThrows
-   protected String formatDownloadDate(String date) {
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(new SimpleDateFormat(dateFormat, Locale.US).parse(date));
-      cal.add(Calendar.DAY_OF_MONTH, 1);
-      return new SimpleDateFormat("ddMM").format(cal.getTime());
    }
    
    protected void scrapeAndDownloadPlaylist(String playlistName, String playListUrl) {
@@ -328,7 +319,7 @@ public abstract class Scraper extends Thread
    private class Driver {
       private void check() {
          try {
-            loginStage();
+            driverCreationStage();
             betweenStages();
             scrapingStage();
          } catch (Exception e) {

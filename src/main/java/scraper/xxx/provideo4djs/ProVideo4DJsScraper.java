@@ -44,7 +44,7 @@ public class ProVideo4DJsScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterLoginStage() {
+   public void afterDriverCreation() {
       driver.get("https://www.provideos4djs.com/index.php?action=downloads");
       sleep(2000);
    }

@@ -7,7 +7,7 @@ public interface ScraperInterface {
    default void beforeCheck() {
    }
    
-   default void loginStage() {
+   default void driverCreationStage() {
    }
    
    default void beforeLogin() {
@@ -16,7 +16,7 @@ public interface ScraperInterface {
    default void afterLogin() {
    }
    
-   default void afterLoginStage() {
+   default void afterDriverCreation() {
    }
    
    default void betweenStages() {

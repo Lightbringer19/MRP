@@ -85,6 +85,9 @@ public class YamlConfig {
       private String clubdj_password;
       private String latinvideoremix_username;
       private String latinvideoremix_password;
+      private String latenightrp_username;
+      private String latenightrp_password;
+      
       private Map<String, String> headlinerPlaylistsMap;
       private Map<String, String> myMp3PoolPlaylistsMap;
    }

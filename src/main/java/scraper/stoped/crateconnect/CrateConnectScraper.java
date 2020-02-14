@@ -51,7 +51,7 @@ public class CrateConnectScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   public void afterLoginStage() {
+   public void afterDriverCreation() {
       driver.get("https://crateconnect.net/record-pool");
       Thread.sleep(10_000);
       //sort by DATE

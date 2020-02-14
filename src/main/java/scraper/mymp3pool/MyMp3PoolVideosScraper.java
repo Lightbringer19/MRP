@@ -34,7 +34,7 @@ public class MyMp3PoolVideosScraper extends Scraper {
    }
    
    @Override
-   public void afterLoginStage() {
+   public void afterDriverCreation() {
       driver.get("https://mp3poolonline.com/videoview");
    }
    
@@ -98,7 +98,7 @@ public class MyMp3PoolVideosScraper extends Scraper {
    
    @Override
    @SneakyThrows
-   protected String formatDownloadDate(String date) {
+   public String formatDownloadDate(String date, String dateFormat) {
       Calendar cal = Calendar.getInstance();
       cal.setTime(new Date()); // get current year
       cal.set(Calendar.DAY_OF_MONTH, 1); // set to first day om the month
