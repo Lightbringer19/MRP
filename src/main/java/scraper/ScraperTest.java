@@ -1,9 +1,9 @@
 package scraper;
 
-import com.mongodb.client.MongoCollection;
-import mongodb.MongoControl;
-import org.bson.Document;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
@@ -12,83 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.mongodb.client.model.Filters.eq;
-
 public class ScraperTest {
    
    public static void main(String[] args) throws ParseException {
       String html = FUtils.readFile(new File("Files/source.html"));
-      // Document document = Jsoup.parse(html);
-      //
-      // String firstDate = document
-      //   .select("div[class=month-divider]")
-      //   .first().text().replace(" Videos", "");
-      //
-      // System.out.println(firstDate);
-      //
-      // String downloadDate = document
-      //   .select("div[class=month-divider]")
-      //   .stream()
-      //   .map(trackInfo -> trackInfo.text().replace(" Videos", ""))
-      //   .filter(date -> !date.equals(firstDate))
-      //   .findFirst()
-      //   .orElse(null);
+      Document document = Jsoup.parse(html);
       
-      // System.out.println(downloadDate);
+      String firstDate = document
+        .select("table[id=dl_table]>tbody>tr").first()
+        .select("td").get(2)
+        .text();
       
-      String downloadDate = null;
+      System.out.println(firstDate);
       
-      // String firstDate = "";
-      List<String> scrapedLinks = new ArrayList<>();
-      Jsoup.parse(html)
-        .select("div[class=innerPlayer1]")
+      String downloadDate = document
+        .select("table[id=dl_table]>tbody>tr")
         .stream()
-        .filter(release -> downloadDate == null || release.select("p").first().text()
-          .replace("Added On: ", "").equals(downloadDate))
-        .forEach(release -> release.select("div>ul>li")
-          .forEach(track -> {
-             track.select("div[class=track-title]").text();
-             track.select("div[class=download2 sub-section]>a")
-               .stream()
-               .map(link -> link.attr("href"))
-               .filter(downloadUrl -> downloadUrl.contains("download/"))
-               .forEach(scrapedLinks::add);
-          }));
+        .map(element -> element.select("td").get(2).text())
+        .filter(date -> !date.equals(firstDate))
+        .findFirst()
+        .orElse(null);
       
-      getStrings(scrapedLinks);
-      
-      List<String> oldScrape = new ArrayList<>();
-      for (int i = 0; i < scrapedLinks.size(); i++) {
-         String s = scrapedLinks.get(i);
-         if (i < 55) {
-            oldScrape.add(s + "%TSASDDASDFASDFA");
-         } else {
-            oldScrape.add(s);
+      System.out.println(downloadDate);
+      Elements trackInfos = Jsoup.parse(html).select("table[id=dl_table]>tbody>tr");
+      for (Element trackInfo : trackInfos) {
+         String trackDate = trackInfo.select("td").get(2).text();
+         if (trackDate.equals(downloadDate)) {
+            String trackName = trackInfo.select("td").get(1).text();
+            String downloadPartLink = trackInfo.select("td").get(1)
+              .select("a").attr("href");
+            String downloadUrl = "https://www.masspoolmp3.com" + downloadPartLink.replaceAll(" ", "%20");
+            System.out.println(trackName + " | " + downloadUrl);
          }
-      }
-      // scrapedLinks.clear();
-      // scrapedLinks.addAll(oldScrape);
-      // compareLists(scrapedLinks, oldScrape);
-      
-      MongoControl mongoControl = new MongoControl();
-      MongoCollection<Document> downloaded = mongoControl.mp3PoolDownloaded;
-      
-      String playlistName = "TEST";
-      Document playlistInDb = downloaded.find(eq("playlistName", playlistName)).first();
-      if (playlistInDb != null) {
-         List<String> scrapedLinksInDb = (List<String>) playlistInDb.get("scrapedLinks");
-         int changedPercent = compareLists(scrapedLinks, scrapedLinksInDb);
-         if (changedPercent > 50) {
-            System.out.println("UPDATED");
-            playlistInDb.put("scrapedLinks", scrapedLinks);
-            downloaded.findOneAndReplace(eq("playlistName", playlistName), playlistInDb);
-            // downloaded.insertOne(playlistInDb);
-         }
-      } else {
-         System.out.println("INSERTED NEW");
-         downloaded.insertOne(new Document()
-           .append("playlistName", playlistName)
-           .append("scrapedLinks", scrapedLinks));
       }
    }
    

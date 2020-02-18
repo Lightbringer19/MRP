@@ -1,6 +1,7 @@
 package tag_editor;
 
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import utils.CheckDate;
 import utils.Constants;
 import utils.FUtils;
@@ -8,6 +9,7 @@ import utils.FUtils;
 import java.io.File;
 
 import static tag_editor.TagEditor.editMP3;
+import static utils.Constants.filesDir;
 import static utils.Constants.tagsDir;
 import static utils.Log.write;
 
@@ -39,39 +41,50 @@ public class TagRunnerMain extends Thread {
       }
    }
    
+   @SneakyThrows
    private static void editRecordPool(File infoFile, File folderToEdit, String category) {
       // Edit tags in folder
       write("Editing Folder: " + folderToEdit.getName(), "Tagger");
       File[] RecordPoolFolder = folderToEdit.listFiles();
       if (RecordPoolFolder != null) {
-         for (File RPfile : RecordPoolFolder) {
-            if (RPfile.getName().toLowerCase().endsWith(".mp3")) {
-               category = "RECORDPOOL MUSIC";
-               break;
-            }
-            if (RPfile.getName().toLowerCase().endsWith(".mp4")) {
-               category = "RECORDPOOL VIDEOS";
-               break;
-            }
-         }
+         category = getSubCategory(category, RecordPoolFolder);
          if (category.equals("RECORDPOOL MUSIC")) {
             for (File file : folderToEdit.listFiles()) {
                if (file.getName().toLowerCase().endsWith(".mp3")) {
                   editMP3(file);
                }
             }
-         } else {
+         } else if (category.equals("RECORDPOOL VIDEOS")) {
             for (File file : folderToEdit.listFiles()) {
                if (file.getName().toLowerCase().endsWith(".mp4")) {
                   TagEditor.EditMP4(file);
                }
             }
+         } else {
+            write("Folder Has No Mp3 or Mp4 files: " + folderToEdit.getName(), "Tagger");
+            FileUtils.moveFileToDirectory(infoFile,
+              new File(filesDir + "NOT-POSTED"), true);
+            return;
          }
          write("Folder Edited: " + folderToEdit.getName(), "Tagger");
          FUtils.writeFile(Constants.uploadDir, folderToEdit.getName() + ".json",
            folderToEdit.getAbsolutePath());
       }
       infoFile.delete();
+   }
+   
+   private static String getSubCategory(String category, File[] recordPoolFolder) {
+      for (File RPfile : recordPoolFolder) {
+         if (RPfile.getName().toLowerCase().endsWith(".mp3")) {
+            category = "RECORDPOOL MUSIC";
+            break;
+         }
+         if (RPfile.getName().toLowerCase().endsWith(".mp4")) {
+            category = "RECORDPOOL VIDEOS";
+            break;
+         }
+      }
+      return category;
    }
    
    @SneakyThrows

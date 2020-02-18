@@ -1,8 +1,8 @@
 package scraper;
 
+import lombok.SneakyThrows;
 import scraper.avdistrict.AvDistrictApiService;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -10,7 +10,9 @@ import java.util.Date;
 import java.util.Locale;
 
 public class JustTest implements AvDistrictApiService {
-   public static void main(String[] args) throws IOException, ParseException {
+   @SneakyThrows
+   public static void main(String[] args) {
+   
    }
    
    public static boolean releaseIsOld(String dateFormat, String date) throws ParseException {

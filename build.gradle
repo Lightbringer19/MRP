@@ -48,6 +48,9 @@ dependencies {
 
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.24'
     compile group: 'io.projectreactor', name: 'reactor-core', version: '3.2.11.RELEASE'
+
+    compile group: 'net.lingala.zip4j', name: 'zip4j', version: '2.3.1'
+
 }
 
 class MyShadow extends ShadowJar {
@@ -185,7 +188,7 @@ task MaletaDvjScraper {
     dependsOn newRelease('monitors.', 'MaletaDvj_Scraper_Monitor', '2.0.')
 }
 task MassPoolScraper {
-    dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '2.0.')
+    dependsOn newRelease('monitors.', 'MassPool_Scraper_Monitor', '3.0.')
 }
 task AvDistrictScraper {
     dependsOn newRelease('monitors.', 'AvDistrict_Scraper_Monitor', '1.0.')
