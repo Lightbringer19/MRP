@@ -1,5 +1,6 @@
 package scraper.mymp3pool;
 
+import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.openqa.selenium.By;
 import scraper.abstraction.Scraper;
@@ -32,6 +33,12 @@ public class MyMp3PoolScraper extends Scraper {
    public static void main(String[] args) {
       MyMp3PoolScraper myMp3PoolScraper = new MyMp3PoolScraper();
       myMp3PoolScraper.run();
+   }
+   
+   @Override
+   @SneakyThrows
+   public void afterLogin() {
+      sleep(2000);
    }
    
    @Override
