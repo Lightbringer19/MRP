@@ -2,6 +2,7 @@ package scraper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ScraperTest {
    
@@ -16,9 +18,10 @@ public class ScraperTest {
       String html = FUtils.readFile(new File("Files/source.html"));
       Document document = Jsoup.parse(html);
       
-      document.select("li[class=set]")
+      Stream<Elements> elementsStream = document.select("li[class=set]")
         .stream()
-        .map(element -> element.select("div[class=set-title]"))
+        .map(element -> element.select("div[class=set-title]"));
+      elementsStream
         .forEach(element -> System.out.println(
           element.text().toLowerCase().replaceAll(" ", "-")));
       

@@ -86,9 +86,13 @@ public interface DownloadInterface {
          File mp3File = new File(pathname);
          getLogger().log("Downloading: " + fileName + " | " + downloadUrl
            + " | " + response.getStatusLine());
-         @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
-         response.getEntity().writeTo(outputStream);
-         getLogger().log("Downloaded: " + fileName);
+         if (response.getStatusLine().getStatusCode() != 403) {
+            @Cleanup OutputStream outputStream = new FileOutputStream(mp3File);
+            response.getEntity().writeTo(outputStream);
+            getLogger().log("Downloaded: " + fileName);
+         } else {
+            getLogger().log("Not Downloaded: " + fileName);
+         }
       } catch (Exception e) {
          getLogger().log(e);
       }

@@ -234,32 +234,36 @@ public abstract class Scraper extends Thread
    }
    
    protected void scrapeAndDownloadPlaylist(String playlistName, String playListUrl) {
-      setCookieForAPI();
-      logger.log("Scraping: " + playlistName);
-      List<String> scrapedLinks = scrapePlaylist(playListUrl);
-      Document playlistInDb = downloaded.find(eq("playlistName", playlistName)).first();
-      if (playlistInDb != null) {
-         List<String> scrapedLinksInDb = (List<String>) playlistInDb.get("scrapedLinks");
-         int changedPercent = getChangedPercent(scrapedLinks, scrapedLinksInDb);
-         if (changedPercent > 70) {
-            downloadPlaylist(playlistName, scrapedLinks);
-            playlistInDb.put("scrapedLinks", scrapedLinks);
-            downloaded.findOneAndReplace(eq("playlistName", playlistName), playlistInDb);
+      try {
+         setCookieForAPI();
+         logger.log("Scraping: " + playlistName);
+         List<String> scrapedLinks = scrapePlaylist(playListUrl);
+         Document playlistInDb = downloaded.find(eq("playlistName", playlistName)).first();
+         if (playlistInDb != null) {
+            List<String> scrapedLinksInDb = (List<String>) playlistInDb.get("scrapedLinks");
+            int changedPercent = getChangedPercent(scrapedLinks, scrapedLinksInDb);
+            if (changedPercent > 70) {
+               downloadPlaylist(playlistName, scrapedLinks);
+               playlistInDb.put("scrapedLinks", scrapedLinks);
+               downloaded.findOneAndReplace(eq("playlistName", playlistName), playlistInDb);
+            }
+         } else {
+            if (downloadFirstTimeScrapedPlaylist) {
+               downloadPlaylist(playlistName, scrapedLinks);
+            }
+            downloaded.insertOne(new Document()
+              .append("playlistName", playlistName)
+              .append("scrapedLinks", scrapedLinks));
          }
-      } else {
-         if (downloadFirstTimeScrapedPlaylist) {
-            downloadPlaylist(playlistName, scrapedLinks);
-         }
-         downloaded.insertOne(new Document()
-           .append("playlistName", playlistName)
-           .append("scrapedLinks", scrapedLinks));
+      } catch (Exception e) {
+         logger.log(e);
       }
    }
    
    protected void downloadPlaylist(String playlistName, List<String> scrapedLinks) {
       String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
       String playlistReleaseName =
-        releaseName + " " + playlistName + " Playlist " + date;
+        releaseName + " " + playlistName.replaceAll(":", "") + " Playlist " + date;
       writeLinksToDB(scrapedLinks, playlistReleaseName);
       setCookieForAPI();
       downloadLinks(scrapedLinks, playlistReleaseName);
