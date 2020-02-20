@@ -2,8 +2,6 @@ package scraper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import utils.FUtils;
 
 import java.io.File;
@@ -18,33 +16,39 @@ public class ScraperTest {
       String html = FUtils.readFile(new File("Files/source.html"));
       Document document = Jsoup.parse(html);
       
-      String firstDate = document
-        .select("table[id=dl_table]>tbody>tr").first()
-        .select("td").get(2)
-        .text();
-      
-      System.out.println(firstDate);
-      
-      String downloadDate = document
-        .select("table[id=dl_table]>tbody>tr")
+      document.select("li[class=set]")
         .stream()
-        .map(element -> element.select("td").get(2).text())
-        .filter(date -> !date.equals(firstDate))
-        .findFirst()
-        .orElse(null);
+        .map(element -> element.select("div[class=set-title]"))
+        .forEach(element -> System.out.println(
+          element.text().toLowerCase().replaceAll(" ", "-")));
       
-      System.out.println(downloadDate);
-      Elements trackInfos = Jsoup.parse(html).select("table[id=dl_table]>tbody>tr");
-      for (Element trackInfo : trackInfos) {
-         String trackDate = trackInfo.select("td").get(2).text();
-         if (trackDate.equals(downloadDate)) {
-            String trackName = trackInfo.select("td").get(1).text();
-            String downloadPartLink = trackInfo.select("td").get(1)
-              .select("a").attr("href");
-            String downloadUrl = "https://www.masspoolmp3.com" + downloadPartLink.replaceAll(" ", "%20");
-            System.out.println(trackName + " | " + downloadUrl);
-         }
-      }
+      // String firstDate = document
+      //   .select("table[id=dl_table]>tbody>tr").first()
+      //   .select("td").get(2)
+      //   .text();
+      //
+      // System.out.println(firstDate);
+      //
+      // String downloadDate = document
+      //   .select("table[id=dl_table]>tbody>tr")
+      //   .stream()
+      //   .map(element -> element.select("td").get(2).text())
+      //   .filter(date -> !date.equals(firstDate))
+      //   .findFirst()
+      //   .orElse(null);
+      //
+      // System.out.println(downloadDate);
+      // Elements trackInfos = Jsoup.parse(html).select("table[id=dl_table]>tbody>tr");
+      // for (Element trackInfo : trackInfos) {
+      //    String trackDate = trackInfo.select("td").get(2).text();
+      //    if (trackDate.equals(downloadDate)) {
+      //       String trackName = trackInfo.select("td").get(1).text();
+      //       String downloadPartLink = trackInfo.select("td").get(1)
+      //         .select("a").attr("href");
+      //       String downloadUrl = "https://www.masspoolmp3.com" + downloadPartLink.replaceAll(" ", "%20");
+      //       System.out.println(trackName + " | " + downloadUrl);
+      //    }
+      // }
    }
    
    private static int compareLists(List<String> scrapedLinks, List<String> oldScrape) {

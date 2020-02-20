@@ -15,8 +15,10 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.ProfilesIni;
 import utils.Constants;
+import utils.FUtils;
 import utils.Logger;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -300,6 +302,20 @@ public abstract class Scraper extends Thread
          nextPage();
       }
       sleep(666666666);
+   }
+   
+   protected void scrapingTesting() {
+      String html = FUtils.readFile(new File("Files/source.html"));
+      
+      String firstDate = scrapeFirstDate(html);
+      System.out.println("First date: " + firstDate);
+      String downloadDate = previousDateOnThisPage(html, firstDate);
+      System.out.println("Download date: " + firstDate);
+      
+      List<String> scrapedLinks = new ArrayList<>();
+      scrapeAllLinksOnPage(html, downloadDate, firstDate, scrapedLinks);
+      System.out.println("Scraped Links:");
+      scrapedLinks.forEach(System.out::println);
    }
    
    @Override

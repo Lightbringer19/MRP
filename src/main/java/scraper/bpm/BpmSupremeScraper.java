@@ -1,6 +1,7 @@
 package scraper.bpm;
 
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -9,11 +10,15 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import scraper.abstraction.Scraper;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.text.MessageFormat.format;
+import static java.util.stream.Collectors.toList;
 
 public class BpmSupremeScraper extends Scraper implements BpmApiService {
+   
+   private boolean scrapeAll = false;
    
    public BpmSupremeScraper() {
       USERNAME = yamlConfig.getBpm_username();
@@ -44,7 +49,49 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
    public void afterDriverCreation() {
       urlToGet = "https://app.bpmsupreme.com/new-releases/classic/audio";
       driver.get(urlToGet);
-      Thread.sleep(10_000);
+      sleep(10_000);
+   }
+   
+   @Override
+   public void scrapingStage() {
+      mainOperation();
+      scrapePlaylists();
+   }
+   
+   @SneakyThrows
+   private void scrapePlaylists() {
+      scrapeAll = true;
+      List<String> playlists = getPlaylists();
+      scrapeAllPlaylists(playlists);
+      scrapeAll = false;
+   }
+   
+   private void scrapeAllPlaylists(List<String> playlists) {
+      String plUrl = "https://app.bpmsupreme.com/playlists/";
+      playlists.forEach(playlistName -> scrapeAndDownloadPlaylist(playlistName,
+        plUrl + playlistName.toLowerCase().replaceAll(" ", "-")));
+   }
+   
+   @NotNull
+   private List<String> getPlaylists() throws InterruptedException {
+      driver.get("https://app.bpmsupreme.com/playlists");
+      sleep(10_000);
+      return Jsoup.parse(getPageSource())
+        .select("li[class=set]")
+        .stream()
+        .map(element -> element.select("div[class=set-title]").text())
+        .collect(toList());
+   }
+   
+   @Override
+   @SneakyThrows
+   public List<String> scrapePlaylist(String playListUrl) {
+      driver.get(playListUrl);
+      sleep(10_000);
+      List<String> scrapedLinks = new ArrayList<>();
+      scrapeAllLinksOnPage(getPageSource(), null, null, scrapedLinks);
+      operationWithLinksAfterScrape(scrapedLinks);
+      return scrapedLinks;
    }
    
    @Override
@@ -55,7 +102,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
       // SCRAPE VIDEOS AND DOWNLOAD
       urlToGet = "https://app.bpmsupreme.com/new-releases/classic/video";
       driver.get(urlToGet);
-      Thread.sleep(10_000);
+      sleep(10_000);
       logger.log("Looking for Video Release");
       scrapeAndDownloadRelease(firstDate, downloadDate,
         releaseName + " Videos");
@@ -86,7 +133,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
         .select("div[class*=row-item-album]");
       for (Element trackInfo : trackInfos) {
          String date = trackInfo.select("div[class=col-created_at link]").text();
-         if (date.equals(downloadDate)) {
+         if (date.equals(downloadDate) || scrapeAll) {
             String title = trackInfo.select("div[class=row-track-name]").first().text();
             String artist = trackInfo.select("div[class=row-artist]").first().text();
             Elements tags = trackInfo.select("div[class=row-tags]").first()
@@ -98,27 +145,10 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
                   pattern = pattern.replace("/audio/", "/video/");
                   pattern = pattern.replace(".mp3", ".mp4");
                }
-               String downloadUrl = MessageFormat.format(
-                 pattern,
+               String downloadUrl = format(pattern,
                  artist, title, tag.text());
                System.out.println(downloadUrl);
                scrapedLinks.add(downloadUrl);
-               
-              /* String trackId = tag.attr("id")
-                 .replace("New Releases_media_tag_", "");
-               String linkForApi = MessageFormat.format(
-                 "https://api.bpmsupreme.com/v1.2/media/{0}/download?crate=false",
-                 trackId);
-               List<String> info = getDownloadInfo(linkForApi);
-               if (info != null) {
-                  String downloadUrl = info.get(0);
-                  cookieForAPI = info.get(1);
-                  String trackType = tag.text();
-                  logger.log(
-                    MessageFormat.format("{0} - {1} ({2}) | {3}",
-                      artist, title, tag.text(), downloadUrl));
-                  scrapedLinks.add(downloadUrl);
-               }*/
             }
          }
       }
@@ -129,7 +159,7 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
       List<String> formattedLinks = scrapedLinks
         .stream()
         .map(url -> url.replaceAll(" ", "%20"))
-        .collect(Collectors.toList());
+        .collect(toList());
       scrapedLinks.clear();
       scrapedLinks.addAll(formattedLinks);
    }
@@ -142,6 +172,6 @@ public class BpmSupremeScraper extends Scraper implements BpmApiService {
       element.sendKeys(Keys.chord(Keys.CONTROL, Keys.BACK_SPACE));
       element.sendKeys(String.valueOf(value + 1));
       element.sendKeys(Keys.ENTER);
-      Thread.sleep(10_000);
+      sleep(10_000);
    }
 }
