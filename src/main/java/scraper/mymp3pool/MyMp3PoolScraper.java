@@ -38,11 +38,17 @@ public class MyMp3PoolScraper extends Scraper {
    public void scrapingStage() {
       //scrape audio
       mainOperation();
-      //scrape video
+      scrapeVideos();
+      scrapeAllPlaylists();
+   }
+   
+   public void scrapeVideos() {
       driver.get("https://mp3poolonline.com/videoview");
       myMp3PoolVideosScraper.setDriver(driver);
       myMp3PoolVideosScraper.mainOperation();
-      //scrape all playlists
+   }
+   
+   public void scrapeAllPlaylists() {
       myMp3PoolPlaylistMap
         .forEach(this::scrapeAndDownloadPlaylist);
    }
